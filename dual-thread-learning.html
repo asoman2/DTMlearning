@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian · The Dual Thread — Utility and Wisdom in the Same Education Moment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F2F4F9;--s:#FFF;--s2:#ECF0F8;--s3:#E0E5F2;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);
+  --ink:#13202E;--ink2:#384E68;--ink3:#677A96;--ink4:#A2B2C6;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  /* The two threads */
+  --util:#1E40AF;   --utill:#EFF2FF;   --utilb:rgba(30,64,175,.18);
+  --wisd:#065F46;   --wisdl:#ECFDF5;   --wisdb:rgba(6,95,70,.18);
+  /* Historical data layer */
+  --hist:#78350F;   --histl:#FFFBEB;   --histb:rgba(120,53,15,.18);
+  /* Synthesis */
+  --syn:#4C1D95;    --synl:#F5F3FF;    --synb:rgba(76,29,149,.18);
+  --gold:#92400E;   --goldl:#FFFBEB;   --goldb:rgba(146,64,14,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 18px rgba(0,0,0,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.58;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 36px;gap:14px;position:sticky;top:0;z-index:100}
+.nav-mark{width:28px;height:28px;background:var(--syn);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:14px;height:14px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-chips{display:flex;gap:6px}
+.nch{font-size:10px;font-weight:600;padding:3px 9px;border-radius:3px;border:1px solid;white-space:nowrap}
+.nch-u{background:rgba(30,64,175,.2);border-color:rgba(30,64,175,.4);color:#93C5FD}
+.nch-w{background:rgba(6,95,70,.2);border-color:rgba(6,95,70,.4);color:#6EE7B7}
+
+/* MASTHEAD */
+.mast{background:linear-gradient(160deg,#0A1628 0%,#0F1E3A 50%,#142640 100%);padding:68px 36px 52px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(30,64,175,.08) 0%,transparent 40%,rgba(6,95,70,.08) 100%);pointer-events:none}
+.mast-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.mast-h1{font-family:var(--serif);font-size:clamp(30px,4vw,50px);font-weight:400;color:#fff;line-height:1.08;margin-bottom:16px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-h1 em.green{color:#6EE7B7}
+.mast-lead{font-size:15px;color:rgba(255,255,255,.5);line-height:1.8;max-width:700px;margin-bottom:28px}
+
+/* THE CENTRAL INSIGHT BOX */
+.insight-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:22px 26px;max-width:840px;margin-bottom:32px}
+.ib-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.28);margin-bottom:12px}
+.ib-statement{font-family:var(--serif);font-size:19px;font-weight:400;color:rgba(255,255,255,.9);line-height:1.45;margin-bottom:14px}
+.ib-statement em{font-style:italic;color:#93C5FD}
+.ib-elaboration{font-size:13px;color:rgba(255,255,255,.5);line-height:1.72}
+.ib-elaboration strong{color:rgba(255,255,255,.75);font-weight:500}
+
+.mast-stats{display:flex;gap:24px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:22px}
+.ms{} .ms-val{font-family:var(--serif);font-size:22px;color:#fff;line-height:1;margin-bottom:3px}
+.ms-lbl{font-size:10px;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.07em}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:48px 36px 96px}
+.sec{margin-bottom:56px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1.5px solid var(--s3)}
+.sec-n{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.07em}
+.sec-title{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1}
+.sec-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid}
+.prose{font-size:14px;color:var(--ink2);line-height:1.84;margin-bottom:22px;max-width:820px}
+.prose strong{color:var(--ink);font-weight:600}
+.prose em{font-style:italic;color:var(--ink3)}
+
+/* THREAD COMPARISON */
+.thread-compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--b2);border-radius:12px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px}
+.tc-col{padding:22px 24px}
+.tc-util{background:var(--utill);border-right:1px solid var(--utilb)}
+.tc-wisd{background:var(--wisdl)}
+.tc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.tc-util .tc-label{color:var(--util)}
+.tc-wisd .tc-label{color:var(--wisd)}
+.tc-title{font-family:var(--serif);font-size:18px;font-weight:400;margin-bottom:10px;line-height:1.3}
+.tc-util .tc-title{color:var(--util)}
+.tc-wisd .tc-title{color:var(--wisd)}
+.tc-def{font-size:13px;line-height:1.72;margin-bottom:14px}
+.tc-util .tc-def{color:#1E3A8A}
+.tc-wisd .tc-def{color:#064E3B}
+.tc-qualities{display:flex;flex-direction:column;gap:4px}
+.tc-quality{font-size:12px;display:flex;gap:7px;align-items:flex-start;line-height:1.45}
+.tc-quality::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.tc-util .tc-quality{color:#1E3A8A} .tc-util .tc-quality::before{background:var(--util)}
+.tc-wisd .tc-quality{color:#064E3B} .tc-wisd .tc-quality::before{background:var(--wisd)}
+
+/* HISTORICAL DATA AS KNOWLEDGE BASE */
+.hist-band{background:var(--histl);border:1px solid var(--histb);border-radius:12px;padding:22px 26px;margin-bottom:28px}
+.hb-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--hist);margin-bottom:10px}
+.hb-title{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--hist);margin-bottom:10px;line-height:1.3}
+.hb-text{font-size:13px;color:#451A03;line-height:1.75;max-width:820px}
+.hb-text strong{color:var(--hist);font-weight:600}
+
+/* DUAL THREAD MOMENTS */
+.dt-flow{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.dt-moment{background:var(--s);border:1px solid var(--b);border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.dt-moment-head{display:grid;grid-template-columns:200px 1fr;gap:0;border-bottom:1px solid var(--b)}
+.dtm-left{padding:14px 16px;background:var(--s2);border-right:1px solid var(--b)}
+.dtm-trigger-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:4px}
+.dtm-trigger{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:4px}
+.dtm-who{font-size:11px;color:var(--ink3)}
+.dtm-right{padding:14px 16px}
+.dtm-data-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--hist);margin-bottom:4px}
+.dtm-data{font-size:12px;color:#451A03;line-height:1.55;font-style:italic}
+.dt-threads{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.dt-thread{padding:14px 16px}
+.dt-thread-u{border-right:1px solid var(--b)}
+.dt-thread-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+.dt-thread-u .dt-thread-label{color:var(--util)}
+.dt-thread-w .dt-thread-label{color:var(--wisd)}
+.dt-thread-content{font-size:12px;line-height:1.65}
+.dt-thread-u .dt-thread-content{color:#1E3A8A}
+.dt-thread-w .dt-thread-content{color:#064E3B}
+.dt-thread-content strong{font-weight:600}
+.dt-bridge{background:var(--synl);border-top:1px solid var(--synb);padding:10px 16px;font-size:12px;color:#4C1D95;line-height:1.55;font-style:italic}
+.dt-bridge-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--syn);margin-right:6px}
+
+/* THE MIGRATION WINDOW */
+.migration-window{background:var(--navy);border-radius:12px;padding:28px 32px;margin-bottom:28px}
+.mw-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:10px}
+.mw-title{font-family:var(--serif);font-size:22px;font-weight:400;color:#fff;margin-bottom:12px;line-height:1.3}
+.mw-title em{font-style:italic;color:#93C5FD}
+.mw-text{font-size:13px;color:rgba(255,255,255,.55);line-height:1.78;max-width:820px;margin-bottom:16px}
+.mw-text strong{color:rgba(255,255,255,.85);font-weight:500}
+.mw-timeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mw-node{padding:6px 13px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid}
+.mw-node-before{background:rgba(30,64,175,.15);border-color:rgba(30,64,175,.3);color:#93C5FD}
+.mw-node-during{background:rgba(76,29,149,.25);border-color:rgba(76,29,149,.4);color:#C4B5FD;font-size:12px;padding:8px 16px}
+.mw-node-after{background:rgba(6,95,70,.15);border-color:rgba(6,95,70,.3);color:#6EE7B7}
+.mw-arrow{color:rgba(255,255,255,.2);font-size:14px}
+.mw-note{font-size:11px;color:rgba(255,255,255,.35);margin-top:12px;font-style:italic}
+
+/* REFLECTION CADENCE */
+.reflect-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+.ref-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:15px 17px;box-shadow:var(--sh);border-top:3px solid}
+.ref-timing{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px}
+.ref-q{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px;line-height:1.3;font-style:italic}
+.ref-q::before{content:'"';font-family:var(--serif);font-size:18px;color:var(--ink4);margin-right:2px;vertical-align:-4px}
+.ref-q::after{content:'"';font-family:var(--serif);font-size:18px;color:var(--ink4);margin-left:2px;vertical-align:-4px}
+.ref-data{font-size:11px;border-radius:5px;padding:7px 10px;margin-bottom:7px;line-height:1.5}
+.ref-roles{display:flex;gap:4px;flex-wrap:wrap}
+.ref-role{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--s2);color:var(--ink3);border:1px solid var(--b)}
+
+/* WHAT CHANGES */
+.change-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.cc-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.cc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--b)}
+.cc-items{display:flex;flex-direction:column;gap:7px}
+.cc-item{font-size:12px;color:var(--ink2);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.cc-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:8px}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:12px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.callout svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-syn{background:var(--synl);border:1px solid var(--synb)} .co-syn svg{color:var(--syn)} .co-syn .callout-text{color:#3B0764} .co-syn .callout-text strong{color:var(--syn)}
+.co-hist{background:var(--histl);border:1px solid var(--histb)} .co-hist svg{color:var(--hist)} .co-hist .callout-text{color:#451A03} .co-hist .callout-text strong{color:var(--hist)}
+.co-wisd{background:var(--wisdl);border:1px solid var(--wisdb)} .co-wisd svg{color:var(--wisd)} .co-wisd .callout-text{color:#064E3B} .co-wisd .callout-text strong{color:var(--wisd)}
+
+/* WISDOM SPIRAL */
+.spiral-diagram{background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:24px 28px;box-shadow:var(--sh);margin-bottom:28px}
+.sd-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:18px}
+.spiral-steps{display:flex;flex-direction:column;gap:0}
+.ss-row{display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:start}
+.ss-connector{width:1px;height:20px;background:var(--s3);margin-left:23px}
+.ss-circle{width:48px;height:48px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);background:var(--s)}
+.ss-body{padding-top:8px;padding-bottom:16px}
+.ss-phase{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.ss-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.ss-util{font-size:12px;margin-bottom:4px;padding:6px 10px;border-radius:5px;line-height:1.5}
+.ss-wisd{font-size:12px;padding:6px 10px;border-radius:5px;line-height:1.5}
+.ss-util-wrap{background:var(--utill);border:1px solid var(--utilb)} .ss-util-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--util);margin-bottom:2px}
+.ss-wisd-wrap{background:var(--wisdl);border:1px solid var(--wisdb)} .ss-wisd-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--wisd);margin-bottom:2px}
+
+.doc-footer{background:var(--navy);padding:22px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:860px){
+  .nav,.mast,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .thread-compare,.dt-threads,.reflect-grid,.change-compare,.dt-moment-head{grid-template-columns:1fr}
+  .dt-thread-u{border-right:none;border-bottom:1px solid var(--b)}
+  .mast-h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.3"/><path d="M7 4v4M7 9.5v.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Meridian Building Group</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">The Dual Thread — Utility and Wisdom</span>
+  <div class="nav-sp"></div>
+  <div class="nav-chips">
+    <span class="nch nch-u">Utilitarian thread</span>
+    <span class="nch nch-w">Wisdom thread</span>
+  </div>
+</nav>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-kicker">Education philosophy · Historical data as knowledge base · Dual-mode learning</div>
+    <h1 class="mast-h1">The data being migrated<br>is not just records — <em>it is memory.</em><br>The migration is not just a move — <em class="green">it is a reading.</em></h1>
+    <p class="mast-lead">Nine years of wins and losses, seasonal compressions, cost overruns, profitable jobs and margin-destroying ones are encoded in those 10 QBDT files. The utilitarian approach moves them cleanly and verifies the mapping. The wisdom approach asks what they reveal — and designs education touchpoints that carry both questions simultaneously. This document argues that these two modes are not in tension. The migration window is the only moment when they are naturally, simultaneously present.</p>
+
+    <div class="insight-box">
+      <div class="ib-label">The central argument</div>
+      <div class="ib-statement">The lived experience of the business <em>is already in the data.</em> The migration is the first time anyone has read all of it at once. That reading — which happens anyway for technical reasons — is also the most powerful wisdom-building event in Meridian's recent history, if it is designed to be.</div>
+      <div class="ib-elaboration">Before migration: 10 silos. Each file knows its own jobs, its own payroll, its own cash cycles. Nobody sees the whole. After migration: one integrated picture — every job, every dollar, every paycheck, every pattern, from all 10 states simultaneously for the first time. <strong>The moment of migration is the moment the company becomes fully visible to itself.</strong> That visibility is both a utility (better reporting) and a wisdom opportunity (better understanding). The question is whether the education is designed to honour both.</div>
+    </div>
+
+    <div class="mast-stats">
+      <div class="ms"><div class="ms-val">9</div><div class="ms-lbl">Years of lived experience in the data</div></div>
+      <div class="ms"><div class="ms-val">2</div><div class="ms-lbl">Learning threads, simultaneously active</div></div>
+      <div class="ms"><div class="ms-val">1</div><div class="ms-lbl">Window when both are naturally present</div></div>
+      <div class="ms"><div class="ms-val">7</div><div class="ms-lbl">Dual-thread education moments</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<!-- ══ 1. THE TWO MODES ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">01 —</span>
+    <span class="sec-title">The two modes — what each produces and what each cannot</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--syn);border-color:var(--synb);background:var(--synl)">Philosophical ground</span>
+  </div>
+
+  <div class="thread-compare">
+    <div class="tc-col tc-util">
+      <div class="tc-label">Thread 1 · Utilitarian</div>
+      <div class="tc-title">Competence at a defined task</div>
+      <div class="tc-def">The utilitarian thread teaches people to do specific things with IES — find a pay stub, run payroll, check job cost, approve an invoice. It is calibrated to immediate need, low cognitive load, and fast competence. Its measure of success is: can the person perform the task independently within a defined time?</div>
+      <div class="tc-qualities">
+        <div class="tc-quality">Reduces uncertainty quickly — the person knows exactly what to do next</div>
+        <div class="tc-quality">Measurable — north-star scenarios, usage logs, task completion rates</div>
+        <div class="tc-quality">Transferable across tools — these skills migrate when the tool changes again</div>
+        <div class="tc-quality">Calibrated for stress — works when cognitive load is high</div>
+        <div class="tc-quality">What it cannot do: produce judgment, transfer to novel situations, or survive a question the task instruction didn't anticipate</div>
+      </div>
+    </div>
+    <div class="tc-col tc-wisd">
+      <div class="tc-label">Thread 2 · Wisdom</div>
+      <div class="tc-title">Understanding that generalises and persists</div>
+      <div class="tc-def">The wisdom thread builds a mental model of the business — why the system is structured the way it is, what the historical patterns reveal, how a decision made today connects to an outcome that won't be visible for 6 months. Its measure of success is: has the person's judgment about their domain improved in a way that survives novel situations?</div>
+      <div class="tc-qualities">
+        <div class="tc-quality">Produces adaptation — the person can handle situations the training didn't cover</div>
+        <div class="tc-quality">Accumulates over time — each new experience enriches the model</div>
+        <div class="tc-quality">Survives tool changes — the underlying business understanding persists even when IES is replaced by something else in 10 years</div>
+        <div class="tc-quality">Requires reflection — cannot be acquired through instruction alone; requires the learner to make meaning from experience</div>
+        <div class="tc-quality">What it cannot do: be delivered quickly, be measured with a pass/fail test, or be forced — it must be grown</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="prose">The tension that appears to exist between these modes is mostly a tension about <strong>sequencing and cognitive load</strong>, not about fundamental incompatibility. Wisdom cannot precede competence — a Payroll Manager who doesn't trust the first IES payroll cannot reflect on what the payroll history reveals about the business. But utility education that is designed with no aperture for the wisdom thread will permanently foreclose the reflective mode. The person builds competence, automation sets in, and the window for building understanding closes.</p>
+
+  <div class="callout co-syn">
+    <svg viewBox="0 0 13 13" fill="none" width="13" height="13"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 5.5v3.5M6.5 4v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>The key design principle:</strong> utility education should always leave a door open for the wisdom thread — a question, an observation, a pattern surfaced in passing — even when the primary purpose of the moment is task instruction. The door does not have to be walked through immediately. It just has to remain open long enough for the learner to return to it when they are ready.</div>
+  </div>
+</section>
+
+<!-- ══ 2. HISTORICAL DATA AS THE BINDING AGENT ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">02 —</span>
+    <span class="sec-title">The historical data as the binding agent</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--hist);border-color:var(--histb);background:var(--histl)">The unique opportunity</span>
+  </div>
+
+  <div class="hist-band">
+    <div class="hb-label">What the historical data actually is</div>
+    <div class="hb-title">Nine years of decision outcomes, encoded in transactions</div>
+    <div class="hb-text">Every job cost entry is a record of a decision that was made — to hire this subcontractor, to quote this price, to absorb this change order rather than fight it. Every cash compression in January is a structural pattern that repeats because of how construction billing cycles work in the states where Meridian operates. Every anomalous payroll month is an event — a prevailing wage dispute, a rushed hire, a workers' comp claim. <strong>The data is not neutral records. It is the company's autobiography of learning, failure, adaptation, and success.</strong> It has never been read all at once before. The migration is the reading.</div>
+  </div>
+
+  <p class="prose">The binding agent is what connects the utilitarian thread to the wisdom thread within a single education moment. Without it, the two threads are parallel but separate — task instruction here, philosophical reflection there. With it, the historical data becomes the common subject that both threads engage with simultaneously. The utilitarian question is: <strong>"Can you find this pattern in IES right now?"</strong> The wisdom question is: <strong>"What does this pattern tell you about why the business works the way it does?"</strong></p>
+
+  <div class="change-compare">
+    <div class="cc-card" style="border-left:3px solid var(--util)">
+      <div class="cc-label" style="color:var(--util)">Without the historical data as binding agent</div>
+      <div class="cc-items">
+        <div class="cc-item"><div class="cc-dot" style="background:var(--util)"></div>Utility session: "Here is how to check job cost in IES Projects."</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--util)"></div>The data shown is a generic demo project with placeholder numbers</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--util)"></div>The learner acquires navigation skill — they can find the screen</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--util)"></div>Reflection session (separate, later): "What does job profitability tell us about our business?"</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--util)"></div>The learner has no bridge between the navigation skill and the analytical question — they live in different experiences</div>
+      </div>
+    </div>
+    <div class="cc-card" style="border-left:3px solid var(--wisd)">
+      <div class="cc-label" style="color:var(--wisd)">With the historical data as binding agent</div>
+      <div class="cc-items">
+        <div class="cc-item"><div class="cc-dot" style="background:var(--wisd)"></div>Utility thread: "Here is how to check job cost in IES Projects — using Copper Ridge Phase 2, your actual job."</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--wisd)"></div>Wisdom door opened: "AI has pre-loaded 9 years of Meridian's job profitability. Notice that your 10 most profitable jobs share a pattern: they all had government or repeat-client contracts. What do you think that means?"</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--wisd)"></div>The learner acquires both: navigation skill AND the beginning of an analytical frame for interpreting what they find there</div>
+        <div class="cc-item"><div class="cc-dot" style="background:var(--wisd)"></div>The bridge is the historical data — the same data that the navigation exercise just demonstrated how to access</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 3. THE MIGRATION WINDOW ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">03 —</span>
+    <span class="sec-title">The migration window — why this moment is unrepeatable</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--hist);border-color:var(--histb);background:var(--histl)">The unique moment</span>
+  </div>
+
+  <div class="migration-window">
+    <div class="mw-label">A once-in-the-company's-history event</div>
+    <div class="mw-title">The moment when <em>all of the past</em> becomes visible at once</div>
+    <div class="mw-text">Before migration, Meridian's history is siloed. The California office knows its own jobs, its own payroll patterns, its own cash cycles. Dallas knows theirs. Neither can see the other's, and nobody can see all ten simultaneously. <strong>The migration consolidates nine years of experience into a single, unified, queryable picture for the first time.</strong> This is not just a technical event. It is the moment the company becomes fully visible to itself.</div>
+    <div class="mw-text">This consolidated visibility exists in its most acute form during the migration process itself — when the AI diagnostic is reading all 10 files simultaneously, when the CoA consolidation is comparing the accounting methods across branches, when the payroll data is being verified across all 210 employees in all 10 states. The people involved in these steps are, for a brief window, looking at something nobody at Meridian has ever seen before. <strong>If that moment is treated purely as a data quality exercise, it is wasted. If it is also treated as an organisational mirror, it is transformative.</strong></div>
+    <div class="mw-timeline">
+      <span class="mw-node mw-node-before">Before migration: 10 silos · No consolidated view · History invisible</span>
+      <span class="mw-arrow">→</span>
+      <span class="mw-node mw-node-during">THE MIGRATION WINDOW: All 9 years visible simultaneously · Both threads active · Unrepeatable</span>
+      <span class="mw-arrow">→</span>
+      <span class="mw-node mw-node-after">After migration: IES is the present · Historical data recedes into background · Wisdom window narrowing</span>
+    </div>
+    <div class="mw-note">The wisdom window is widest during migration. After go-live, the historical data is always technically accessible — but it competes with the urgency of the present. During migration, it is the subject of active examination anyway. The marginal cost of asking "what does this tell us?" is nearly zero. After migration, the cost is high: it requires deliberately pulling people away from current operations to examine history.</div>
+  </div>
+</section>
+
+<!-- ══ 4. DUAL-THREAD EDUCATION MOMENTS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">04 —</span>
+    <span class="sec-title">Seven dual-thread moments — both threads designed into the same touchpoint</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--syn);border-color:var(--synb);background:var(--synl)">Practical design</span>
+  </div>
+
+  <p class="prose">Each moment below is already in the education strategy — as a utilitarian touchpoint. What is added here is the explicit wisdom thread that runs alongside it, using the historical data as its material. The two threads do not compete for the same time. The wisdom thread is a question asked at the end of the utility session, or a pattern surfaced in passing, or a comparison that the data makes naturally available. It is not a second session. It is a second dimension of the same session.</p>
+
+  <div class="dt-flow">
+
+    <!-- Moment 1 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">AI Operational DNA report</div>
+          <div class="dtm-who">Controller + CFO · Month 1</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">9 years of transactions across 10 files. Job profitability by client and project type. Payroll patterns by season and state. Cash cycle by month. All read simultaneously for the first time.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Confirm the AI's classification of Meridian's business type is accurate. Agree the industry template (Construction & Contracting) is correct. Identify the 3 feature gaps and decide how to handle them. <strong>Outcome: migration scoping can proceed with a verified business profile.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">The AI report contains the first-ever consolidated view of which 20% of Meridian's project types have generated 80% of margin. It shows the cash compression pattern — the same months, every year. It shows that the California branch's labour burden is 43% higher than Texas, adjusted for prevailing wage. <strong>Ask: "Is any of this surprising? What does it confirm that you already knew but couldn't prove? What changes how you'd bid next quarter?"</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> The same AI read that produces the migration classification also produces the business intelligence. One reading. Two questions. The Controller answers the first. The CFO sits with the second.</div>
+    </div>
+
+    <!-- Moment 2 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">Customer:Jobs → Projects concept translation</div>
+          <div class="dtm-who">Project Managers · Stage 2</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">187 jobs mapped with 9 years of cost vs estimate variance. Which project types consistently over-run. Which clients' scopes reliably expand. Which phases are where budget is lost.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Understand that Phases become cost categories in IES Projects. Confirm the AI mapping of Copper Ridge Phase 2's cost category structure. Learn to navigate to a project and read the budget vs actual view. <strong>Outcome: PM can find real-time job cost independently.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">AI has pre-loaded 9 years of job cost variance by phase type. Open the historical view: MEP phases have over-run by an average of 22% across Meridian's commercial jobs. Structural phases consistently deliver at or under budget. <strong>Ask: "What would you do differently on the next MEP bid if you knew this number going in?" This is the question that changes how PMs estimate, not just how they track.</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> The same Projects screen that the PM just learned to navigate contains 9 years of data about their own jobs. The navigation exercise and the historical insight use the same screen, the same moment, the same attention.</div>
+    </div>
+
+    <!-- Moment 3 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">First live payroll run + YTD validation</div>
+          <div class="dtm-who">Payroll Manager · Day 3–5 post go-live</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">9 years of payroll patterns. Which months run high (Q1 hiring, summer overtime spikes). Which states have consistently increasing compliance burden. Which pay items have grown as a % of payroll over 9 years.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Run the first live payroll for Wave 1 (100 employees, 4 states). Verify direct deposits confirmed. Review anomaly detection output. Confirm YTD matches QBDT baseline for all 100 employees. <strong>Outcome: first payroll completed without errors. Second payroll can run independently.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">After the payroll clears: IES shows the 9-year seasonal payroll pattern. "Your payroll runs 18% higher in Q1 every year. Your credit line draws follow the same pattern with a 3-week lag." <strong>Ask: "If you could see this pattern 8 weeks in advance, what would you do differently in December?" This is the question that moves the Payroll Manager from reactive administration to proactive planning.</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> The payroll validation that confirms the migration succeeded also, in the same screen, surfaces the seasonal pattern. The Payroll Manager who just confirmed accuracy now sees predictability. Both arise from the same historical data, in the same session.</div>
+    </div>
+
+    <!-- Moment 4 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">CoA consolidation — 10 files into one structure</div>
+          <div class="dtm-who">Controller + CPA · Month 2–3</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">10 different Chart of Account structures, revealing different accounting methods, different capitalisation approaches, different revenue recognition assumptions — a 9-year record of how 10 branches understood their own business differently.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Consolidate 10 CoAs into one IES structure. Resolve accounting method inconsistencies. Get CPA sign-off on opening balances. Configure the 3-legal-entity structure with intercompany elimination accounts. <strong>Outcome: clean opening balances. Audit trail from Day 1 of migration.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">The CoA comparison reveals: the Arizona branch has been capitalising items that HQ expenses — which means Arizona's profitability has been systematically understated for 3 years. The Florida branch uses an aggressive revenue recognition approach. <strong>Ask: "Before we standardise, what does each branch's approach tell us about how they understand the business they're running? Is the Arizona branch actually less profitable, or are they being more conservative?"</strong> This is an accounting decision with strategic implications.</div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> The CoA inconsistency that must be resolved for technical migration reasons is also a window into how different parts of the business understand their own economics. The resolution is the utility task. The understanding is the wisdom gain.</div>
+    </div>
+
+    <!-- Moment 5 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">Retainage balance verification ($4.2M across 23 projects)</div>
+          <div class="dtm-who">Controller + PMs · Stage 4</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">9-year retainage collection history. How long each client type takes to release. Which government agencies are slowest. The cumulative cost of carrying $4.2M at 0% interest while paying interest on the credit line.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Confirm each project's retainage balance migrated correctly. Verify retainage accounts in the new IES CoA. Confirm lien waiver status per project. Set up the retainage release workflow. <strong>Outcome: $4.2M of retainage is correctly recorded and will release correctly on project completion.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">The migration surfaces the full retainage picture for the first time: average collection period by client type (government: 9.2 months; commercial: 5.4 months; repeat clients: 4.1 months). Meridian's credit line costs approximately $185,000/year in interest. The retainage it carries represents 3–4 months of credit line draw. <strong>Ask: "Which $4.2M is the most overdue? What is the cost of not having a systematic retainage follow-up process? What would IES-automated retainage aging do to your credit line utilisation?"</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> The retainage verification that must happen for migration accuracy is the same process that reveals the full cost of Meridian's retainage exposure for the first time. Same data. Same moment. The Controller answers the technical question and the CFO gets the strategic insight.</div>
+    </div>
+
+    <!-- Moment 6 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Migration moment</div>
+          <div class="dtm-trigger">Dimensions configuration — Classes → Division</div>
+          <div class="dtm-who">Controller + Division VPs · Stage 2</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">9 years of Class-coded transactions, revealing the actual revenue and cost distribution by business division. Which division drives margin. Which division drives volume. Whether volume and margin are correlated or inverse.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Map 6 QBDT Classes to 6 IES Division Dimension values. Confirm 100% of transactions are correctly tagged. Set up the Division × State Office P&L report template. Verify the commercial segment looks correct in the new structure. <strong>Outcome: Dimensions are configured. The first Dimensions-filtered P&L can be run immediately after go-live.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">Before confirming the mapping, run the Division P&L against 9 years of historical data. "Here is the actual gross margin by division, adjusted for overhead allocation, over 9 years." Government division: 11.2% average gross margin. Commercial: 19.4%. Residential: 22.8%. Equipment: 31.7%. <strong>Ask: "If you'd seen this breakdown 5 years ago, would you have allocated the same growth capital to each division? What does this change about next year's strategic plan?"</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> Confirming that the Division mapping is technically correct requires running the 9-year data through the new structure. That same run is also the most accurate divisional P&L analysis Meridian has ever produced. The technical verification and the strategic insight are the same output.</div>
+    </div>
+
+    <!-- Moment 7 -->
+    <div class="dt-moment">
+      <div class="dt-moment-head">
+        <div class="dtm-left">
+          <div class="dtm-trigger-label">Post go-live moment</div>
+          <div class="dtm-trigger">IES AI Insights first activation — Month 3</div>
+          <div class="dtm-who">CFO + Controller + Division VPs</div>
+        </div>
+        <div class="dtm-right">
+          <div class="dtm-data-label">Historical data in play</div>
+          <div class="dtm-data">9 years of historical data now combined with 3 months of live IES data. AI can compare current performance against long-run baseline. Anomalies — costs running higher than historical average, collections running slower, jobs showing early signs of the margin compression pattern — are now detectable.</div>
+        </div>
+      </div>
+      <div class="dt-threads">
+        <div class="dt-thread dt-thread-u">
+          <div class="dt-thread-label">Utilitarian thread</div>
+          <div class="dt-thread-content">Learn to read the AI Insights dashboard. Understand what each alert means. Know which alerts require action vs awareness. Configure which insights get emailed to which personas each morning. <strong>Outcome: leadership team is receiving and acting on AI-generated business intelligence daily.</strong></div>
+        </div>
+        <div class="dt-thread dt-thread-w">
+          <div class="dt-thread-label">Wisdom thread</div>
+          <div class="dt-thread-content">This is the moment when the historical data and the present converge. IES AI says: "The NV DOT US-95 job is showing a cost pattern that matches your 6 historically worst-performing government jobs at week 8." It is using 9 years of lived experience as its reference. <strong>The wisdom question is not "what do I do?" — that's utilitarian. The wisdom question is "why does this pattern repeat? What is it about government highway jobs in week 8 that creates this pressure? What would have to change about how we manage that phase to break the pattern?"</strong></div>
+        </div>
+      </div>
+      <div class="dt-bridge"><span class="dt-bridge-label">The bridge:</span> AI Insights is the living synthesis of the utilitarian and wisdom threads. It uses historical data (wisdom source) to generate present-moment alerts (utility action). Every Insights alert is simultaneously a call to action and a lesson from experience. Teaching people to read it as both is the education design challenge.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ 5. THE REFLECTION CADENCE ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">05 —</span>
+    <span class="sec-title">The reflection cadence — the missing piece in our strategy</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--wisd);border-color:var(--wisdb);background:var(--wisdl)">What needs to be added</span>
+  </div>
+
+  <p class="prose">The dual-thread moments described above are designed into specific touchpoints. But wisdom does not accumulate in isolated moments — it accumulates through a <strong>cycle of experience, reflection, and re-encounter.</strong> A PM who caught a cost overrun 3 weeks early has had an experience. Without a designed reflection moment, that experience remains personal. With one, it becomes organisational — a story the whole PM group can learn from, generalise from, and apply to their own jobs before they encounter the same situation.</p>
+
+  <div class="reflect-grid">
+    <div class="ref-card" style="border-top-color:var(--util)">
+      <div class="ref-timing" style="color:var(--util)">Monthly · 30 minutes · Each persona group</div>
+      <div class="ref-q">What did IES show you this month that changed how you thought about something?</div>
+      <div class="ref-data" style="background:var(--utill);color:#1E3A8A;border:1px solid var(--utilb)">Not a training session. Not a review of dashboard features. A question that treats lived experience in IES as the primary source of organisational learning. Facilitated by the Champion. Answers recorded. Patterns extracted across months.</div>
+      <div class="ref-roles"><span class="ref-role">PMs</span><span class="ref-role">Controller</span><span class="ref-role">Branch Managers</span></div>
+    </div>
+    <div class="ref-card" style="border-top-color:var(--hist)">
+      <div class="ref-timing" style="color:var(--hist)">Quarterly · CFO-level · The historical data review</div>
+      <div class="ref-q">What does IES now let us see that we couldn't see before — and what decisions would we have made differently?</div>
+      <div class="ref-data" style="background:var(--histl);color:#451A03;border:1px solid var(--histb)">The retrospective question. Uses historical data as the material. Not a post-mortem. A forward-looking review: "Now that we can see 9 years of divisional margin by state, what does that tell us about where to grow?" The historical data is never "finished" as a source of insight.</div>
+      <div class="ref-roles"><span class="ref-role">CFO</span><span class="ref-role">Division VPs</span><span class="ref-role">Controller</span></div>
+    </div>
+    <div class="ref-card" style="border-top-color:var(--wisd)">
+      <div class="ref-timing" style="color:var(--wisd)">Annual · Full leadership · The wisdom audit</div>
+      <div class="ref-q">What does our business understand about itself at the end of this year that it didn't understand at the beginning?</div>
+      <div class="ref-data" style="background:var(--wisdl);color:#064E3B;border:1px solid var(--wisdb)">The wisdom-building question at its most explicit. Requires identifying not what was learned as skill (utilitarian) but what was understood differently (wisdom). The answers compound: each year's understanding becomes the baseline for the next year's questions.</div>
+      <div class="ref-roles"><span class="ref-role">All leadership</span><span class="ref-role">Champions</span><span class="ref-role">Programme Manager</span></div>
+    </div>
+  </div>
+
+  <div class="callout co-wisd">
+    <svg viewBox="0 0 13 13" fill="none" width="13" height="13"><path d="M6.5 1l1.5 4H12l-3.5 2.5 1.3 4L6.5 9l-3.3 2.5 1.3-4L1 5h4L6.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The single most important addition to the existing strategy:</strong> the monthly 30-minute reflection session, facilitated by the Champion, asking "what did IES show you this month that changed how you thought about something?" This session costs nothing to run, requires no PS support, and is where the utilitarian competence built in Months 1–2 begins to convert into the organisational wisdom that is the actual long-term value of the migration investment.</div>
+  </div>
+</section>
+
+<!-- ══ 6. THE WISDOM SPIRAL ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">06 —</span>
+    <span class="sec-title">The wisdom spiral — how the two threads compound over 24 months</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--syn);border-color:var(--synb);background:var(--synl)">Long arc</span>
+  </div>
+
+  <p class="prose">Wisdom does not accumulate linearly. It accumulates in a spiral — each cycle of experience and reflection builds on the previous one, but it returns to the same questions at a higher level of understanding. The 24-month post-migration period is not a sequence of lessons. It is a spiral of deepening engagement with the same fundamental question: <em>what does Meridian now understand about itself that it could not have known before?</em></p>
+
+  <div class="spiral-diagram">
+    <div class="sd-title">The wisdom spiral — 24 months of dual-thread learning at Meridian</div>
+    <div class="spiral-steps">
+
+      <div class="ss-row">
+        <div class="ss-circle" style="border-color:var(--util);color:var(--util)">M0–2</div>
+        <div class="ss-body">
+          <div class="ss-phase" style="color:var(--util)">Foundation — survival competence</div>
+          <div class="ss-title">Learning to operate the tool</div>
+          <div class="ss-util ss-util-wrap"><div class="ss-util-label">Utilitarian thread</div>First payroll runs. Pay stubs accessible. North-star scenarios passed. Co-pilot retired. Basic navigation competent.</div>
+          <div class="ss-wisd ss-wisd-wrap"><div class="ss-wisd-label">Wisdom thread (seed only — door opened)</div>The AI Operational DNA report surfaces the first consolidated business picture. Leadership sees the divisional margin breakdown for the first time. The seed is planted. Nothing more is asked of it yet.</div>
+        </div>
+      </div>
+      <div class="ss-connector"></div>
+
+      <div class="ss-row">
+        <div class="ss-circle" style="border-color:var(--hist);color:var(--hist)">M3–6</div>
+        <div class="ss-body">
+          <div class="ss-phase" style="color:var(--hist)">First encounter — the data begins to speak</div>
+          <div class="ss-title">The historical data as a living reference</div>
+          <div class="ss-util ss-util-wrap"><div class="ss-util-label">Utilitarian thread</div>Monthly close efficiency improving. PMs running job cost reviews weekly. AI Insights alerts being acted on. Approval workflows fully operational.</div>
+          <div class="ss-wisd ss-wisd-wrap"><div class="ss-wisd-label">Wisdom thread (first activation)</div>AI Insights fires its first "this pattern matches your historical worst-case jobs" alert. A PM catches a cost overrun 3 weeks early and tells the story at the ops meeting. The monthly reflection session runs for the first time. The first "what changed in how I think?" answers are given — tentative but real.</div>
+        </div>
+      </div>
+      <div class="ss-connector"></div>
+
+      <div class="ss-row">
+        <div class="ss-circle" style="border-color:var(--syn);color:var(--syn)">M6–12</div>
+        <div class="ss-body">
+          <div class="ss-phase" style="color:var(--syn)">Pattern recognition — the spiral's first full turn</div>
+          <div class="ss-title">Individual experience becoming organisational pattern</div>
+          <div class="ss-util ss-util-wrap"><div class="ss-util-label">Utilitarian thread</div>Capability sprints running quarterly. Dimensions P&L report now a standard boardroom tool. AP automation reducing Controller close time consistently. IES is the system of record — not a new tool.</div>
+          <div class="ss-wisd ss-wisd-wrap"><div class="ss-wisd-label">Wisdom thread (first consolidation)</div>The monthly reflection sessions have accumulated enough answers to identify patterns: MEP subcontractors are consistently the cost risk. Government jobs are less profitable than they appear. Q1 cash compression is structural, not accidental. The quarterly leadership review names these patterns explicitly. Bidding strategy begins to shift based on 9 years of evidence, not intuition.</div>
+        </div>
+      </div>
+      <div class="ss-connector"></div>
+
+      <div class="ss-row">
+        <div class="ss-circle" style="border-color:var(--wisd);color:var(--wisd)">M12–18</div>
+        <div class="ss-body">
+          <div class="ss-phase" style="color:var(--wisd)">Judgment — the tool becomes invisible</div>
+          <div class="ss-title">The CFO reads IES the way they used to read experience</div>
+          <div class="ss-util ss-util-wrap"><div class="ss-util-label">Utilitarian thread</div>Champions certified. New employees onboarded through IES sandbox. Utility competence is now routine — it is no longer noticed or discussed. The tool is transparent.</div>
+          <div class="ss-wisd ss-wisd-wrap"><div class="ss-wisd-label">Wisdom thread (integration)</div>The CFO opens the AI Insights dashboard not to check on problems but to think about the business. The Controller's month-end process has internalised IES logic — the close is not faster because they move faster, it is faster because they understand the system differently. PMs budget MEP phases with a contingency informed by 10 years of variance data. The historical data has become part of the company's operational intuition.</div>
+        </div>
+      </div>
+      <div class="ss-connector"></div>
+
+      <div class="ss-row">
+        <div class="ss-circle" style="border-color:var(--syn);color:var(--syn)">M18–24</div>
+        <div class="ss-body">
+          <div class="ss-phase" style="color:var(--syn)">Adaptation — the second spiral begins</div>
+          <div class="ss-title">The business begins to teach IES what to look for</div>
+          <div class="ss-util ss-util-wrap"><div class="ss-util-label">Utilitarian thread</div>IES configuration has matured — custom Dimensions reports, bespoke anomaly thresholds, approval workflows tuned to Meridian's actual risk profile. The tool is shaped by Meridian, not the other way around.</div>
+          <div class="ss-wisd ss-wisd-wrap"><div class="ss-wisd-label">Wisdom thread (the second spiral)</div>The first spiral asked "what does our history tell us about our business?" The second spiral asks "what would we need to learn to do the next thing well?" The organisation is now using IES as a prospective tool — modelling future scenarios against the historical baseline — rather than a retrospective record. This is where financial intelligence becomes genuine business adaptation.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. THE HONEST ANSWER ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">07 —</span>
+    <span class="sec-title">Is it possible — the direct answer</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--syn);border-color:var(--synb);background:var(--synl)">Synthesis</span>
+  </div>
+
+  <div class="migration-window">
+    <div class="mw-label">The direct answer</div>
+    <div class="mw-title">Yes. Not only possible — the migration window makes it <em>more natural than at any other time.</em></div>
+    <div class="mw-text">The utilitarian and wisdom threads are not in competition during migration. They are using the same material — the historical data being examined for technical migration purposes — and asking different questions of it. The cost of adding the wisdom question to the utility session is nearly zero. The cost of not adding it is that the wisdom window closes as soon as go-live is over and the urgency of the present overtakes the legibility of the past.</div>
+    <div class="mw-text">The three conditions required for the dual thread to work simultaneously: <strong>First:</strong> the utility task must use real company data, not synthetic examples — because real data is the bridge between the task and the insight. <strong>Second:</strong> the wisdom question must be asked <em>after</em> the utility task is complete, not before — because competence precedes reflection; a person who hasn't navigated to the job cost screen cannot meaningfully reflect on what job cost patterns reveal. <strong>Third:</strong> the wisdom question must not require an answer — it must be offered as an invitation that the learner can return to when they are ready. The seed is planted during migration. The wisdom grows in the months of operation that follow.</div>
+    <div class="mw-text">What this means for the education strategy already built: the dual thread is present in our strategy but it is not <strong>named, designed, and tracked</strong> as a first-class concern. The monthly reflection session, the historical data surfacing in concept translation, the AI Insights framing as "the data is reading your history" — these are the additions that would make it explicit. They do not require rebuilding the strategy. They require <strong>adding a second question to moments that are already designed.</strong></div>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group</strong> · The Dual Thread — Utilitarian and Wisdom Education in the Migration Window</div>
+  <div class="df-t">7 dual-thread moments · 3-cadence reflection structure · 24-month wisdom spiral</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11" style="flex-shrink:0"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a><span class="rn-doc cur">08·Dual Thread</span></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="ies-education-rollout.html">← 07</a></div></div>
+</body>
+</html>
