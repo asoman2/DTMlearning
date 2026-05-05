@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian · Concept Translation Education Layer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F4F6FA;--s:#FFF;--s2:#F0F2F7;--s3:#E5E8F2;--s4:#D8DCE8;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.18);
+  --ink:#13202E;--ink2:#384E68;--ink3:#677A96;--ink4:#A2B2C6;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  /* concept colours */
+  --proj:#1E40AF;--projl:#EFF2FF;--projb:rgba(30,64,175,.18);
+  --dim:#065F46;--diml:#ECFDF5;--dimb:rgba(6,95,70,.18);
+  --price:#6D28D9;--pricel:#F5F3FF;--priceb:rgba(109,40,217,.18);
+  /* AI */
+  --ai:#7C3AED;--ail:#F5F3FF;--aib:rgba(124,58,237,.18);
+  /* role colours */
+  --r-cfo:#1E40AF;  --r-cfol:#EFF2FF;
+  --r-ctrl:#065F46; --r-ctrll:#ECFDF5;
+  --r-pm:#B45309;   --r-pml:#FFFBEB;
+  --r-est:#6D28D9;  --r-estl:#F5F3FF;
+  --r-pay:#0E7490;  --r-payl:#ECFEFF;
+  /* semantic */
+  --ok:#059669;--okl:#ECFDF5;--okb:rgba(5,150,105,.18);
+  --warn:#D97706;--warnl:#FFF8EC;--warnb:rgba(217,119,6,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 32px;gap:14px;position:sticky;top:0;z-index:200}
+.nav-mark{width:28px;height:28px;background:var(--proj);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:14px;height:14px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-role-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,.8);font-weight:500;cursor:pointer;transition:background .15s}
+.nav-role-pill:hover{background:rgba(255,255,255,.1)}
+.nav-role-pill .role-dot{width:8px;height:8px;border-radius:50%}
+
+/* ROLE SELECTOR OVERLAY */
+.role-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:center;justify-content:center}
+.role-overlay.show{display:flex}
+.role-picker{background:var(--s);border-radius:16px;padding:28px 32px;max-width:560px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.rp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:6px}
+.rp-title{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:6px}
+.rp-sub{font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.6}
+.rp-roles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rp-role{border:1.5px solid var(--b2);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s}
+.rp-role:hover{background:var(--s2)}
+.rp-role.active{border-color:var(--rcol,var(--proj));background:var(--rcoll,var(--projl))}
+.rp-role-top{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.rp-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;font-family:var(--serif)}
+.rp-role-name{font-size:13px;font-weight:600;color:var(--ink)}
+.rp-role-desc{font-size:11px;color:var(--ink3);line-height:1.45}
+.rp-confirm{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;margin-top:16px;display:flex;align-items:center;gap:7px;transition:opacity .15s}
+.rp-confirm:hover{opacity:.85}
+.rp-confirm svg{width:13px;height:13px}
+
+/* MASTHEAD */
+.mast{background:linear-gradient(160deg,var(--navy) 0%,#1A2E52 60%,#1E3865 100%);padding:60px 32px 48px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;inset:0;opacity:.4;background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.mast-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.mast-h1{font-family:var(--serif);font-size:clamp(30px,4vw,48px);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.75;max-width:660px;margin-bottom:28px}
+
+/* ROLE BAR */
+.role-bar{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 18px;max-width:780px;margin-bottom:28px}
+.rb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.35);margin-bottom:10px}
+.rb-roles{display:flex;gap:8px;flex-wrap:wrap}
+.rb-role{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.rb-role:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8)}
+.rb-role.active{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;font-weight:600}
+.rb-role-dot{width:7px;height:7px;border-radius:50%}
+
+/* CONCEPT TABS */
+.concept-tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.ctab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;border:1px solid var(--b2);background:var(--s);color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+.ctab:hover{border-color:var(--b3);background:var(--s2)}
+.ctab.active{border-color:var(--ccol);background:var(--ccoll);color:var(--ccol);font-weight:600}
+.ctab-num{font-family:var(--mono);font-size:11px;opacity:.6}
+.ctab-dot{width:7px;height:7px;border-radius:50%}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:36px 32px 100px}
+
+/* CONCEPT PANEL */
+.concept-panel{display:none}
+.concept-panel.active{display:block}
+
+/* SECTION */
+.sec{margin-bottom:36px}
+.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);margin-bottom:12px}
+
+/* AI DIAGNOSTIC BLOCK */
+.ai-block{background:var(--ail);border:1px solid var(--aib);border-radius:10px;padding:16px 20px;margin-bottom:20px}
+.aib-header{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.aib-icon{width:26px;height:26px;border-radius:6px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center}
+.aib-icon svg{width:12px;height:12px;color:var(--ai)}
+.aib-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ai)}
+.aib-tasks{display:flex;flex-direction:column;gap:5px}
+.aib-task{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;background:var(--s);border:1px solid rgba(124,58,237,.1);border-radius:7px}
+.aib-status{width:15px;height:15px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.ast-done{background:var(--okl);border:1px solid var(--okb)}
+.ast-done svg{width:8px;height:8px;color:var(--ok)}
+.aib-task-text{font-size:12px;font-weight:500;color:var(--ink);line-height:1.3}
+.aib-task-sub{font-size:11px;color:var(--ink3);margin-top:2px}
+.aib-result{margin-top:10px;padding:9px 12px;background:var(--s);border:1px solid var(--okb);border-radius:6px;font-size:12px;color:var(--ink2);display:flex;align-items:flex-start;gap:7px;line-height:1.55}
+.aib-result svg{width:12px;height:12px;color:var(--ok);flex-shrink:0;margin-top:2px}
+
+/* CONCEPT BRIDGE */
+.cb{border:1px solid var(--b2);border-radius:10px;overflow:hidden;margin-bottom:20px;box-shadow:var(--sh)}
+.cb-header{padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--b)}
+.cb-header svg{width:12px;height:12px}
+.cb-header-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em}
+.cb-header-sub{margin-left:auto;font-size:11px;color:var(--ink4)}
+.cb-body{padding:16px;background:var(--s)}
+.cb-map{display:grid;grid-template-columns:1fr 36px 1fr;gap:10px;align-items:center;margin-bottom:14px}
+.cb-side{border-radius:8px;padding:12px 14px}
+.cb-from{background:var(--s2);border:1px solid var(--b2)}
+.cb-to{border:1px solid}
+.cb-side-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;color:var(--ink3)}
+.cb-to .cb-side-lbl{color:var(--ccol,var(--proj))}
+.cb-side-val{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--ink);margin-bottom:3px;line-height:1.35}
+.cb-side-desc{font-size:11px;color:var(--ink3);line-height:1.45}
+.cb-arrow{display:flex;flex-direction:column;align-items:center;gap:2px}
+.cb-arrow svg{width:20px;height:20px}
+.cb-arrow span{font-size:9px;color:var(--ink4)}
+.cb-why{border-radius:7px;padding:11px 14px;font-size:12px;line-height:1.7;border:1px solid}
+.cb-parity{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.pchip{font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;border:1px solid}
+.pc-full{background:var(--okl);color:var(--ok);border-color:var(--okb)}
+.pc-part{background:var(--warnl);color:var(--warn);border-color:var(--warnb)}
+.pc-gap{background:#FEF2F2;color:#991B1B;border-color:rgba(153,27,27,.2)}
+
+/* ROLE SPOTLIGHT — the "what changes for you" card */
+.role-spotlight{border-radius:10px;padding:18px 20px;margin-bottom:20px;border:1px solid}
+.rs-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.rs-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--serif);flex-shrink:0}
+.rs-role-name{font-size:13px;font-weight:600}
+.rs-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-left:auto}
+.rs-aha{font-family:var(--serif);font-size:17px;font-weight:400;line-height:1.4;margin-bottom:12px}
+.rs-aha em{font-style:italic}
+.rs-before-after{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.rs-ba{border-radius:7px;padding:10px 13px;font-size:12px;line-height:1.6}
+.rs-ba-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.rs-before{background:var(--s2);border:1px solid var(--b2)}
+.rs-before .rs-ba-label{color:var(--ink3)}
+.rs-after{border:1px solid}
+.rs-usecase{font-size:12px;color:var(--ink2);background:var(--s);border-radius:6px;padding:10px 13px;border-left:3px solid var(--ccol,var(--proj));line-height:1.65}
+.rs-usecase-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;color:var(--ccol,var(--proj))}
+
+/* DATA SAMPLE TABLE */
+.data-sample{margin-bottom:20px;background:var(--s);border:1px solid var(--b);border-radius:9px;overflow:hidden;box-shadow:var(--sh)}
+.ds-header{background:var(--s2);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b)}
+.ds-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.ds-ai-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;background:var(--ail);color:var(--ai);border:1px solid var(--aib)}
+.ds-table{width:100%;border-collapse:collapse;font-size:12px}
+.ds-table th{padding:7px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink4);border-bottom:1px solid var(--b)}
+.ds-table td{padding:8px 12px;border-bottom:1px solid var(--b);color:var(--ink2);line-height:1.4;vertical-align:middle}
+.ds-table tr:last-child td{border-bottom:none}
+.ds-table tr:hover td{background:var(--s2)}
+.ds-mono{font-family:var(--mono);font-size:11px;color:var(--ink)}
+.ds-new{font-family:var(--mono);font-size:11px;color:var(--ccol,var(--proj))}
+.ds-chip{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;border:1px solid}
+
+/* CONSTRUCTION USE CASES */
+.use-cases{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.uc-card{background:var(--s);border:1px solid var(--b);border-radius:9px;padding:14px 16px;box-shadow:var(--sh)}
+.uc-card-scenario{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.uc-card-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px;line-height:1.3}
+.uc-card-qbdt{font-size:12px;color:var(--ink3);line-height:1.55;margin-bottom:8px}
+.uc-card-ies{font-size:12px;color:var(--ink2);line-height:1.55;padding:8px 10px;border-radius:6px;border-left:2px solid var(--ccol,var(--proj));background:var(--s2)}
+
+/* CONFIRMATION */
+.confirm-block{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;margin-bottom:20px;box-shadow:var(--sh)}
+.conf-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.conf-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.conf-label{font-size:12px;font-weight:600;color:var(--ink)}
+.conf-sub{font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.55}
+.conf-options{display:flex;gap:8px;flex-wrap:wrap}
+.conf-btn{padding:8px 16px;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s;display:flex;align-items:center;gap:6px}
+.conf-btn svg{width:11px;height:11px}
+.conf-btn svg{width:10px;height:10px;display:inline-block;vertical-align:middle;flex-shrink:0;min-width:10px}
+.conf-btn-accept{background:var(--ccol,var(--proj));color:#fff;border-color:var(--ccol,var(--proj))}
+.conf-btn-accept:hover{opacity:.85}
+.conf-btn-adjust{background:var(--s);color:var(--ink2);border-color:var(--b2)}
+.conf-btn-adjust:hover{background:var(--s2)}
+.conf-accepted{background:var(--okl);border:1px solid var(--okb);border-radius:7px;padding:9px 14px;font-size:12px;color:var(--ok);display:none;align-items:center;gap:7px}
+.conf-accepted.show{display:flex}
+.conf-accepted svg{width:12px;height:12px;color:var(--ok);flex-shrink:0}
+.confirm-block svg{max-width:14px;max-height:14px}
+.callout svg{width:13px;height:13px;flex-shrink:0;min-width:13px;display:inline-block}
+
+/* PROGRESS INDICATOR */
+.concept-progress{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--b);border-radius:9px;overflow:hidden;background:var(--s);box-shadow:var(--sh)}
+.cp-step{flex:1;padding:10px 14px;border-right:1px solid var(--b);cursor:pointer;transition:background .15s}
+.cp-step:last-child{border-right:none}
+.cp-step:hover{background:var(--s2)}
+.cp-step.active{background:var(--ccoll,var(--projl))}
+.cp-step.done{background:var(--okl)}
+.cp-num{font-family:var(--mono);font-size:10px;margin-bottom:3px}
+.cp-step.active .cp-num{color:var(--ccol,var(--proj))}
+.cp-step.done .cp-num{color:var(--ok)}
+.cp-step.active .cp-name{color:var(--ink);font-weight:600}
+.cp-step.done .cp-name{color:var(--ok)}
+.cp-name{font-size:12px;color:var(--ink3)}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:11px 15px;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start}
+.callout svg{width:12px;height:12px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-ai{background:var(--ail);border:1px solid var(--aib)} .co-ai svg,.co-ai .callout-text{color:#4C1D95} .co-ai .callout-text strong{color:var(--ai)}
+.co-ok{background:var(--okl);border:1px solid var(--okb)} .co-ok svg{color:var(--ok)} .co-ok .callout-text{color:#064E3B} .co-ok .callout-text strong{color:var(--ok)}
+.co-warn{background:var(--warnl);border:1px solid var(--warnb)} .co-warn svg{color:var(--warn)} .co-warn .callout-text{color:#78350F} .co-warn .callout-text strong{color:var(--warn)}
+
+/* STRATEGY NOTE (collapsible) */
+.strategy-note{background:var(--navy);border-radius:10px;padding:16px 20px;margin-bottom:24px;cursor:pointer}
+.sn-header{display:flex;align-items:center;gap:9px}
+.sn-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4)}
+.sn-title{font-size:13px;font-weight:500;color:rgba(255,255,255,.85);flex:1}
+.sn-toggle{font-size:10px;color:rgba(255,255,255,.35)}
+.sn-body{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:13px;color:rgba(255,255,255,.55);line-height:1.75;display:none}
+.sn-body.open{display:block}
+.sn-body strong{color:rgba(255,255,255,.8);font-weight:500}
+
+/* FOOTER */
+.doc-footer{background:var(--navy);padding:22px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:860px){
+  .nav,.mast,.page,.doc-footer{padding-left:18px;padding-right:18px}
+  .use-cases,.rs-before-after,.cb-map{grid-template-columns:1fr}
+  .rp-roles{grid-template-columns:1fr}
+  .concept-progress{display:none}
+  .rb-roles{gap:5px}
+}
+</style>
+</head>
+<body>
+
+<!-- ROLE PICKER OVERLAY -->
+<div class="role-overlay" id="roleOverlay">
+  <div class="role-picker">
+    <div class="rp-label">Meridian Building Group · IES Migration</div>
+    <div class="rp-title">Who are you in this migration?</div>
+    <div class="rp-sub">Each concept is explained using your role's daily work — not generic accounting theory. Select your role and the education adapts to what matters to you.</div>
+    <div class="rp-roles" id="rpRoles"></div>
+    <button class="rp-confirm" onclick="confirmRole()" id="rpConfirm" disabled>
+      <svg viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      See concepts through my role
+    </button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L2 4v6l5 3 5-3V4L7 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 1v12M2 4l5 3 5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Intuit Enterprise Suite</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">Concept Translation · Meridian Migration</span>
+  <div class="nav-sp"></div>
+  <div class="nav-role-pill" onclick="showRolePicker()" id="navRolePill">
+    <div class="role-dot" id="navRoleDot" style="background:#4B9BE8"></div>
+    <span id="navRoleLabel">Select your role</span>
+    <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </div>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-kicker">AI-assisted concept translation · Construction industry · Meridian Building Group</div>
+    <h1 class="mast-h1">These four concepts<br>are <em>already mapped</em> in your file</h1>
+    <p class="mast-sub">AI has read nine years of your QBDT history and translated your Customer:Jobs, Classes, Locations, and Price Levels into IES equivalents — using your actual projects, divisions, clients, and pricing. You are not learning abstract concepts. You are confirming what AI has already done with your own data.</p>
+
+    <div class="role-bar">
+      <div class="rb-label">View this education through a specific role</div>
+      <div class="rb-roles" id="mastRoleBar"></div>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- STRATEGY NOTE -->
+  <div class="strategy-note" onclick="toggleSN(this)">
+    <div class="sn-header">
+      <div class="sn-label">UX strategy note</div>
+      <div class="sn-title">Why "done for you" changes how concept translation works</div>
+      <div class="sn-toggle">▼</div>
+    </div>
+    <div class="sn-body">
+      <strong>The cognitive sequence is inverted.</strong> Traditional migration education: learn the concept → understand the mapping → configure from scratch. Done-for-you: discover what AI has already mapped in your file → understand the mapping in the context of your own data → confirm or adjust. The user never configures from scratch. They recognise their own projects, classes, and clients in the new structure and confirm. Education happens through recognition, not recall.
+      <br><br>
+      <strong>Why role-specific framing matters here specifically.</strong> "Customer:Jobs map to Projects" means entirely different things to a Project Manager (who cares about job cost reporting), a Controller (who cares about WIP accounting), and an Estimator (who cares about bid-to-budget workflow). The concept is the same. The consequence for daily work is completely different. One explanation cannot serve all three — so the AI generates role-specific "what changes for you" framings from the same underlying mapping data.
+      <br><br>
+      <strong>Construction industry conceptual layer.</strong> Every example uses real Meridian project names, real client relationships, and real construction workflows (AIA billing, certified payroll, WIP schedules, prevailing wage). Abstract concepts like "Dimensions" become concrete when the example is "Division: Government → all your CalTrans and municipal contracts" rather than "Dimensions allow multi-segment reporting."
+    </div>
+  </div>
+
+  <!-- CONCEPT TABS -->
+  <div class="concept-tabs" id="conceptTabs"></div>
+
+  <!-- CONCEPT PROGRESS -->
+  <div class="concept-progress" id="conceptProgress"></div>
+
+  <!-- CONCEPT PANELS -->
+  <div id="conceptPanels"></div>
+
+</div>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group</strong> · IES Concept Translation Education · AI-assisted · Construction industry · Role-specific</div>
+  <div class="df-t">4 concepts · 5 roles · Done-for-you AI layer · Meridian data throughout</div>
+</footer>
+
+<script>
+/* ════════════════════════════════
+   ROLE DATA
+════════════════════════════════ */
+const ROLES = [
+  {id:'cfo', name:'CFO', fullName:'CFO — Tom Vasquez', dept:'Executive', col:'var(--r-cfo)', colL:'var(--r-cfol)', avatar:'CFO', aha_short:'See the business as a whole'},
+  {id:'ctrl', name:'Controller', fullName:'Controller', dept:'Finance · Books & reports', col:'var(--r-ctrl)', colL:'var(--r-ctrll)', avatar:'CON', aha_short:'Close the books faster'},
+  {id:'pm', name:'Project Manager', fullName:'Project Manager', dept:'Operations · Job cost', col:'var(--r-pm)', colL:'var(--r-pml)', avatar:'PM', aha_short:'See job cost in real time'},
+  {id:'est', name:'Estimator', fullName:'Chief Estimator', dept:'Pre-construction · Bids', col:'var(--r-est)', colL:'var(--r-estl)', avatar:'EST', aha_short:'Bid to budget automatically'},
+  {id:'pay', name:'Payroll Manager', fullName:'Payroll Manager', dept:'Finance · Multi-state payroll', col:'var(--r-pay)', colL:'var(--r-payl)', avatar:'PAY', aha_short:'Payroll cost by job, live'}
+];
+
+/* ════════════════════════════════
+   CONCEPT DATA
+════════════════════════════════ */
+const CONCEPTS = [
+  /* ── CONCEPT 1: CUSTOMER:JOBS → PROJECTS ── */
+  {
+    id:'c1', num:'01', name:'Customer:Jobs → Projects',
+    col:'var(--proj)', colL:'var(--projl)', colB:'var(--projb)',
+    headerBg:'#1E40AF',
+    shortName:'Jobs → Projects',
+    tagline:'Your 187 active jobs are now 187 live IES Projects',
+    aiTasks:[
+      {t:'Customer:Job hierarchy extracted — 3 levels deep', sub:'42 clients · 187 active jobs · ~940 phase records across all active jobs'},
+      {t:'Job phase patterns analysed across 9 years', sub:'Average 4–6 phases per job · Government jobs average 8 phases (certified payroll cost code requirements)'},
+      {t:'Draft IES Projects architecture generated for all 187 jobs', sub:'Client → IES Customer · Job → IES Project · Phase → Project cost category (budget line)'},
+      {t:'Government jobs flagged for sub-project consideration', sub:'4 government jobs (CalTrans I-15, LA County, San Bernardino Municipal, NV DOT) have strict cost-code billing requirements'}
+    ],
+    aiResult:'187 QBDT jobs mapped to 187 IES Projects. 42 client relationships preserved. 4 government jobs flagged for your architecture decision below.',
+    concept:{
+      fromVal:'Customer → Job → Phase → Cost code',
+      fromDesc:'4-level hierarchy. Sub-jobs represent phases (Foundation, Framing, MEP, Finishes). Cost codes define what was purchased within each phase.',
+      toVal:'Customer → Project → Cost category',
+      toDesc:'3-level structure. Phases become budget line items inside the Project. Budget vs actual is live — not at month-end. AIA billing runs directly from Project milestones.',
+      why:'IES Projects gives every Project Manager at Meridian real-time estimated vs actual profitability — something QBDT can only produce when the Controller closes the month. The hierarchy is one level flatter: your QBDT Phase level maps to Project cost categories rather than a sub-level. For your 183 commercial and residential jobs this is a capability upgrade. For your 4 government jobs with strict cost-code billing requirements, a sub-project structure is also available.',
+      parity:['Client tracking:full','Job profitability:full','Phase cost visibility:part','4-level nesting:gap','Real-time budget vs actual:full','AIA progress billing:full']
+    },
+    sampleData:{
+      label:'Sample: Customer:Job → IES Projects mapping (6 of 187)',
+      cols:['QBDT Customer:Job','IES Project','Client in IES','Cost categories','Status'],
+      rows:[
+        ['Vasquez:Copper Ridge Ph.2','Copper Ridge Ph.2','Vasquez Developers','Demolition · Structure · MEP · Finishes · FF&E · Closeout','Active'],
+        ['Hendricks:Midtown Office','Midtown Office Fit-out','Hendricks Commercial','Demo · Structural · MEP · Interiors · Commissioning','Active'],
+        ['CalTrans:I-15 Bridge Rehab','I-15 Bridge Rehab','CalTrans Region 8','Mobilisation · Demolition · Substructure · Superstructure · Railings · Paving · Closeout · Inspection','Gov · 8 cats'],
+        ['Oakmont:Resi Tract 14A','Resi Tract 14A','Oakmont Homes','Site Work · Foundation · Framing · MEP Rough · Finishes · Final','Active'],
+        ['NV DOT:US 95 Widening','US-95 Widening Proj.','Nevada DOT','Mobilisation · Clearing · Grading · Drainage · Paving · Striping · Final','Gov · 7 cats'],
+        ['Vasquez:Copper Ridge Ph.1','Copper Ridge Ph.1 (archive)','Vasquez Developers','—','Closed — archived']
+      ]
+    },
+    roleContent:{
+      cfo:{
+        aha:'IES tells you which jobs made money — today, not at month-end.',
+        beforeLabel:'QBDT today', before:'Consolidated job profitability comes from the Controller\'s monthly Excel workbook. You see it 10–15 days after month-end. By then the job has already run over.',
+        afterLabel:'IES Projects', after:'The multi-entity dashboard shows estimated vs actual margin for every active job in real time. A job running over budget appears the day the subcontractor invoice is approved.',
+        usecase:{
+          scenario:'Copper Ridge Phase 2 · Cost overrun detection',
+          title:'Early margin alert on active job',
+          qbdt:'You learn that Copper Ridge Phase 2 is running 14% over on MEP when the Controller closes February — on March 10th.',
+          ies:'The moment the last MEP sub invoice is approved in IES, your dashboard shows Copper Ridge Phase 2 at 114% of MEP budget. You call Tom Vasquez on February 14th, not March 10th.'
+        }
+      },
+      ctrl:{
+        aha:'The WIP schedule updates automatically as jobs progress — you don\'t build it in Excel anymore.',
+        beforeLabel:'QBDT today', before:'WIP schedule is a monthly Excel workbook. You pull job cost reports from QBDT, manually calculate percentage of completion for each job, and build the WIP table every close cycle.',
+        afterLabel:'IES Projects', after:'IES calculates percentage of completion from Project cost categories. WIP schedule auto-generates from Project data. Your monthly close drops from 10 days to 5–6 days.',
+        usecase:{
+          scenario:'Month-end close · WIP schedule automation',
+          title:'WIP schedule from IES Projects data',
+          qbdt:'End of month: pull Job Cost Summary from QBDT for each of 187 jobs, manually calculate % complete for each, enter into WIP template, check retainage balances separately. Takes 2 days.',
+          ies:'IES Projects calculates % complete from cost categories. WIP report runs directly from Project data. Retainage is tracked per Project. The 2-day WIP build becomes a 2-hour review.'
+        }
+      },
+      pm:{
+        aha:'You see your job\'s cost against budget the moment a bill is approved — not 3 weeks later.',
+        beforeLabel:'QBDT today', before:'You ask the office manager to pull a Job Cost Detail report from QBDT. It\'s available after the accounting team processes last week\'s invoices. You\'re always looking at last week\'s numbers.',
+        afterLabel:'IES Projects', after:'Your IES Project dashboard shows cost-to-date by cost category in real time. You see MEP costs the moment the subcontractor invoice is approved — even if you\'re on-site.',
+        usecase:{
+          scenario:'Midtown Office Fit-out · Real-time cost visibility',
+          title:'Catching a MEP overrun before it compounds',
+          qbdt:'Your MEP sub completes rough-in on the Midtown job. You find out 3 weeks later — when the Controller closes March — that MEP came in 18% over budget. Change order window with Hendricks is closed.',
+          ies:'The MEP sub invoice is approved by the Controller on Tuesday. On Wednesday morning your IES Projects dashboard shows MEP at 118% of budget. You call Hendricks on Wednesday and open a change order before the next phase begins.'
+        }
+      },
+      est:{
+        aha:'Your bid divisions automatically become the budget inside the IES Project when you win the job.',
+        beforeLabel:'QBDT today', before:'You win a bid, hand the estimate to the Controller, and they manually re-enter the bid breakdowns as a QBDT job cost budget. Your bid divisions and the QBDT cost codes are different — reconciling them takes a day.',
+        afterLabel:'IES Projects', after:'Your bid divisions (Site Work, Foundation, Framing, MEP, Finishes) are configured as cost categories in the IES Project template. When a bid is awarded, the Project is created with your bid amounts pre-loaded as budget. No re-entry.',
+        usecase:{
+          scenario:'Copper Ridge Phase 3 bid · Awarded project setup',
+          title:'Bid-to-budget in IES — zero re-entry',
+          qbdt:'You win Copper Ridge Phase 3 ($2.8M). Your estimating spreadsheet has 12 bid divisions. The Controller creates a QBDT job and manually enters budget amounts using a different cost code structure. Reconciliation takes a full day.',
+          ies:'Your 12 bid divisions are the Project cost categories. When the contract is signed, a new IES Project is created using your bid template. Budget amounts are pre-populated from the estimate. Phase 3 is live and tracking within 30 minutes.'
+        }
+      },
+      pay:{
+        aha:'Certified payroll cost codes map directly to IES Project cost categories — no separate system needed.',
+        beforeLabel:'QBDT today', before:'For CalTrans and other government jobs, you run certified payroll through LCPtracker using QBDT job cost codes. The cost code structure in QBDT doesn\'t quite match LCPtracker\'s WH-347 fields — you manually map them every week.',
+        afterLabel:'IES Projects', after:'Government jobs (CalTrans, NV DOT, LA County) are configured with cost categories that align to certified payroll cost codes. LCPtracker pulls from IES Project data. The weekly mapping step is eliminated.',
+        usecase:{
+          scenario:'CalTrans I-15 Bridge Rehab · Certified payroll',
+          title:'Eliminating the weekly cost-code mapping step',
+          qbdt:'Every Monday you pull the CalTrans job cost report from QBDT, manually map QBDT cost codes to LCPtracker\'s WH-347 fields, review for errors, and submit. Takes 90 minutes per government job per week.',
+          ies:'IES Project cost categories for CalTrans are set up to match LCPtracker\'s cost-code structure. LCPtracker pulls directly from IES Project data. The 90-minute mapping step is automated. You review, not rebuild.'
+        }
+      }
+    },
+    decision:{
+      q:'How should Meridian\'s job phases be represented in IES Projects?',
+      options:[
+        {t:'Phases as cost categories inside each Project (recommended)', sub:'Foundation, Framing, MEP, Finishes each appear as budget line items. Real-time cost visibility at phase level. How 92% of general contractors configure IES.', good:true},
+        {t:'Government jobs use sub-projects; all others use cost categories', sub:'CalTrans and 3 other government jobs get a sub-project per phase for strict cost-code billing. All other jobs use cost categories.', good:false}
+      ]
+    }
+  },
+
+  /* ── CONCEPT 2: CLASSES + LOCATIONS → DIMENSIONS ── */
+  {
+    id:'c2', num:'02', name:'Classes & Locations → Dimensions',
+    col:'var(--dim)', colL:'var(--diml)', colB:'var(--dimb)',
+    headerBg:'#065F46',
+    shortName:'Classes → Dimensions',
+    tagline:'Your 6 classes and 3 locations are now 2 unified Dimensions — and more powerful',
+    aiTasks:[
+      {t:'6 QBDT classes analysed across 9 years of transactions', sub:'Residential · Commercial · Government · Equipment · G&A · Estimating · 11,465 total transactions tagged'},
+      {t:'3 QBDT locations analysed', sub:'California Office · Nevada Office · Arizona Field · 11,465 total transactions tagged'},
+      {t:'Transaction overlap matrix built — how classes and locations co-occur', sub:'Commercial + California: 2,109 transactions · Government + California: 1,847 · Residential + Nevada: 1,214 · Equipment is used across all 3 locations'},
+      {t:'Draft Dimensions structure proposed: 2 Dimensions, 9 values', sub:'Division (from 6 classes) · State Office (from 3 locations) · All existing transaction tags preserved'}
+    ],
+    aiResult:'2 Dimensions proposed. 100% of existing Class and Location data preserved. The unified model adds the ability to report by Division AND State Office simultaneously — a capability you do not have in QBDT today.',
+    concept:{
+      fromVal:'Class list (6) + Location list (3) — separate',
+      fromDesc:'Two independent tracking systems. A transaction has one Class OR one Location. You cannot filter a report by both simultaneously without exporting to Excel.',
+      toVal:'Dimensions — Division (6) + State Office (3)',
+      toDesc:'A unified model. Any transaction can carry both a Division Dimension and a State Office Dimension. Any report can be filtered by any combination of Dimensions.',
+      why:'IES Dimensions is strictly more capable than QBDT Classes + Locations. The naming changes — what you called a Class is now called a Division Dimension value, and what you called a Location is now a State Office Dimension value — but all 9 of your existing segment values are preserved exactly. The gain is the ability to combine them: "Show me Commercial margin in California only" is a two-filter IES report. In QBDT it requires exporting two separate reports and building a pivot table.',
+      parity:['Division (Class) tracking:full','State Office (Location) tracking:full','Combined segment P&L:full','Multi-dimension reports:full','Historical data preserved:full']
+    },
+    sampleData:{
+      label:'Dimensions mapping — all 9 segment values with transaction counts',
+      cols:['QBDT source','Type','IES Dimension','IES value','Transactions'],
+      rows:[
+        ['Class: Residential','Class','Division','Residential','3,842'],
+        ['Class: Commercial','Class','Division','Commercial','2,109'],
+        ['Class: Government','Class','Division','Government','1,847'],
+        ['Class: Equipment','Class','Division','Equipment','922'],
+        ['Class: G&A','Class','Division','General & Admin','2,441'],
+        ['Class: Estimating','Class','Division','Estimating','304'],
+        ['Location: California Office','Location','State Office','California','6,920'],
+        ['Location: Nevada Office','Location','State Office','Nevada','2,814'],
+        ['Location: Arizona Field','Location','State Office','Arizona','1,731']
+      ]
+    },
+    roleContent:{
+      cfo:{
+        aha:'You can finally see Commercial margin vs Government margin vs Residential margin — in a single P&L, filtered by state.',
+        beforeLabel:'QBDT today', before:'To compare Commercial margin in California vs Nevada, you run a Class-filtered P&L for Commercial, then a Location-filtered P&L for each state, then manually combine them in Excel. Takes 45 minutes. Done monthly.',
+        afterLabel:'IES Dimensions', after:'One IES P&L report with two Dimension filters: Division = Commercial, State Office = California. Change State Office to Nevada for the comparison. Takes 3 minutes. Updated daily.',
+        usecase:{
+          scenario:'Quarterly board review · Segment margin analysis',
+          title:'Government vs Commercial profitability by state',
+          qbdt:'Board asks: "What\'s our government contract margin in California vs commercial?" You ask the Controller. She spends an afternoon building the comparison in Excel from three separate QBDT reports.',
+          ies:'You open the IES P&L. Filter: Division = Government, State Office = California. Gross margin: 14.2%. Change: Division = Commercial, State Office = California. Gross margin: 22.8%. Board answer: 3 minutes.'
+        }
+      },
+      ctrl:{
+        aha:'Your segment P&L consolidation is a 2-filter report, not a 3-hour Excel build.',
+        beforeLabel:'QBDT today', before:'Segment reporting requires running a Class P&L (6 reports — one per class), a Location P&L (3 reports), and manually combining them in a pivot table to answer "how did each division do in each state?"',
+        afterLabel:'IES Dimensions', after:'IES P&L with Division and State Office Dimensions. Any combination on demand. The 9-report + Excel build becomes a parameterised IES report saved as a template.',
+        usecase:{
+          scenario:'Month-end close · Segment reporting',
+          title:'Division × State Office P&L in one report',
+          qbdt:'Month-end: run 6 class P&Ls, 3 location P&Ls, export all 9 to Excel, build pivot table combining them, format for the CFO. 3 hours. Every month.',
+          ies:'Run the saved "Division × State Office P&L" report template. Two Dimension filters. Export-ready in 5 minutes. The CFO gets it on Day 1 of close, not Day 6.'
+        }
+      },
+      pm:{
+        aha:'Every invoice you approve automatically tags to the right division and state — no manual class entry.',
+        beforeLabel:'QBDT today', before:'When you approve a subcontractor invoice in QBDT, someone in accounting has to manually tag it to the correct Class and Location. Sometimes they get it wrong. Month-end requires corrections.',
+        afterLabel:'IES Dimensions', after:'When you create a Project in IES, both Dimensions (Division and State Office) are set on the Project. Every transaction associated with that Project automatically inherits both Dimensions. Zero manual tagging by your team.',
+        usecase:{
+          scenario:'Copper Ridge Phase 2 · Automatic transaction tagging',
+          title:'Dimension tagging from Project — zero manual entry',
+          qbdt:'Your crew invoices for Copper Ridge Phase 2. The accounting team needs to tag each invoice to Class: Commercial and Location: California Office. Two entries per transaction. 15–20% error rate. Monthly corrections.',
+          ies:'Copper Ridge Phase 2 Project is tagged: Division = Commercial, State Office = California. Every transaction on this Project inherits both Dimensions automatically. Zero tagging errors. Zero manual entry.'
+        }
+      },
+      est:{
+        aha:'Your bid type (Residential, Commercial, Government) automatically becomes the Division Dimension for every new project.',
+        beforeLabel:'QBDT today', before:'When you win a bid, the accounting team has to manually set the QBDT Class for each transaction on that job. Estimating doesn\'t control this — and sometimes the wrong class gets used for the first month.',
+        afterLabel:'IES Dimensions', after:'The Division Dimension is set when the IES Project is created — based on the contract type (Residential, Commercial, Government). All transactions inherit it automatically from Day 1.',
+        usecase:{
+          scenario:'NV DOT US-95 · Government job setup',
+          title:'Government Division set at project creation, never wrong',
+          qbdt:'NV DOT contract is awarded. Accounting creates the job. First 3 weeks of invoices are tagged as Commercial (wrong) because the Class wasn\'t set correctly at job creation. Month-end reclass required.',
+          ies:'NV DOT contract created as an IES Project. Division Dimension = Government set at creation. Every transaction from Day 1 is correctly tagged. No reclass. No corrections.'
+        }
+      },
+      pay:{
+        aha:'Payroll costs automatically split by Division and State — your payroll reporting by division is live.',
+        beforeLabel:'QBDT today', before:'Payroll cost by division requires running separate payroll reports filtered by Class — which means payroll items need to be manually tagged to a Class during payroll entry. This is rarely done consistently.',
+        afterLabel:'IES Dimensions', after:'Time entries in QB Time are tagged to IES Projects, which carry Division and State Office Dimensions. Payroll cost flows to the correct Division automatically. No manual payroll class entry.',
+        usecase:{
+          scenario:'Multi-state payroll · Division cost allocation',
+          title:'Labour cost by Division × State — from payroll data',
+          qbdt:'To see how much field labour Meridian spent on Government jobs in California this month, you would need to manually match payroll registers to job cost reports. Nobody does this. The data exists but isn\'t accessible.',
+          ies:'QB Time entries are tagged to Projects which carry Division and State Office. Payroll cost by Division × State is a built-in IES payroll report. Government labour cost in California: available in 2 minutes.'
+        }
+      }
+    },
+    decision:null
+  },
+
+  /* ── CONCEPT 3: PRICE LEVELS → PRICE RULES ── */
+  {
+    id:'c3', num:'03', name:'Price Levels → Price Rules',
+    col:'var(--price)', colL:'var(--pricel)', colB:'var(--priceb)',
+    headerBg:'#6D28D9',
+    shortName:'Price Levels → Rules',
+    tagline:'Your 4 pricing tiers are now intelligent Price Rules — client assignments preserved',
+    aiTasks:[
+      {t:'4 QBDT price levels across 42 clients detected and extracted', sub:'Standard T&M: 18 clients · Preferred Contractor −10%: 14 · Government SOV: 6 · Cost Plus 18%: 4'},
+      {t:'IES Price Rules drafted for all 4 levels — all 42 client assignments preserved', sub:'No manual reassignment required · 0 pricing data lost'},
+      {t:'Government contract expiry dates detected — 5 of 6 government clients have contract end dates in QBDT notes', sub:'CalTrans: 31 Dec 2025 · LA County: 30 Jun 2025 · San Bernardino Municipal: 31 Mar 2026 · NV DOT: 31 Dec 2025 · Reno Municipal: not found'},
+      {t:'T&M rate escalation clauses detected in 3 of 18 Standard T&M clients', sub:'Hendricks Commercial (+3% Jan 2026) · Desert Sun Properties (+2.5% Mar 2026) · Pacific Coast Dev. (+3% Jun 2026)'}
+    ],
+    aiResult:'4 Price Rules configured. 42 client assignments preserved. AI has added expiry dates to 5 government contracts and flagged 3 T&M escalation clauses — capabilities QBDT price levels do not have.',
+    concept:{
+      fromVal:'Price Levels (flat % per customer)',
+      fromDesc:'A static percentage discount applied to all items for a customer. One rule per customer. No expiry date. No item-category specificity. Manual update required when rates change.',
+      toVal:'Price Rules (conditional, date-aware, item-aware)',
+      toDesc:'Rules can target specific customers, date ranges, item categories, or quantities. Multiple rules can apply. Rules can expire automatically. Rate escalation clauses can be programmed.',
+      why:'IES Price Rules replicate every Meridian price level exactly and add capabilities that construction businesses need but QBDT never provided: government contract rates that expire on the contract end date (no more accidental government-rate billing on expired contracts), T&M rates that escalate automatically on a scheduled date, and Cost Plus percentages that apply only to specific cost categories. Your existing pricing carries over unchanged — these are additions, not replacements.',
+      parity:['Per-customer pricing:full','Flat discount levels:full','Government SOV rates:full','Date-expiring rules:full','T&M rate escalation:full','Cost-category specificity:full']
+    },
+    sampleData:{
+      label:'Price Level → Price Rule mapping — 42 clients, 4 rules',
+      cols:['QBDT Level','Clients','IES Price Rule','AI addition','Billing approach'],
+      rows:[
+        ['Standard T&M','18','Standard Rate Schedule','Rate escalation on 3 clients (AI-detected)','Time & Materials at posted rates'],
+        ['Preferred Contractor −10%','14','Preferred Contractor Rate','None — carries over exactly','10% discount on labour, standard materials'],
+        ['Government Contract SOV','6','Government Schedule of Values','Expiry dates added to 5 contracts (AI-detected)','Fixed-fee milestone billing per SOV'],
+        ['Cost Plus 18%','4','Cost Plus Management Fee','Fee applies to direct costs only (AI-suggested)','All direct costs + 18% management fee']
+      ]
+    },
+    roleContent:{
+      cfo:{
+        aha:'Government contract rates expire automatically on the contract end date. No more accidentally billing CalTrans at government rates after the contract ends.',
+        beforeLabel:'QBDT today', before:'When a government contract expires, someone must remember to change the client\'s price level in QBDT. This is done inconsistently. Billing errors — government rates applied to non-contract work — get caught by the client, not by Meridian.',
+        afterLabel:'IES Price Rules', after:'Government contract Price Rules have expiry dates set by AI from the contract data in your QBDT notes. On the expiry date, the rule becomes inactive. Billing reverts to Standard T&M automatically. No manual action.',
+        usecase:{
+          scenario:'CalTrans I-15 Bridge Rehab · Contract expiry',
+          title:'Automatic rate expiry on contract end',
+          qbdt:'CalTrans I-15 contract ends December 31, 2025. In January 2026, someone invoices two mobilisation visits at Government SOV rates instead of Standard T&M. CalTrans audit catches it in April. Credit memo issued.',
+          ies:'AI sets the CalTrans Government SOV Price Rule to expire December 31, 2025. On January 1, 2026, Standard T&M rates apply automatically. The January mobilisation invoices at T&M. No audit issue. No credit memo.'
+        }
+      },
+      ctrl:{
+        aha:'T&M rate escalations apply automatically on the scheduled date — no more manual rate updates across 18 clients.',
+        beforeLabel:'QBDT today', before:'When Meridian raises its T&M rates, you need to manually update the price level for each of the 18 Standard T&M clients. Miss one, and you\'re billing at the old rate until someone catches it.',
+        afterLabel:'IES Price Rules', after:'T&M rate escalation dates are programmed into the Price Rule. On the escalation date, the new rate applies automatically to all 18 clients. You update one rule. All 18 clients see the new rate simultaneously.',
+        usecase:{
+          scenario:'Annual T&M rate increase · January 2026',
+          title:'One-rule update applies to all 18 T&M clients',
+          qbdt:'January rate increase. You need to update price levels for 18 clients. It takes 90 minutes. Miss Hendricks Commercial. They get billed at 2025 rates for two months until discovered.',
+          ies:'You update the Standard Rate Schedule Price Rule with the 2026 rates. Effective date: January 1, 2026. All 18 clients automatically invoice at the new rate from January 1. Zero manual updates. Zero missed clients.'
+        }
+      },
+      pm:{
+        aha:'When you create a progress invoice, IES automatically applies the right rate for that client — government SOV, preferred rate, or standard T&M.',
+        beforeLabel:'QBDT today', before:'When creating an invoice in QBDT, the price level is applied based on the customer record. You sometimes need to verify which level applies, especially for clients with time-limited government contracts.',
+        afterLabel:'IES Price Rules', after:'When you create a progress invoice in IES for a Project, the correct Price Rule is applied automatically based on the client and the current date. Government SOV for government clients. T&M for others. Nothing to check.',
+        usecase:{
+          scenario:'Hendricks Commercial · Progress billing',
+          title:'Preferred contractor rate applied automatically on billing',
+          qbdt:'Creating progress invoice for Midtown Office Fit-out. You have to check whether Hendricks is on Preferred Contractor rate (10% discount on labour). Check the client record. It is. Apply manually.',
+          ies:'IES creates the Midtown Office progress invoice. Hendricks is assigned to Preferred Contractor Rate Rule. Labour discount applied automatically. You review the amounts — you don\'t check the rate.'
+        }
+      },
+      est:{
+        aha:'Your bid rates for Cost Plus jobs can now include the 18% management fee as a rule — it can\'t be accidentally excluded from an invoice.',
+        beforeLabel:'QBDT today', before:'Cost Plus 18% jobs require manually applying the 18% management fee to each invoice. If the accounting team creates an invoice directly, they sometimes forget the management fee. It\'s caught in review — usually.',
+        afterLabel:'IES Price Rules', after:'The Cost Plus Management Fee Price Rule automatically adds 18% to all direct cost line items for the 4 Cost Plus clients. The fee cannot be omitted — it\'s built into the rule. No manual step.',
+        usecase:{
+          scenario:'Cost Plus client · Management fee',
+          title:'Management fee can\'t be forgotten on Cost Plus invoices',
+          qbdt:'Office team creates a sub-invoice for a Cost Plus client. Management fee is a separate manual line item. Accounting team creates 4 invoices — misses the management fee on one. Net: $4,200 uncollected. Discovered 45 days later.',
+          ies:'Cost Plus Management Fee Price Rule applies 18% to direct costs automatically. The rule is on the client record. No manual line item. No missed fee. Invoice created correctly every time.'
+        }
+      },
+      pay:{
+        aha:'Prevailing wage rate schedules for government jobs can be programmed as Price Rules — rates update automatically when wage determinations are renewed.',
+        beforeLabel:'QBDT today', before:'Prevailing wage rates on government jobs are updated manually in QBDT when the Department of Labor issues new wage determinations (typically annually). Outdated rates cause certified payroll compliance issues.',
+        afterLabel:'IES Price Rules', after:'Prevailing wage rate schedules are configured as IES Price Rules per government project. When new wage determinations are issued, you update one Price Rule. All affected transactions automatically use the new rates.',
+        usecase:{
+          scenario:'CalTrans I-15 · Annual wage determination update',
+          title:'Prevailing wage rate update — one rule, all transactions',
+          qbdt:'DOL issues new CA prevailing wage determinations for highway construction. You manually update the wage rates in QBDT for the CalTrans job. Miss one classification (Operating Engineer). Certified payroll discrepancy flagged by CalTrans.',
+          ies:'Updated CA prevailing wage determinations are entered as a new IES Price Rule effective date. All CalTrans job transaction rates update automatically on the effective date. Every classification updates. LCPtracker submission is clean.'
+        }
+      }
+    },
+    decision:{
+      q:'How should Meridian\'s government contract Price Rules be handled?',
+      options:[
+        {t:'Expiry dates on government contracts + escalation dates on T&M (recommended)', sub:'AI-detected expiry and escalation dates applied. CalTrans, NV DOT, LA County, San Bernardino expire Dec/Jun 2025–2026. T&M escalations in Jan, Mar, Jun 2026.', good:true},
+        {t:'Carry over price levels as static rules — manage dates manually', sub:'Rules carry over without expiry dates. You manage rate changes manually as you do today.', good:false}
+      ]
+    }
+  }
+];
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let activeRole = 'pm'; // default
+let activeConcept = 0;
+let confirmed = {}; // {c1: true, c2: true, ...}
+let selectedDecisions = {};
+
+/* ════════════════════════════════
+   ROLE HELPERS
+════════════════════════════════ */
+function getRole(){return ROLES.find(r=>r.id===activeRole)||ROLES[0]}
+
+function applyRole(roleId){
+  activeRole = roleId;
+  const r = getRole();
+  document.documentElement.style.setProperty('--active-role-col', r.col);
+  document.documentElement.style.setProperty('--active-role-colL', r.colL);
+  // update nav pill
+  document.getElementById('navRoleDot').style.background = r.col.replace('var(--r-','#').replace(')','');
+  document.getElementById('navRoleLabel').textContent = r.name;
+  // update mast role bar
+  renderMastRoleBar();
+  // re-render active concept
+  renderConceptPanel(activeConcept);
+}
+
+/* ════════════════════════════════
+   RENDER ROLE BAR (masthead)
+════════════════════════════════ */
+function renderMastRoleBar(){
+  const bar = document.getElementById('mastRoleBar');
+  bar.innerHTML = ROLES.map(r=>`
+    <div class="rb-role${r.id===activeRole?' active':''}" onclick="applyRole('${r.id}')" style="${r.id===activeRole?`background:${r.col};border-color:${r.col};color:#fff;opacity:.85`:''}">
+      <div class="rb-role-dot" style="background:${r.id===activeRole?'rgba(255,255,255,.6)':r.col}"></div>
+      ${r.name}
+    </div>`).join('');
+}
+
+/* ════════════════════════════════
+   RENDER ROLE PICKER
+════════════════════════════════ */
+function renderRolePicker(selectedId){
+  const el = document.getElementById('rpRoles');
+  el.innerHTML = ROLES.map(r=>`
+    <div class="rp-role${r.id===selectedId?' active':''}" onclick="pickRole('${r.id}')" style="--rcol:${r.col};--rcoll:${r.colL}">
+      <div class="rp-role-top">
+        <div class="rp-avatar" style="background:${r.colL};color:${r.col}">${r.avatar}</div>
+        <div class="rp-role-name">${r.fullName}</div>
+      </div>
+      <div class="rp-role-desc">${r.dept}</div>
+    </div>`).join('');
+}
+
+let pendingRole = null;
+function pickRole(id){
+  pendingRole = id;
+  renderRolePicker(id);
+  document.getElementById('rpConfirm').disabled = false;
+}
+function confirmRole(){
+  if(pendingRole){applyRole(pendingRole);}
+  document.getElementById('roleOverlay').classList.remove('show');
+}
+function showRolePicker(){
+  renderRolePicker(activeRole);
+  pendingRole = activeRole;
+  document.getElementById('rpConfirm').disabled = false;
+  document.getElementById('roleOverlay').classList.add('show');
+}
+document.getElementById('roleOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('roleOverlay'))document.getElementById('roleOverlay').classList.remove('show')});
+
+/* ════════════════════════════════
+   RENDER CONCEPT TABS
+════════════════════════════════ */
+function renderTabs(){
+  const tabs = document.getElementById('conceptTabs');
+  tabs.innerHTML = CONCEPTS.map((c,i)=>`
+    <div class="ctab${i===activeConcept?' active':''}" onclick="selectConcept(${i})" style="--ccol:${c.col};--ccoll:${c.colL}">
+      <div class="ctab-dot" style="background:${c.col}"></div>
+      <span class="ctab-num">${c.num}</span>
+      ${c.shortName}
+      ${confirmed[c.id]?'<svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M1.5 5l2.5 2.5 5-5" stroke="'+c.col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+    </div>`).join('');
+
+  const prog = document.getElementById('conceptProgress');
+  prog.innerHTML = CONCEPTS.map((c,i)=>`
+    <div class="cp-step${i===activeConcept?' active':''}${confirmed[c.id]?' done':''}" onclick="selectConcept(${i})" style="--ccol:${c.col};--ccoll:${c.colL}">
+      <div class="cp-num">${c.num}</div>
+      <div class="cp-name">${c.shortName}</div>
+    </div>`).join('');
+}
+
+function selectConcept(i){
+  activeConcept = i;
+  renderTabs();
+  renderConceptPanel(i);
+  document.getElementById('conceptPanels').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ════════════════════════════════
+   SVG HELPERS
+════════════════════════════════ */
+const Svg = {
+  check:`<svg viewBox="0 0 10 10" fill="none" width="10" height="10" style="display:inline-block;vertical-align:middle;flex-shrink:0;min-width:10px"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  spin:`<svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.3" stroke-dasharray="16" stroke-dashoffset="8"/></svg>`,
+  arrow:`<svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  next:`<svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+};
+
+/* ════════════════════════════════
+   RENDER CONCEPT PANEL
+════════════════════════════════ */
+function renderConceptPanel(ci){
+  const c = CONCEPTS[ci];
+  const r = getRole();
+  const rc = c.roleContent[r.id] || c.roleContent['pm'];
+
+  // parity chips
+  const parityHTML = (c.concept.parity||[]).map(p=>{
+    const [l,s]=p.split(':');
+    return `<span class="pchip pc-${s}">${s==='full'?'✓':s==='part'?'~':'✗'} ${l}</span>`;
+  }).join('');
+
+  // data sample rows
+  const sampleHTML = c.sampleData ? `
+    <div class="data-sample">
+      <div class="ds-header">
+        <div class="ds-title">${c.sampleData.label}</div>
+        <div class="ds-ai-tag">${Svg.check} AI-generated</div>
+      </div>
+      <table class="ds-table">
+        <thead><tr>${c.sampleData.cols.map(col=>`<th>${col}</th>`).join('')}</tr></thead>
+        <tbody>${c.sampleData.rows.map((row,ri)=>`<tr>${row.map((cell,ci2)=>`<td class="${ci2===0?'ds-mono':ci2===1?'ds-new':''}">${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>` : '';
+
+  // decision
+  let decisionHTML = '';
+  if(c.decision){
+    const sel = selectedDecisions[c.id];
+    decisionHTML = `
+    <div class="confirm-block" style="border-color:${c.col}1A">
+      <div class="conf-header">
+        <div class="conf-icon" style="background:${c.colL}"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4.5" stroke="${c.col}" stroke-width="1.2"/><path d="M6 5v3M6 4v.5" stroke="${c.col}" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        <div class="conf-label">Your decision</div>
+      </div>
+      <div class="conf-sub">${c.decision.q}</div>
+      <div class="conf-options">
+        ${c.decision.options.map((opt,oi)=>`
+        <div class="conf-btn${oi===0?' conf-btn-accept':' conf-btn-adjust'}" 
+             onclick="selectDecision('${c.id}',${oi})"
+             style="${oi===0?`background:${c.col};border-color:${c.col}`:''}" >
+          ${oi===0?Svg.check:Svg.next} ${opt.t}
+        </div>`).join('')}
+      </div>
+      ${sel!==undefined?`<div style="margin-top:10px;padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.55;display:flex;align-items:flex-start;gap:7px;background:${c.decision.options[sel].good?'var(--okl)':'var(--warnl)'};border:1px solid ${c.decision.options[sel].good?'var(--okb)':'var(--warnb)'};color:${c.decision.options[sel].good?'var(--ok)':'var(--warn)'}">
+        ${sel===0?Svg.check:'⚠'} ${c.decision.options[sel].sub}
+      </div>`:''}
+    </div>`;
+  }
+
+  // role spotlight
+  const rsBgCol = r.col; const rsBgColL = r.colL;
+  const rsHTML = `
+  <div class="role-spotlight" style="background:${rsBgColL};border-color:${rsBgCol}22;--ccol:${rsBgCol}">
+    <div class="rs-header">
+      <div class="rs-avatar" style="background:${rsBgColL};color:${rsBgCol};border:1.5px solid ${rsBgCol}40">${r.avatar}</div>
+      <div>
+        <div class="rs-role-name" style="color:${rsBgCol}">${r.fullName}</div>
+      </div>
+      <div class="rs-label" style="color:${rsBgCol}">What changes for you</div>
+    </div>
+    <div class="rs-aha" style="color:${rsBgCol}">${rc.aha}</div>
+    <div class="rs-before-after">
+      <div class="rs-ba rs-before">
+        <div class="rs-ba-label">${rc.beforeLabel}</div>
+        ${rc.before}
+      </div>
+      <div class="rs-ba rs-after" style="background:${rsBgColL};border-color:${rsBgCol}22">
+        <div class="rs-ba-label" style="color:${rsBgCol}">${rc.afterLabel}</div>
+        <span style="color:var(--ink2)">${rc.after}</span>
+      </div>
+    </div>
+    <div class="rs-usecase">
+      <div class="rs-usecase-label" style="color:${rsBgCol}">Construction use case · ${rc.usecase.scenario}</div>
+      <strong style="color:var(--ink)">${rc.usecase.title}</strong><br><br>
+      <strong style="color:var(--ink3)">Before (QBDT):</strong> ${rc.usecase.qbdt}<br><br>
+      <strong style="color:${rsBgCol}">After (IES):</strong> ${rc.usecase.ies}
+    </div>
+  </div>`;
+
+  // confirmation row
+  const isConfirmed = confirmed[c.id];
+  const confirmHTML = `
+  <div class="confirm-block" style="border-color:${isConfirmed?'var(--okb)':'var(--b)'}">
+    <div class="conf-header">
+      <div class="conf-icon" style="background:${isConfirmed?'var(--okl)':c.colL}">
+        <svg viewBox="0 0 12 12" fill="none" width="12" height="12"><path d="M1.5 6l3 3 6-6" stroke="${isConfirmed?'var(--ok)':c.col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="conf-label" style="color:${isConfirmed?'var(--ok)':c.col}">${isConfirmed?'Confirmed — AI configuration accepted':'Confirm AI mapping'}</div>
+    </div>
+    <div class="conf-sub">${isConfirmed?`The AI mapping for <strong>${c.shortName}</strong> has been confirmed. The configuration is ready for the migration stage.`:`Review the AI-generated mapping above. If it looks correct for Meridian, confirm it. AI has done the configuration — you are reviewing, not building.`}</div>
+    ${isConfirmed?`
+    <div class="callout co-ok" style="margin-bottom:0">
+      <svg viewBox="0 0 12 12" fill="none" width="12" height="12" style="display:inline-block;flex-shrink:0;min-width:12px"><path d="M1.5 6l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="callout-text"><strong>${c.shortName}</strong> — AI configuration confirmed. ${ci<CONCEPTS.length-1?`Next: ${CONCEPTS[ci+1].shortName}.`:'All concept translations complete.'}</div>
+    </div>`:`
+    <div class="conf-options">
+      <button class="conf-btn conf-btn-accept" onclick="confirmConcept('${c.id}',${ci})" style="background:${c.col};border-color:${c.col}">
+        ${Svg.check} Confirm — this mapping looks correct
+      </button>
+      <button class="conf-btn conf-btn-adjust" onclick="openAdjust('${c.id}')">
+        Adjust something
+      </button>
+    </div>`}
+  </div>`;
+
+  document.getElementById('conceptPanels').innerHTML = `
+  <div class="concept-panel active" id="panel_${c.id}" style="--ccol:${c.col};--ccoll:${c.colL};--ccb:${c.colB}">
+
+    <!-- HEADER -->
+    <div style="background:${c.headerBg};border-radius:12px;padding:20px 24px;margin-bottom:20px;color:#fff">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:8px">${c.num} · Concept translation</div>
+      <div style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:6px;line-height:1.2">${c.name}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6">${c.tagline}</div>
+    </div>
+
+    <!-- AI DIAGNOSTIC -->
+    <div class="sec">
+      <div class="sec-label">What AI found in your QBDT file</div>
+      <div class="ai-block">
+        <div class="aib-header">
+          <div class="aib-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v2M6 9v2M1 6h2M9 6h2M2.5 2.5l1.4 1.4M8.1 8.1l1.4 1.4M2.5 9.5l1.4-1.4M8.1 3.9l1.4-1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="aib-label">AI analysis — complete</div>
+        </div>
+        <div class="aib-tasks">
+          ${c.aiTasks.map(t=>`
+          <div class="aib-task">
+            <div class="aib-status ast-done">${Svg.check}</div>
+            <div>
+              <div class="aib-task-text">${t.t}</div>
+              <div class="aib-task-sub">${t.sub}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="aib-result">${Svg.check}<span>${c.aiResult}</span></div>
+      </div>
+    </div>
+
+    <!-- CONCEPT BRIDGE -->
+    <div class="sec">
+      <div class="sec-label">The translation — what changes and what gets better</div>
+      <div class="cb">
+        <div class="cb-header" style="background:${c.colL};border-color:${c.colB}">
+          <svg viewBox="0 0 12 12" fill="none" style="color:${c.col}"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="cb-header-title" style="color:${c.col}">Concept translation — ${c.name}</span>
+          <span class="cb-header-sub">What changes in IES</span>
+        </div>
+        <div class="cb-body">
+          <div class="cb-map">
+            <div class="cb-side cb-from">
+              <div class="cb-side-lbl">In QuickBooks Desktop Enterprise</div>
+              <div class="cb-side-val">${c.concept.fromVal}</div>
+              <div class="cb-side-desc">${c.concept.fromDesc}</div>
+            </div>
+            <div class="cb-arrow">
+              <svg viewBox="0 0 20 20" fill="none" style="color:${c.col}"><path d="M3 10h14M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>becomes</span>
+            </div>
+            <div class="cb-side cb-to" style="background:${c.colL};border-color:${c.colB}">
+              <div class="cb-side-lbl">In Intuit Enterprise Suite</div>
+              <div class="cb-side-val">${c.concept.toVal}</div>
+              <div class="cb-side-desc">${c.concept.toDesc}</div>
+            </div>
+          </div>
+          <div class="cb-why" style="background:${c.colL};border-color:${c.colB}">
+            <strong style="color:${c.col}">Why this matters for Meridian: </strong><span style="color:var(--ink2)">${c.concept.why}</span>
+          </div>
+          <div class="cb-parity">${parityHTML}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROLE SPOTLIGHT -->
+    <div class="sec">
+      <div class="sec-label">What this means for your role — ${r.name}</div>
+      ${rsHTML}
+    </div>
+
+    <!-- DATA SAMPLE -->
+    <div class="sec">
+      <div class="sec-label">Meridian's data — AI-generated mapping (review, don't re-enter)</div>
+      ${sampleHTML}
+    </div>
+
+    <!-- DECISION (if applicable) -->
+    ${c.decision ? `<div class="sec"><div class="sec-label">One decision required</div>${decisionHTML}</div>` : ''}
+
+    <!-- CONFIRMATION -->
+    <div class="sec">
+      <div class="sec-label">Confirm this concept translation</div>
+      ${confirmHTML}
+    </div>
+
+    <!-- NEXT CONCEPT -->
+    ${ci < CONCEPTS.length-1 ? `
+    <div class="callout co-ai">
+      <svg viewBox="0 0 12 12" fill="none"><path d="M6 1v2M6 9v2M1 6h2M9 6h2M2.5 2.5l1.4 1.4M8.1 8.1l1.4 1.4M2.5 9.5l1.4-1.4M8.1 3.9l1.4-1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div class="callout-text"><strong>Next:</strong> ${CONCEPTS[ci+1].name} — <span onclick="selectConcept(${ci+1})" style="cursor:pointer;text-decoration:underline">continue to concept ${ci+2}</span></div>
+    </div>` : `
+    <div class="callout co-ok">
+      <svg viewBox="0 0 12 12" fill="none"><path d="M1.5 6l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="callout-text"><strong>All three concept translations complete.</strong> The IES environment is configured with Meridian's Projects structure, Dimensions model, and Price Rules. The migration can proceed to the data preparation stage.</div>
+    </div>`}
+
+  </div>`;
+}
+
+/* ════════════════════════════════
+   INTERACTIONS
+════════════════════════════════ */
+function confirmConcept(cid, ci){
+  confirmed[cid] = true;
+  renderTabs();
+  renderConceptPanel(ci);
+  if(ci < CONCEPTS.length-1){
+    setTimeout(()=>selectConcept(ci+1), 600);
+  }
+}
+function selectDecision(cid, oi){
+  selectedDecisions[cid] = oi;
+  renderConceptPanel(activeConcept);
+}
+function openAdjust(cid){
+  alert('In the production experience, this opens a side panel to adjust specific mapping values — for example, renaming a Dimension value or reassigning a client to a different Price Rule.');
+}
+function toggleSN(el){
+  el.querySelector('.sn-body').classList.toggle('open');
+  el.querySelector('.sn-toggle').textContent = el.querySelector('.sn-body').classList.contains('open') ? '▲' : '▼';
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+renderMastRoleBar();
+renderTabs();
+renderConceptPanel(0);
+</script>
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><span class="rn-doc cur">06·Concepts</span><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="ies-education-strategy.html">← 05</a><a class="rn-arr" href="ies-education-rollout.html">07 →</a></div></div>
+</body>
+</html>

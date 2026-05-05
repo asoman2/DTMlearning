@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian · IES Education Rollout — Full Workforce Strategy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F3F5F9;--s:#FFF;--s2:#EEF0F7;--s3:#E3E6F0;--s4:#D4D9E8;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.17);
+  --ink:#13202E;--ink2:#384E68;--ink3:#677A96;--ink4:#A2B2C6;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  /* Tier colours — 5 tiers */
+  --t1:#1E40AF; --t1l:#EFF2FF; --t1b:rgba(30,64,175,.18);   /* Power users */
+  --t2:#065F46; --t2l:#ECFDF5; --t2b:rgba(6,95,70,.18);     /* Regular users */
+  --t3:#6D28D9; --t3l:#F5F3FF; --t3b:rgba(109,40,217,.18);  /* Light users */
+  --t4:#B45309; --t4l:#FFFBEB; --t4b:rgba(180,83,9,.18);    /* Self-service */
+  --t5:#374151; --t5l:#F9FAFB; --t5b:rgba(55,65,81,.15);    /* IES-ambient */
+  /* Phase colours */
+  --ph1:#0E7490; --ph1l:#ECFEFF; --ph1b:rgba(14,116,144,.18);
+  --ph2:#4C1D95; --ph2l:#F5F3FF; --ph2b:rgba(76,29,149,.18);
+  --ph3:#065F46; --ph3l:#ECFDF5; --ph3b:rgba(6,95,70,.18);
+  /* DSU sequence */
+  --disc:#1E40AF; --discl:#EFF2FF;
+  --und:#065F46;  --undl:#ECFDF5;
+  --conf:#6D28D9; --confl:#F5F3FF;
+  --ok:#059669; --okl:#ECFDF5; --okb:rgba(5,150,105,.18);
+  --warn:#D97706; --warnl:#FFF8EC; --warnb:rgba(217,119,6,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06); --sh2:0 4px 16px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 36px;gap:14px;position:sticky;top:0;z-index:100}
+.nav-mark{width:28px;height:28px;background:var(--t1);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:14px;height:14px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.6)}
+
+.mast{background:linear-gradient(160deg,var(--navy) 0%,#18304E 60%,#1E3A62 100%);padding:68px 36px 52px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%, rgba(30,64,175,.15) 0%, transparent 60%);pointer-events:none}
+.mast-inner{max-width:1120px;margin:0 auto;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.mast-h1{font-family:var(--serif);font-size:clamp(30px,4vw,50px);font-weight:400;color:#fff;line-height:1.08;margin-bottom:14px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-lead{font-size:15px;color:rgba(255,255,255,.5);line-height:1.78;max-width:680px;margin-bottom:28px}
+
+/* CORE REFRAME */
+.reframe{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px 22px;max-width:820px;margin-bottom:28px}
+.rf-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:10px}
+.rf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rf-col-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.rf-col-title.blue{color:#93C5FD} .rf-col-title.gold{color:#FCD34D}
+.rf-pts{display:flex;flex-direction:column;gap:4px}
+.rf-pt{font-size:12px;color:rgba(255,255,255,.55);display:flex;gap:7px;align-items:flex-start;line-height:1.4}
+.rf-pt::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.rf-pt.blue::before{background:#93C5FD} .rf-pt.gold::before{background:#FCD34D}
+
+.mast-stats{display:flex;gap:28px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:22px}
+.ms{} .ms-val{font-family:var(--serif);font-size:24px;color:#fff;line-height:1;margin-bottom:3px}
+.ms-lbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em}
+
+.page{max-width:1120px;margin:0 auto;padding:48px 36px 100px}
+.sec{margin-bottom:60px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:12px;border-bottom:1.5px solid var(--s3)}
+.sec-n{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.07em}
+.sec-title{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1}
+.sec-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid}
+.prose{font-size:14px;color:var(--ink2);line-height:1.82;margin-bottom:22px;max-width:820px}
+.prose strong{color:var(--ink);font-weight:600}
+
+/* ── WORKFORCE MAP ── */
+.wf-map{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.wf-row{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:stretch}
+.wf-left{border-radius:10px;padding:14px 16px;border:1px solid}
+.wf-tier-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.wf-tier-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.wf-tier-size{font-family:var(--mono);font-size:22px;font-weight:400;line-height:1;margin-bottom:3px}
+.wf-tier-lbl{font-size:10px;color:var(--ink3)}
+.wf-right{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;box-shadow:var(--sh)}
+.wf-col-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:6px}
+.wf-col-pts{display:flex;flex-direction:column;gap:3px}
+.wf-col-pt{font-size:12px;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;line-height:1.4}
+.wf-col-pt::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--ink4);flex-shrink:0;margin-top:7px}
+.wf-col-pt.highlight{color:var(--ink);font-weight:500}
+.wf-col-pt.highlight::before{background:var(--wcol,var(--t1))}
+
+/* ── DSU SEQUENCE CARD ── */
+.dsu-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;margin-bottom:28px}
+.dsu-tier-block{border-radius:10px;overflow:hidden;border:1px solid var(--b);box-shadow:var(--sh)}
+.dsu-tier-head{padding:10px 13px;border-bottom:1px solid var(--b)}
+.dsu-tier-num{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:3px}
+.dsu-tier-label{font-size:12px;font-weight:600}
+.dsu-sequence{display:flex;flex-direction:column;gap:0}
+.dsu-step{padding:10px 13px;border-bottom:1px solid var(--b)}
+.dsu-step:last-child{border-bottom:none}
+.dsu-step-phase{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.dsu-step-content{font-size:11px;color:var(--ink2);line-height:1.5}
+.dsu-step-content strong{color:var(--ink);font-weight:600;display:block;margin-bottom:2px;font-size:11px}
+.dsu-step-format{font-size:10px;color:var(--ink4);margin-top:4px;font-style:italic}
+
+/* ── WAVE-ALIGNED ROLLOUT ── */
+.wave-rollout{display:flex;flex-direction:column;gap:0;margin-bottom:28px}
+.wr-connector{width:1px;height:16px;background:var(--b2);margin-left:55px}
+.wr-row{display:grid;grid-template-columns:110px 1fr;gap:0}
+.wr-left{display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.wr-circle{width:38px;height:38px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);background:var(--s)}
+.wr-time{font-size:10px;text-align:center;color:var(--ink3);margin-top:5px;line-height:1.3;max-width:90px}
+.wr-card{background:var(--s);border:1px solid var(--b);border-radius:10px;margin:8px 0 8px 14px;padding:16px 18px;box-shadow:var(--sh)}
+.wr-card-head{margin-bottom:10px}
+.wr-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.wr-card-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px}
+.wr-card-sub{font-size:12px;color:var(--ink3);line-height:1.5}
+.wr-tier-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.wr-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:4px;border:1px solid;white-space:nowrap}
+.wr-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wr-action{background:var(--s2);border:1px solid var(--b);border-radius:7px;padding:9px 12px}
+.wr-action-tier{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:4px}
+.wr-action-text{font-size:11px;color:var(--ink2);line-height:1.5}
+
+/* ── CHANNEL MATRIX ── */
+.channel-matrix{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.channel-matrix th{background:var(--navy);padding:9px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.08)}
+.channel-matrix td{padding:9px 12px;border-bottom:1px solid var(--b);vertical-align:top;line-height:1.5;color:var(--ink2)}
+.channel-matrix tr:last-child td{border-bottom:none}
+.channel-matrix tr:hover td{background:var(--s2)}
+.ch-yes{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;background:var(--okl);color:var(--ok);border:1px solid var(--okb)}
+.ch-no{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;background:var(--s2);color:var(--ink4);border:1px solid var(--b)}
+.ch-pri{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--t1l);color:var(--t1);border:1px solid var(--t1b)}
+
+/* ── AMBIENT IES ── */
+.ambient-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+.amb-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.amb-icon{font-size:20px;margin-bottom:10px}
+.amb-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);margin-bottom:4px}
+.amb-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.3}
+.amb-text{font-size:12px;color:var(--ink3);line-height:1.65}
+.amb-text strong{color:var(--ink2);font-weight:500}
+
+/* ── MOMENT CARDS ── */
+.moment-flow{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.moment-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:14px;align-items:start;box-shadow:var(--sh)}
+.mc-trigger{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3}
+.mc-trigger-sub{font-size:11px;color:var(--ink3);margin-top:3px}
+.mc-phase{border-radius:6px;padding:9px 11px}
+.mc-phase-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.mc-phase-text{font-size:11px;line-height:1.5}
+.mc-disc{background:var(--discl);border:1px solid rgba(30,64,175,.15)} .mc-disc .mc-phase-label{color:var(--disc)}  .mc-disc .mc-phase-text{color:#1E3A8A}
+.mc-und{background:var(--undl);border:1px solid rgba(6,95,70,.15)} .mc-und .mc-phase-label{color:var(--und)} .mc-und .mc-phase-text{color:#064E3B}
+.mc-conf{background:var(--confl);border:1px solid rgba(109,40,217,.15)} .mc-conf .mc-phase-label{color:var(--conf)} .mc-conf .mc-phase-text{color:#4C1D95}
+
+/* ── LANGUAGE / ACCESS STRIP ── */
+.access-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
+.as-card{background:var(--s);border:1px solid var(--b);border-radius:9px;padding:14px 15px;box-shadow:var(--sh);border-left:3px solid}
+.as-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+.as-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.as-text{font-size:12px;color:var(--ink3);line-height:1.6}
+
+/* ── MEASUREMENT TABLE ── */
+.meas-table{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.meas-table th{background:var(--s2);padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--b2)}
+.meas-table td{padding:9px 13px;border-bottom:1px solid var(--b);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.meas-table tr:last-child td{border-bottom:none}
+.meas-table tr:hover td{background:var(--s2)}
+
+/* ── CALLOUT ── */
+.callout{border-radius:8px;padding:12px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.callout svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-navy{background:var(--navy);border:1px solid rgba(255,255,255,.08)} .co-navy svg{color:rgba(255,255,255,.4)} .co-navy .callout-text{color:rgba(255,255,255,.6)} .co-navy .callout-text strong{color:#fff}
+.co-t1{background:var(--t1l);border:1px solid var(--t1b)} .co-t1 svg,.co-t1 .callout-text{color:#1E3A8A} .co-t1 .callout-text strong{color:var(--t1)}
+.co-t4{background:var(--t4l);border:1px solid var(--t4b)} .co-t4 svg{color:var(--t4)} .co-t4 .callout-text{color:#451A03} .co-t4 .callout-text strong{color:var(--t4)}
+.co-t5{background:var(--t5l);border:1px solid var(--t5b)} .co-t5 svg{color:var(--t5)} .co-t5 .callout-text{color:#1F2937} .co-t5 .callout-text strong{color:var(--t5)}
+.co-ok{background:var(--okl);border:1px solid var(--okb)} .co-ok svg{color:var(--ok)} .co-ok .callout-text{color:#064E3B} .co-ok .callout-text strong{color:var(--ok)}
+
+.doc-footer{background:var(--navy);padding:22px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:900px){
+  .nav,.mast,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .wf-row,.dsu-grid,.wr-actions,.channel-matrix,.ambient-grid,.access-strip,.moment-card{grid-template-columns:1fr}
+  .mast-h1{font-size:28px}
+  .rf-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L2 4v6l5 3 5-3V4L7 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 1v12M2 4l5 3 5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Meridian Building Group</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">IES Education Rollout — Full Workforce</span>
+  <div class="nav-sp"></div>
+  <span class="nav-tag">~210 employees · 10 states · 5 tiers</span>
+</nav>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-kicker">UX strategy · Rollout and scale · Beyond the migration team</div>
+    <h1 class="mast-h1">The <em>entire workforce</em> is<br>affected. Not all of them use IES.</h1>
+    <p class="mast-lead">The Discover → Understand in context → Confirm model was designed for the migration team. But Meridian has 210 people whose paychecks, hours, job data, or financial reports are processed by IES. Every one of them needs a version of this education — calibrated to their actual relationship with the system, not the migration team's relationship with it.</p>
+
+    <div class="reframe">
+      <div class="rf-label">The reframe — two very different questions</div>
+      <div class="rf-grid">
+        <div>
+          <div class="rf-col-title blue">Who uses IES</div>
+          <div class="rf-pts">
+            <div class="rf-pt blue">~35 people use IES deeply every day</div>
+            <div class="rf-pt blue">~60 people use IES functionally — approvals, dashboards</div>
+            <div class="rf-pt blue">~115 people use IES for exactly one thing: their own pay stub</div>
+            <div class="rf-pt blue">~40 people never log into IES</div>
+          </div>
+        </div>
+        <div>
+          <div class="rf-col-title gold">Who is affected by IES</div>
+          <div class="rf-pts">
+            <div class="rf-pt gold">All 210 employees — their paycheck is processed by IES</div>
+            <div class="rf-pt gold">~120 field workers — their certified payroll hours are in IES</div>
+            <div class="rf-pt gold">~120 active subcontractors — their payments run through IES</div>
+            <div class="rf-pt gold">14 union locals — their fringe benefit remittances come from IES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mast-stats">
+      <div class="ms"><div class="ms-val">5</div><div class="ms-lbl">Workforce tiers</div></div>
+      <div class="ms"><div class="ms-val">210</div><div class="ms-lbl">Total employees</div></div>
+      <div class="ms"><div class="ms-val">3</div><div class="ms-lbl">Education waves</div></div>
+      <div class="ms"><div class="ms-val">7</div><div class="ms-lbl">Delivery channels</div></div>
+      <div class="ms"><div class="ms-val">12</div><div class="ms-lbl">Trigger moments</div></div>
+      <div class="ms"><div class="ms-val">2</div><div class="ms-lbl">Languages minimum</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<!-- ══ 1. THE FIVE TIERS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">01 —</span>
+    <span class="sec-title">Five workforce tiers — IES relationship, not org chart position</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--t1);border-color:var(--t1b);background:var(--t1l)">Segmentation model</span>
+  </div>
+
+  <p class="prose">The segmentation that matters for education design is not the org chart — it is each person's actual relationship with IES. A Controller and a field laborer are not in adjacent tiers of an org chart, but they are in adjacent tiers of IES relationship (both are deeply affected; one configures, one has their paycheck generated). The five tiers cut across departments and seniority levels.</p>
+
+  <div class="wf-map">
+    <!-- T1 -->
+    <div class="wf-row">
+      <div class="wf-left" style="background:var(--t1l);border-color:var(--t1b)">
+        <div class="wf-tier-badge" style="color:var(--t1)">Tier 1 · Power users</div>
+        <div class="wf-tier-name" style="color:var(--t1)">IES is their primary work surface</div>
+        <div class="wf-tier-size" style="color:var(--t1)">~35</div>
+        <div class="wf-tier-lbl">employees · every day, all day</div>
+      </div>
+      <div class="wf-right" style="--wcol:var(--t1)">
+        <div>
+          <div class="wf-col-label">Who</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Controller + finance team (AP/AR)</div>
+            <div class="wf-col-pt highlight">Payroll Manager + payroll admins</div>
+            <div class="wf-col-pt highlight">HR Director + HR staff</div>
+            <div class="wf-col-pt">Project Managers (15–20)</div>
+            <div class="wf-col-pt">IT Director</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Their IES relationship</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Configure, approve, enter, report</div>
+            <div class="wf-col-pt">Run payroll, close books, manage projects</div>
+            <div class="wf-col-pt">IES is the system — not a tool</div>
+            <div class="wf-col-pt">Migration changes their daily workflow substantially</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Education need</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Full DSU sequence per concept</div>
+            <div class="wf-col-pt">Role-specific aha framing</div>
+            <div class="wf-col-pt">Sandbox access</div>
+            <div class="wf-col-pt">Co-pilot for first critical runs</div>
+            <div class="wf-col-pt">Ongoing capability sprints</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T2 -->
+    <div class="wf-row">
+      <div class="wf-left" style="background:var(--t2l);border-color:var(--t2b)">
+        <div class="wf-tier-badge" style="color:var(--t2)">Tier 2 · Regular users</div>
+        <div class="wf-tier-name" style="color:var(--t2)">IES is one of several tools</div>
+        <div class="wf-tier-size" style="color:var(--t2)">~60</div>
+        <div class="wf-tier-lbl">employees · several times per week</div>
+      </div>
+      <div class="wf-right" style="--wcol:var(--t2)">
+        <div>
+          <div class="wf-col-label">Who</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Branch/Regional Managers (10)</div>
+            <div class="wf-col-pt highlight">VP Operations / Division Heads (4)</div>
+            <div class="wf-col-pt highlight">Chief Estimator + estimating team</div>
+            <div class="wf-col-pt">IES Champions per branch (10)</div>
+            <div class="wf-col-pt">Senior PMs who use Procore + IES together</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Their IES relationship</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Approve, review, report — not enter</div>
+            <div class="wf-col-pt">Use IES dashboards alongside Procore</div>
+            <div class="wf-col-pt">IES is where financial data lives, Procore is where project ops live</div>
+            <div class="wf-col-pt">Workflow changes are partial, not total</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Education need</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Focused DSU on the 3–5 IES features they use</div>
+            <div class="wf-col-pt">Approval workflow and dashboard orientation</div>
+            <div class="wf-col-pt">How Procore and IES connect</div>
+            <div class="wf-col-pt">90-min session, not 4-week programme</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T3 -->
+    <div class="wf-row">
+      <div class="wf-left" style="background:var(--t3l);border-color:var(--t3b)">
+        <div class="wf-tier-badge" style="color:var(--t3)">Tier 3 · Light users</div>
+        <div class="wf-tier-name" style="color:var(--t3)">IES for decisions and sign-offs</div>
+        <div class="wf-tier-size" style="color:var(--t3)">~15</div>
+        <div class="wf-tier-lbl">employees · weekly or less</div>
+      </div>
+      <div class="wf-right" style="--wcol:var(--t3)">
+        <div>
+          <div class="wf-col-label">Who</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">CFO</div>
+            <div class="wf-col-pt highlight">Board members (if any IES access)</div>
+            <div class="wf-col-pt">External reviewers: CPA, legal</div>
+            <div class="wf-col-pt">CPO (Certified Payroll Officer)</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Their IES relationship</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Consume IES outputs, rarely enter data</div>
+            <div class="wf-col-pt">Gate-only interactions (sign-offs)</div>
+            <div class="wf-col-pt">Dashboard and report consumers</div>
+            <div class="wf-col-pt">High-stakes decisions from IES data</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Education need</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Benefit demonstration (Day-in-the-life)</div>
+            <div class="wf-col-pt">Dashboard literacy — 3-hour session</div>
+            <div class="wf-col-pt">How to interpret AI Insights alerts</div>
+            <div class="wf-col-pt">No feature training — just outcomes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T4 -->
+    <div class="wf-row">
+      <div class="wf-left" style="background:var(--t4l);border-color:var(--t4b)">
+        <div class="wf-tier-badge" style="color:var(--t4)">Tier 4 · Self-service users</div>
+        <div class="wf-tier-name" style="color:var(--t4)">IES for one task: their own record</div>
+        <div class="wf-tier-size" style="color:var(--t4)">~115</div>
+        <div class="wf-tier-lbl">employees · monthly or at need</div>
+      </div>
+      <div class="wf-right" style="--wcol:var(--t4)">
+        <div>
+          <div class="wf-col-label">Who</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Office and admin staff who don't manage finance</div>
+            <div class="wf-col-pt highlight">Field supervisors and foremen</div>
+            <div class="wf-col-pt">Mid-level field crew with smartphones</div>
+            <div class="wf-col-pt">All employees needing W-2, pay stub, benefits</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Their IES relationship</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Pay stub access (monthly)</div>
+            <div class="wf-col-pt">Direct deposit management</div>
+            <div class="wf-col-pt">W-2 download (annual)</div>
+            <div class="wf-col-pt">Benefits enrollment</div>
+            <div class="wf-col-pt">Personal info updates</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Education need</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">One session, three tasks, on their device</div>
+            <div class="wf-col-pt">Bilingual English + Spanish</div>
+            <div class="wf-col-pt">On-site orientation by Champion</div>
+            <div class="wf-col-pt">Laminated card at workstation</div>
+            <div class="wf-col-pt">No prior software knowledge required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T5 -->
+    <div class="wf-row">
+      <div class="wf-left" style="background:var(--t5l);border-color:var(--t5b)">
+        <div class="wf-tier-badge" style="color:var(--t5)">Tier 5 · IES-ambient</div>
+        <div class="wf-tier-name" style="color:var(--t5)">Affected by IES, don't log in</div>
+        <div class="wf-tier-size" style="color:var(--t5)">~40+</div>
+        <div class="wf-tier-lbl">employees + external — IES touches their work invisibly</div>
+      </div>
+      <div class="wf-right" style="--wcol:var(--t5)">
+        <div>
+          <div class="wf-col-label">Who</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Field labour — no smartphone or no company account</div>
+            <div class="wf-col-pt highlight">Seasonal / short-term workers</div>
+            <div class="wf-col-pt">Some 1099 subcontractors</div>
+            <div class="wf-col-pt">Union benefit fund administrators</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Their IES relationship</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">Paycheck produced by IES — never see the system</div>
+            <div class="wf-col-pt">Certified payroll hours tracked in IES</div>
+            <div class="wf-col-pt">Union fringe benefit remittances from IES</div>
+            <div class="wf-col-pt">W-2 generated by IES — mailed or handed over</div>
+          </div>
+        </div>
+        <div>
+          <div class="wf-col-label">Education need</div>
+          <div class="wf-col-pts">
+            <div class="wf-col-pt highlight">"Here's what changes for your paycheck" — oral + printed</div>
+            <div class="wf-col-pt">Foreman delivers on-site</div>
+            <div class="wf-col-pt">One-page bilingual card</div>
+            <div class="wf-col-pt">Who to call if paycheck looks different</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-t5">
+    <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 5.5v3.5M6.5 4v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Tier 5 is the most overlooked education population in every migration.</strong> A field worker who shows up on a Monday after go-live and gets paid correctly is a silent success. One who gets paid incorrectly — wrong hours, wrong deductions, missing union fringe benefit — calls their foreman and the foreman calls the branch manager and the branch manager calls corporate. The entire visible symptom of a Tier 5 education failure is a payroll complaint chain. Prevent it with a 10-minute on-site conversation and a card.</div>
+  </div>
+</section>
+
+<!-- ══ 2. DSU ADAPTED PER TIER ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">02 —</span>
+    <span class="sec-title">Discover → Understand → Confirm — adapted for each tier</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--disc);border-color:rgba(30,64,175,.2);background:var(--discl)">Universal architecture</span>
+  </div>
+
+  <p class="prose">The cognitive sequence is identical across all five tiers. What changes is the subject matter, the channel, the time investment, and the confirmation format. A Tier 1 Controller confirming the WIP schedule automation is in the same DSU sequence as a Tier 5 field worker confirming their pay stub shows the right deductions. Same three steps. Completely different content, depth, and context.</p>
+
+  <div class="dsu-grid">
+    <div class="dsu-tier-block" style="border-top:3px solid var(--t1)">
+      <div class="dsu-tier-head" style="background:var(--t1l)">
+        <div class="dsu-tier-num" style="color:var(--t1)">Tier 1 · Power users</div>
+        <div class="dsu-tier-label">Controller, Payroll, PMs, HR, IT</div>
+      </div>
+      <div class="dsu-sequence">
+        <div class="dsu-step" style="background:var(--discl)">
+          <div class="dsu-step-phase" style="color:var(--disc)">Discover</div>
+          <div class="dsu-step-content"><strong>Benefit-first video (90 sec)</strong> "Your month-end close drops to 6 days. Here's why." Opens with the outcome — not the feature.</div>
+          <div class="dsu-step-format">→ Sandbox with Meridian's own data pre-loaded</div>
+        </div>
+        <div class="dsu-step" style="background:var(--undl)">
+          <div class="dsu-step-phase" style="color:var(--und)">Understand in context</div>
+          <div class="dsu-step-content"><strong>Role-specific concept bridge</strong> "Customer:Jobs → Projects, explained using Copper Ridge Phase 2 and your 187 active jobs." AI has already mapped it.</div>
+          <div class="dsu-step-format">→ Role-based 10-min learning module per concept · 5 modules per role</div>
+        </div>
+        <div class="dsu-step" style="background:var(--confl)">
+          <div class="dsu-step-phase" style="color:var(--conf)">Confirm</div>
+          <div class="dsu-step-content"><strong>North-star scenario test</strong> "Navigate to Copper Ridge Phase 2, check cost vs budget, create a progress invoice — without help." Pass = confirmed.</div>
+          <div class="dsu-step-format">→ Co-pilot for first critical live run</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dsu-tier-block" style="border-top:3px solid var(--t2)">
+      <div class="dsu-tier-head" style="background:var(--t2l)">
+        <div class="dsu-tier-num" style="color:var(--t2)">Tier 2 · Regular users</div>
+        <div class="dsu-tier-label">Branch Managers, VPs, Estimators, Champions</div>
+      </div>
+      <div class="dsu-sequence">
+        <div class="dsu-step" style="background:var(--discl)">
+          <div class="dsu-step-phase" style="color:var(--disc)">Discover</div>
+          <div class="dsu-step-content"><strong>Day-in-the-life walkthrough (30 min)</strong> "This is your Monday morning in IES — approvals waiting, one job flagged. Here's how you handle it."</div>
+          <div class="dsu-step-format">→ Live IES session with Champion, no agenda</div>
+        </div>
+        <div class="dsu-step" style="background:var(--undl)">
+          <div class="dsu-step-phase" style="color:var(--und)">Understand in context</div>
+          <div class="dsu-step-content"><strong>Workflow intersection points</strong> Where IES and Procore overlap. Where the approval workflow sits. How Dimensions appear in the dashboard. Focused on their specific 3–4 screens.</div>
+          <div class="dsu-step-format">→ 90-min session, not a 4-week programme</div>
+        </div>
+        <div class="dsu-step" style="background:var(--confl)">
+          <div class="dsu-step-phase" style="color:var(--conf)">Confirm</div>
+          <div class="dsu-step-content"><strong>First week observation</strong> Champion monitors: are they opening IES, or routing around it? Personal follow-up at Day 7.</div>
+          <div class="dsu-step-format">→ "If IES went offline, which of your tasks stops?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dsu-tier-block" style="border-top:3px solid var(--t3)">
+      <div class="dsu-tier-head" style="background:var(--t3l)">
+        <div class="dsu-tier-num" style="color:var(--t3)">Tier 3 · Light users</div>
+        <div class="dsu-tier-label">CFO, Division VPs, CPO, External reviewers</div>
+      </div>
+      <div class="dsu-sequence">
+        <div class="dsu-step" style="background:var(--discl)">
+          <div class="dsu-step-phase" style="color:var(--disc)">Discover</div>
+          <div class="dsu-step-content"><strong>"This is what Monday looks like now"</strong> IES live dashboard, real Meridian data. "You're looking at Tuesday's job cost, not last month's." No training framing.</div>
+          <div class="dsu-step-format">→ 20-min live session, PS facilitates</div>
+        </div>
+        <div class="dsu-step" style="background:var(--undl)">
+          <div class="dsu-step-phase" style="color:var(--und)">Understand in context</div>
+          <div class="dsu-step-content"><strong>Outcome literacy only</strong> What each alert means. When to investigate vs when to trust. How consolidated P&L is calculated. Not how to navigate — what the numbers mean.</div>
+          <div class="dsu-step-format">→ 3-hour executive dashboard session at Month 1</div>
+        </div>
+        <div class="dsu-step" style="background:var(--confl)">
+          <div class="dsu-step-phase" style="color:var(--conf)">Confirm</div>
+          <div class="dsu-step-content"><strong>North-star: 5 minutes, no help</strong> Open IES. Find consolidated P&L by state and division. Locate one over-budget job. Done. If they can do this independently, they're confirmed.</div>
+          <div class="dsu-step-format">→ 30-day VoP: "Have you requested the Excel P&L from anyone?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dsu-tier-block" style="border-top:3px solid var(--t4)">
+      <div class="dsu-tier-head" style="background:var(--t4l)">
+        <div class="dsu-tier-num" style="color:var(--t4)">Tier 4 · Self-service users</div>
+        <div class="dsu-tier-label">Field supervisors, office staff, all 210 employees</div>
+      </div>
+      <div class="dsu-sequence">
+        <div class="dsu-step" style="background:var(--discl)">
+          <div class="dsu-step-phase" style="color:var(--disc)">Discover</div>
+          <div class="dsu-step-content"><strong>"Your pay stub is on your phone now"</strong> That's the discovery. Benefit in one sentence, no software context needed.</div>
+          <div class="dsu-step-format">→ Foreman delivers on-site / Champion at branch meeting</div>
+        </div>
+        <div class="dsu-step" style="background:var(--undl)">
+          <div class="dsu-step-phase" style="color:var(--und)">Understand in context</div>
+          <div class="dsu-step-content"><strong>Their actual pay stub on their phone</strong> Not a demo account — their real stub from their first IES payroll. "Find the YTD line. Does it match what you'd expect?"</div>
+          <div class="dsu-step-format">→ QR code on laminated card → their IES self-service page direct</div>
+        </div>
+        <div class="dsu-step" style="background:var(--confl)">
+          <div class="dsu-step-phase" style="color:var(--conf)">Confirm</div>
+          <div class="dsu-step-content"><strong>Can they find it independently?</strong> "Next payday, don't call HR — find it yourself. If you can't, call [Champion name] at this number."</div>
+          <div class="dsu-step-format">→ IES access log: stub opened in 14 days = confirmed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dsu-tier-block" style="border-top:3px solid var(--t5)">
+      <div class="dsu-tier-head" style="background:var(--t5l)">
+        <div class="dsu-tier-num" style="color:var(--t5)">Tier 5 · IES-ambient</div>
+        <div class="dsu-tier-label">Field labour, seasonal, 1099s, union funds</div>
+      </div>
+      <div class="dsu-sequence">
+        <div class="dsu-step" style="background:var(--discl)">
+          <div class="dsu-step-phase" style="color:var(--disc)">Discover</div>
+          <div class="dsu-step-content"><strong>"Your paycheck works the same. Here's the one thing that might look different."</strong> Oral delivery by foreman. Focus: reassurance, not instruction.</div>
+          <div class="dsu-step-format">→ 10-minute on-site group session, day before go-live</div>
+        </div>
+        <div class="dsu-step" style="background:var(--undl)">
+          <div class="dsu-step-phase" style="color:var(--und)">Understand in context</div>
+          <div class="dsu-step-content"><strong>Physical pay stub comparison</strong> Side-by-side: "This is what your stub looked like before. This is what it looks like now. Same money. Different label on the deduction line."</div>
+          <div class="dsu-step-format">→ Printed A4 comparison sheet in English + Spanish</div>
+        </div>
+        <div class="dsu-step" style="background:var(--confl)">
+          <div class="dsu-step-phase" style="color:var(--conf)">Confirm</div>
+          <div class="dsu-step-content"><strong>Zero paycheck complaints after first payroll</strong> If nobody calls the foreman about their paycheck, Tier 5 education succeeded. If someone does, foreman resolves it with the number on the card.</div>
+          <div class="dsu-step-format">→ Foreman counts: calls received in 48h after payroll</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-t4">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1l1.5 4H12l-3.5 2.5 1.3 4L6.5 9l-3.3 2.5 1.3-4L1 5h4L6.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The Tier 4 DSU is the highest-volume education event in the programme.</strong> ~115 employees need to know one thing: their pay stub is on their phone. The DSU for this group is compressed to 15 minutes, conducted by the Champion or foreman, using the employee's own device and their own actual pay stub. The "context" in "understand in context" is literally their paycheck number — not an abstract example. This is the most powerful possible personalisation: showing someone their own data before asking them to do anything with it.</div>
+  </div>
+</section>
+
+<!-- ══ 3. TRIGGER MOMENTS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">03 —</span>
+    <span class="sec-title">Trigger moments — education arrives when it is needed, not before</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--ph2);border-color:var(--ph2b);background:var(--ph2l)">Just-in-time delivery</span>
+  </div>
+
+  <p class="prose">The most important principle in the rollout is not what to teach — it is <strong>when.</strong> Education delivered before the moment of need is perceived as extra work. Education delivered at the moment of need is perceived as help. Every education touchpoint is anchored to a specific trigger event in the migration programme, not to a calendar date or a content schedule.</p>
+
+  <div class="moment-flow">
+    <!-- Header row -->
+    <div style="display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:14px;padding:0 18px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4)">
+      <div>Trigger event</div>
+      <div style="background:var(--discl);border-radius:4px;padding:3px 8px;color:var(--disc)">Discover</div>
+      <div style="background:var(--undl);border-radius:4px;padding:3px 8px;color:var(--und)">Understand in context</div>
+      <div style="background:var(--confl);border-radius:4px;padding:3px 8px;color:var(--conf)">Confirm</div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">AI diagnostic scan complete</div><div class="mc-trigger-sub">Tier 1 · Month 1 · Programme setup</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">"AI has read nine years of your file. Here is what it found about how Meridian runs — in plain language, not accounting terms."</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Operational DNA report — business-readable, not technical. Controller + CFO review together.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">Controller signs off: "This is an accurate description of how we work." Gap decisions documented.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">Concept translation layer opens</div><div class="mc-trigger-sub">Tier 1 + 2 · Stage 2 of migration flow</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">Role-specific 90-sec benefit video plays automatically on first open. "For your role, here is the one thing that gets better."</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Role-specific concept bridge using Meridian's actual projects, clients, and data. Copper Ridge, CalTrans, Midtown Office as examples.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">AI mapping confirmation: "Does this mapping look correct for Meridian?" One-click confirmation per concept.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">IES Champion completes training</div><div class="mc-trigger-sub">All tiers via Champion · 4 weeks before go-live</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">Champion receives the full role library: all five role-specific benefit framings for all three concepts. They can speak every role's language.</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Champions shadow the Tier 1 DSU process. They learn it by experiencing it — not by reading about it.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">Champion delivers a micro-session to 3 colleagues in their branch. PS team observes and provides feedback.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">Wave 1 go-live (TX/AZ/GA/NC)</div><div class="mc-trigger-sub">Tier 4 + 5 · ~100 employees · Day 0</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">Personalised IES welcome screen: one sentence, one benefit, three next actions. Tier 4: "Your pay stub is here → tap to see it." Tier 5: foreman delivers the card on-site.</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Tier 4: their actual first IES pay stub on their phone, right now, with their own numbers. Tier 5: printed comparison of old vs new pay stub format.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">IES usage log check at Day 7: has each T4 employee accessed their pay stub? Non-accessors get personal Champion outreach — not an email.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">First live payroll run completed</div><div class="mc-trigger-sub">Tier 1 · Payroll Manager · Day 3–5 post go-live</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">"You just ran payroll for 100 employees across 4 states. Here's what the system tracked that QBDT could never show you automatically."</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">IES payroll anomaly detection walkthrough: what each flag means, why it fired, how to resolve. Using the real first payroll output.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">VoP Day 7: "What did you check in QBDT after the payroll ran?" Healthy: "Nothing." Concerning: name the specific check → targeted follow-up session.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">Day 30 · First IES monthly close</div><div class="mc-trigger-sub">Tier 1 · Controller · Month 1 post go-live</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">"Your close is running 2 days faster than last month. Here's why — and here's the step you didn't have to do." IES shows which steps were automated vs manual.</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Close process redesign session: map current close step by step inside IES. Identify which remaining manual steps have an IES automation available.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">Target: close completes in ≤6 days. Month 2 close is the north-star scenario test. If it takes longer, PS facilitates a root-cause session.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">Day 60 · Capability sprint 1</div><div class="mc-trigger-sub">Tier 1 + 2 · PMs and Champions · Month 2</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">"Name one thing IES has shown you that QBDT couldn't." The answers to this question determine which capability sprint happens next. Education follows what users have already discovered on their own.</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">90-min session: one feature, real Meridian data, real active projects. "Let's look at the Copper Ridge Phase 2 job cost together." No slides. No screen recording. Live data.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">New standing habit anchored to the feature: "Monday 15-min job cost review — all PMs, IES Projects dashboard, before the weekly ops call." Habit, not training.</div></div>
+    </div>
+
+    <div class="moment-card">
+      <div><div class="mc-trigger">Wave 3 go-live (CA/NY/WA)</div><div class="mc-trigger-sub">All tiers · Union workforce · Month 12–13</div></div>
+      <div class="mc-phase mc-disc"><div class="mc-phase-label">Discover</div><div class="mc-phase-text">Union member orientation: "Your fringe benefit contributions are now calculated directly from your IES timesheet hours — here's what that means for your pension and health fund." Delivered by steward-approved language.</div></div>
+      <div class="mc-phase mc-und"><div class="mc-phase-label">Understand</div><div class="mc-phase-text">Union steward co-facilitates the Tier 4 and Tier 5 session for Wave 3 workers. Steward presence = trust signal. Fringe benefit calculation explained using the actual CBA schedule visible on screen.</div></div>
+      <div class="mc-phase mc-conf"><div class="mc-phase-label">Confirm</div><div class="mc-phase-text">First remittance to each union fund arrives correctly. Steward confirms in writing. Zero discrepancy = Tier 5 education confirmed for Wave 3. Any discrepancy triggers immediate escalation — not a "we'll fix it next month."</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. IES-AMBIENT EDUCATION ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">04 —</span>
+    <span class="sec-title">IES-ambient education — for people who never log in</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--t5);border-color:var(--t5b);background:var(--t5l)">Tier 5 strategy</span>
+  </div>
+
+  <p class="prose">For Tier 5 employees — those who will never have an IES login — the education is not about software. It is about reassurance and orientation: their money is safe, the process that generates their paycheck has changed, and here is the one person they can call if something looks wrong. This is a human communication strategy, not a technology education strategy. The UX team's role is to design the foreman's talking points and the printed card — not an app or a portal.</p>
+
+  <div class="ambient-grid">
+    <div class="amb-card">
+      <div class="amb-icon">💬</div>
+      <div class="amb-label" style="color:var(--t5)">Format 1 · Oral delivery</div>
+      <div class="amb-title">Foreman delivers the message on-site</div>
+      <div class="amb-text">The foreman receives a 3-point script from the Champion — not a long document, three sentences. <strong>(1)</strong> "We switched to a new payroll system last week." <strong>(2)</strong> "Your money arrives the same way, same day, same amount." <strong>(3)</strong> "If your paycheck looks different, call me first — here's what's normal and here's what isn't." The foreman is the trusted source, not HR. This is by design.</div>
+    </div>
+    <div class="amb-card">
+      <div class="amb-icon">🃏</div>
+      <div class="amb-label" style="color:var(--t5)">Format 2 · Printed card</div>
+      <div class="amb-title">One card, two sides, two languages</div>
+      <div class="amb-text">A wallet-sized or trailer-wall card with one paycheck illustration on each side: QBDT stub on the left, IES stub on the right. Three differences highlighted: stub format, company name in the header (may change for entities), deduction label changes. And at the bottom: Champion's first name and phone number. Not the HR department. Not a ticket system. A name and a number. <strong>This card goes home with the worker after the foreman session.</strong></div>
+    </div>
+    <div class="amb-card">
+      <div class="amb-icon">🤝</div>
+      <div class="amb-label" style="color:var(--t5)">Format 3 · Union steward co-sign</div>
+      <div class="amb-title">For Wave 3: steward delivers the fringe benefit message</div>
+      <div class="amb-text">For union workers in CA, NY, WA, OH, CO — the message about fringe benefit calculation changes must come from the steward, not from Meridian management. The steward reviews the new fringe benefit configuration before go-live, confirms it matches the CBA, and then delivers the "here's what's changing in your benefit fund contributions" message to their members. <strong>Management delivers system changes. Steward delivers benefit changes.</strong> This distinction matters to union members.</div>
+    </div>
+    <div class="amb-card">
+      <div class="amb-icon">📞</div>
+      <div class="amb-label" style="color:var(--t5)">Format 4 · Hot line — not a ticket</div>
+      <div class="amb-title">One phone number, answered by a person, first week only</div>
+      <div class="amb-text">For the first week after each wave go-live, the IES Champion (or a designated HR admin) is on call for Tier 5 payroll questions. Not a ticket. Not "email HR." A phone number that rings a person. This is expensive for one week and nearly free every other week — because after the first payroll is processed correctly, Tier 5 questions drop to nearly zero. <strong>The first paycheck is the product. Everything else is support for the product.</strong></div>
+    </div>
+    <div class="amb-card">
+      <div class="amb-icon">📄</div>
+      <div class="amb-label" style="color:var(--t5)">Format 5 · Stub comparison sheet</div>
+      <div class="amb-title">Old stub format vs new — annotated, printed</div>
+      <div class="amb-text">A one-page printed comparison showing a sample QBDT pay stub and the equivalent IES pay stub side by side. Every line annotated: "This line moved here." "This label changed to this." "This amount is the same." Available in English and Spanish. Given to every Tier 5 employee before their first IES paycheck. The goal: when the IES stub arrives, it looks familiar, not alien. <strong>Familiarity is the outcome of this sheet. The sheet is not a manual.</strong></div>
+    </div>
+    <div class="amb-card">
+      <div class="amb-icon">📅</div>
+      <div class="amb-label" style="color:var(--t5)">Format 6 · W-2 advance notice</div>
+      <div class="amb-title">January: "Your W-2 comes from IES this year"</div>
+      <div class="amb-text">The only other Tier 5 education touchpoint is in January. A one-page note (with the first IES W-2 if mailed, or text message if mobile) explaining: "Your W-2 this year comes from Intuit Enterprise Suite, not from [old system]. The format is slightly different. All the same boxes. Your accountant can use it exactly as before." For split-year migrations (QBDT + IES in same tax year): W-2 reconciliation note explaining why the total might appear in two statements.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5. CHANNEL MATRIX ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">05 —</span>
+    <span class="sec-title">Channel matrix — right format for the right context</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--ph1);border-color:var(--ph1b);background:var(--ph1l)">Delivery design</span>
+  </div>
+
+  <p class="prose">Every tier and every trigger moment requires a channel decision. The channel must match the person's physical context, device access, literacy level, and the cognitive load they have available at that moment. A field supervisor on a scaffolding at 7am on a Tuesday does not receive a portal notification — they receive a 30-second conversation with their foreman and a laminated card. A Controller at their desk on a Thursday morning receives a structured module with real data. Same concept. Completely different delivery.</p>
+
+  <table class="channel-matrix">
+    <thead>
+      <tr>
+        <th style="width:18%">Channel</th>
+        <th style="width:10%">Tier 1</th>
+        <th style="width:10%">Tier 2</th>
+        <th style="width:10%">Tier 3</th>
+        <th style="width:10%">Tier 4</th>
+        <th style="width:10%">Tier 5</th>
+        <th style="width:32%">Format and context notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>IES in-product tooltips</strong><br><small>Contextual, on-screen, QBDT first</small></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Appears on first encounter with any IES element that has a QBDT equivalent. "Projects (like your Customer:Jobs)" — one line. Dismissable. Never repeats. This is the concept translation layer embedded at the screen level.</td>
+      </tr>
+      <tr>
+        <td><strong>IES learning portal</strong><br><small>Role-based modules, 10 min each</small></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>5 modules per role. Available in IES dashboard. Module 1 always opens with the benefit outcome, not the instruction. Completion tracked. Champions follow up on non-completers personally by Day 14.</td>
+      </tr>
+      <tr>
+        <td><strong>IES self-service portal</strong><br><small>Pay stubs, W-2, benefits, direct deposit</small></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Mobile-first. QR code accessible. No training required — benefit is immediately visible on login. Pay stub on the first screen. Bilingual English/Spanish labels. Champion provides QR card in Tier 4 orientation.</td>
+      </tr>
+      <tr>
+        <td><strong>Live Champion session</strong><br><small>In-person or video, 30–90 min</small></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Champion holds office hours daily for Week 1 post go-live. Tier 2: 90-min structured walkthrough. Tier 4: 20-min on-site group session, standing, no slides. Champion uses their own device to show rather than tell.</td>
+      </tr>
+      <tr>
+        <td><strong>PS co-pilot (screen-share)</strong><br><small>First critical run only</small></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Payroll Manager first live payroll. Controller first monthly close. Senior PM first AIA progress invoice in IES. Co-pilot is present, not driving. Three successful runs = independent. Dependency is explicit and temporary.</td>
+      </tr>
+      <tr>
+        <td><strong>Benefit video (90 sec)</strong><br><small>Portrait, phone, bilingual</small></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Opens with the benefit in the first 8 seconds. Under 90 seconds. Portrait orientation for phone viewing. Subtitled. Available in the IES self-service portal and on the company intranet. One video per role per concept. Not a screen recording.</td>
+      </tr>
+      <tr>
+        <td><strong>Foreman oral delivery</strong><br><small>On-site, 10 min, 3-point script</small></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td>The only channel that reliably reaches Tier 5. Three sentences maximum. Champion provides foreman with a printed script card (not a document — a card). Delivered before the first IES payroll run. The foreman's authority is the trust mechanism, not the content.</td>
+      </tr>
+      <tr>
+        <td><strong>Laminated reference card</strong><br><small>Physical, bilingual, durable</small></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td>Wallet size (Tier 5) or A4 laminated at workstation (Tier 4). Champion's first name and number at the bottom — not a department, a person. QR code links to self-service page for Tier 4. Spanish on reverse. Designed to last 90 days minimum without replacement.</td>
+      </tr>
+      <tr>
+        <td><strong>Sandbox environment</strong><br><small>Meridian data, explore freely, no consequences</small></td>
+        <td><span class="ch-pri">Primary</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>Available 6 weeks before go-live and permanently post go-live for new employee onboarding. Pre-loaded with anonymised Meridian project data. Single instruction: "Try to do your job here. You can break nothing." Confidence is built through experience, not instruction.</td>
+      </tr>
+      <tr>
+        <td><strong>Monthly adoption digest</strong><br><small>AI-generated, shared by leadership</small></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-yes">Yes</span></td>
+        <td><span class="ch-no">No</span></td>
+        <td>AI-generated monthly summary: invoices processed, paychecks run, reports generated, hours saved vs QBDT baseline. CFO shares at leadership meeting. Branch Managers share at branch. Tone: "Here's what Meridian built this month." Not usage statistics — achievements.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 6. WAVE-ALIGNED ROLLOUT ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">06 —</span>
+    <span class="sec-title">Wave-aligned rollout — education tied to go-live, not a calendar</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--ph3);border-color:var(--ph3b);background:var(--ph3l)">Sequenced delivery</span>
+  </div>
+
+  <p class="prose">Education rollout is not a standalone programme — it is synchronised to the three migration waves. Tier 1 and 2 education runs 4–6 weeks ahead of each wave's go-live. Tier 4 and 5 education runs 1 week before and Day 0 of each wave's go-live. The sequencing prevents cognitive overload: people only receive education for the systems they are about to use, not systems that go live in 8 months.</p>
+
+  <div class="wave-rollout">
+    <div class="wr-row">
+      <div class="wr-left">
+        <div class="wr-circle" style="border-color:var(--t1);color:var(--t1)">W0</div>
+        <div class="wr-time">Months 1–3<br>Programme setup</div>
+      </div>
+      <div class="wr-card">
+        <div class="wr-card-head">
+          <div class="wr-card-label" style="color:var(--t1)">Wave 0 · Programme-wide education foundation</div>
+          <div class="wr-card-title">Champion training · DSU framework introduction · Leadership benefit session</div>
+          <div class="wr-card-sub">Education infrastructure is built before any migration education begins. Champions trained. Content produced. Channels prepared.</div>
+        </div>
+        <div class="wr-tier-pills">
+          <span class="wr-pill" style="color:var(--t1);border-color:var(--t1b);background:var(--t1l)">Tier 1 — sandboxed preview</span>
+          <span class="wr-pill" style="color:var(--t2);border-color:var(--t2b);background:var(--t2l)">Tier 2 — Champion programme launch</span>
+          <span class="wr-pill" style="color:var(--t3);border-color:var(--t3b);background:var(--t3l)">Tier 3 — CFO Day-in-the-life session</span>
+        </div>
+        <div class="wr-actions">
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t1)">Tier 1 action</div><div class="wr-action-text">Concept translation education layer opens. Controllers, Payroll Managers, PMs review AI-generated mappings using Meridian's own data. All three concepts confirmed.</div></div>
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t2)">Tier 2 action</div><div class="wr-action-text">10 branch Champions complete 4-hour training. Receive Champion kit: FAQ, escalation path, PS Slack channel access, 90-sec role videos for all 5 roles.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wr-connector"></div>
+
+    <div class="wr-row">
+      <div class="wr-left">
+        <div class="wr-circle" style="border-color:var(--ph3);color:var(--ph3)">W1</div>
+        <div class="wr-time">Months 6–7<br>TX, AZ, GA, NC<br>~100 employees</div>
+      </div>
+      <div class="wr-card">
+        <div class="wr-card-head">
+          <div class="wr-card-label" style="color:var(--ph3)">Wave 1 · First full workforce education event</div>
+          <div class="wr-card-title">All 5 tiers activated for TX/AZ/GA/NC branches</div>
+          <div class="wr-card-sub">The most important rollout event. Lessons learned here are applied to Wave 2 immediately. Target: T4 self-service access rate ≥70% by Day 14.</div>
+        </div>
+        <div class="wr-tier-pills">
+          <span class="wr-pill" style="color:var(--t1);border-color:var(--t1b);background:var(--t1l)">Tier 1 — learning modules complete (6 weeks prior)</span>
+          <span class="wr-pill" style="color:var(--t4);border-color:var(--t4b);background:var(--t4l)">Tier 4 — on-site orientation (1 week prior)</span>
+          <span class="wr-pill" style="color:var(--t5);border-color:var(--t5b);background:var(--t5l)">Tier 5 — foreman delivery (Day –1)</span>
+        </div>
+        <div class="wr-actions">
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t4)">Tier 4 key learning</div><div class="wr-action-text">What % of field employees completed DD re-entry without Champion assistance? This number predicts Wave 2 strategy. If below 60%, foreman-led oral delivery must be the primary channel — not QR codes.</div></div>
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t5)">Tier 5 key learning</div><div class="wr-action-text">How many foremen needed the script card vs delivered the message confidently without it? Script card simplicity rating from foreman feedback. Update before Wave 2.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wr-connector"></div>
+
+    <div class="wr-row">
+      <div class="wr-left">
+        <div class="wr-circle" style="border-color:var(--warn);color:var(--warn)">W2</div>
+        <div class="wr-time">Months 9–10<br>FL, CO, OH<br>~60 employees</div>
+      </div>
+      <div class="wr-card">
+        <div class="wr-card-head">
+          <div class="wr-card-label" style="color:var(--warn)">Wave 2 · Refined approach based on Wave 1 learnings</div>
+          <div class="wr-card-title">Complexity adds: CO FAMLI, OH municipal tax, OH union — reflected in Tier 1 education update</div>
+          <div class="wr-card-sub">Wave 2 education is not a repeat of Wave 1 — it incorporates Wave 1 feedback and adds CO/OH-specific content. OH union workers receive the union fringe benefit education for the first time.</div>
+        </div>
+        <div class="wr-tier-pills">
+          <span class="wr-pill" style="color:var(--warn);border-color:var(--warnb);background:var(--warnl)">Payroll-specific update: CO FAMLI + OH municipal tax</span>
+          <span class="wr-pill" style="color:var(--t5);border-color:var(--t5b);background:var(--t5l)">Tier 5 OH union: fringe benefit comparison card</span>
+        </div>
+        <div class="wr-actions">
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--warn)">New Tier 4/5 content</div><div class="wr-action-text">Ohio union workers receive a supplementary card explaining CO FAMLI contributions and OH school district withholding — two deduction lines that will appear on their IES stub that didn't appear in QBDT the same way.</div></div>
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t1)">Payroll Manager update</div><div class="wr-action-text">DSU micro-session on CO FAMLI: Discover (what it is), Understand (how it appears in IES payroll), Confirm (test calculation on one employee before first live payroll). 45 minutes. Role-specific. Not a general session.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wr-connector"></div>
+
+    <div class="wr-row">
+      <div class="wr-left">
+        <div class="wr-circle" style="border-color:var(--t5);color:var(--t5)">W3</div>
+        <div class="wr-time">Months 12–13<br>CA, NY, WA<br>~50 employees</div>
+      </div>
+      <div class="wr-card">
+        <div class="wr-card-head">
+          <div class="wr-card-label" style="color:var(--t5)">Wave 3 · Highest complexity — union, certified payroll, CA/NY/WA</div>
+          <div class="wr-card-title">Union member education must be steward-co-delivered. Certified payroll education goes to CPO and Payroll Manager only.</div>
+          <div class="wr-card-sub">Wave 3 is where the IES-ambient education is most consequential. Union members care about their fringe benefits. If the education about fringe benefit changes isn't delivered by someone they trust (steward), it will not be believed.</div>
+        </div>
+        <div class="wr-tier-pills">
+          <span class="wr-pill" style="color:var(--t5);border-color:var(--t5b);background:var(--t5l)">Tier 5 union: steward co-delivers fringe benefit session</span>
+          <span class="wr-pill" style="color:var(--t1);border-color:var(--t1b);background:var(--t1l)">Tier 1 CPO: LCPtracker → IES workflow DSU</span>
+          <span class="wr-pill" style="color:var(--t4);border-color:var(--t4b);background:var(--t4l)">Tier 4 CA: DIR portal and certified payroll stub differences</span>
+        </div>
+        <div class="wr-actions">
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t5)">Wave 3 Tier 5 non-negotiable</div><div class="wr-action-text">The union steward must deliver — or co-deliver — the fringe benefit change message to their members before the first IES payroll run. This is not a Meridian HR communication. It is a union communication. Steward controls the language.</div></div>
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t1)">CPO DSU — 3 sessions</div><div class="wr-action-text">Session 1: Discover — "LCPtracker now pulls from IES data, not QBDT." Session 2: Understand — walk through the LCPtracker integration using a real CalTrans job. Session 3: Confirm — CPO submits one test WH-347 report. Agency accepts it. CPO signs go-live gate.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wr-connector"></div>
+
+    <div class="wr-row">
+      <div class="wr-left">
+        <div class="wr-circle" style="border-color:var(--ok);color:var(--ok)">P+</div>
+        <div class="wr-time">Months 14–24<br>All 10 states<br>Full workforce</div>
+      </div>
+      <div class="wr-card">
+        <div class="wr-card-head">
+          <div class="wr-card-label" style="color:var(--ok)">Post go-live · Capability build across all tiers</div>
+          <div class="wr-card-title">From survival to mastery — quarterly sprints for T1/T2, annual for T4/T5</div>
+          <div class="wr-card-sub">Education does not stop at go-live. Capability sprints for power users. Annual W-2 orientation for self-service users. Champion certification at Month 12. New employee onboarding via sandbox from Month 14 onwards.</div>
+        </div>
+        <div class="wr-tier-pills">
+          <span class="wr-pill" style="color:var(--t1);border-color:var(--t1b);background:var(--t1l)">T1: quarterly capability sprints · AI Insights · AP automation · Dimensions reporting</span>
+          <span class="wr-pill" style="color:var(--t4);border-color:var(--t4b);background:var(--t4l)">T4/T5: annual W-2 orientation · new employee self-service onboarding</span>
+        </div>
+        <div class="wr-actions">
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t1)">Champion certification (Month 12)</div><div class="wr-action-text">Champions who performed their role well receive IES power user certification from Intuit. Access to IES beta features. Network of Champions from peer companies. New employees trained by certified internal experts — not external consultants.</div></div>
+          <div class="wr-action"><div class="wr-action-tier" style="color:var(--t4)">New employee IES onboarding path</div><div class="wr-action-text">From Month 14, every new Meridian employee receives a role-specific IES onboarding path on their first day. Tier 4/5: self-service orientation with their actual pay stub within 48 hours of first paycheck. Tier 1: sandbox access before first live day in the system.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. LANGUAGE AND ACCESS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">07 —</span>
+    <span class="sec-title">Language, literacy, and access — the equity layer</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--t4);border-color:var(--t4b);background:var(--t4l)">Inclusion by design</span>
+  </div>
+
+  <p class="prose">Meridian's field workforce includes Spanish-speaking employees, workers with limited written literacy, and workers without smartphones or reliable data access. An education strategy that does not account for this is not a strategy for Meridian — it is a strategy for the subset of Meridian that already has the easiest relationship with technology. The DSU model must be accessible to every tier regardless of language, device, or literacy level.</p>
+
+  <div class="access-strip">
+    <div class="as-card" style="border-color:var(--t1)">
+      <div class="as-label" style="color:var(--t1)">Language</div>
+      <div class="as-title">English + Spanish minimum</div>
+      <div class="as-text">All Tier 4/5 materials (cards, comparison sheets, foreman scripts, 90-sec videos) produced in English and Spanish. For CA and NY branches with significant populations: Mandarin and Cantonese versions of the pay stub comparison sheet considered. Not a translation — a cultural adaptation. The foreman who speaks their crew's language delivers the message. HR provides the material; the foreman chooses the words.</div>
+    </div>
+    <div class="as-card" style="border-color:var(--t2)">
+      <div class="as-label" style="color:var(--t2)">Literacy</div>
+      <div class="as-title">Visual-first for Tier 4/5</div>
+      <div class="as-text">The pay stub comparison sheet and the reference card prioritise visual comparison over written explanation. Side-by-side stub images with colour-coded annotations. Numbers, not paragraphs. The laminated card has QR codes that open a 90-second video — not a written guide. For employees who are stronger visual than written learners, the image is the education and the foreman's voice is the explanation.</div>
+    </div>
+    <div class="as-card" style="border-color:var(--t4)">
+      <div class="as-label" style="color:var(--t4)">Device access</div>
+      <div class="as-title">Designed for the phone they have</div>
+      <div class="as-text">IES self-service is mobile-first. QR codes take users directly to their specific self-service page — no navigation required. For Tier 5 workers without smartphones: the IES pay stub is printed and distributed the same way the QBDT stub was — no self-service required from them. The education for this group is entirely oral and physical. Not every person needs to touch IES. The paycheck is the product.</div>
+    </div>
+    <div class="as-card" style="border-color:var(--t5)">
+      <div class="as-label" style="color:var(--t5)">Data access</div>
+      <div class="as-title">Offline-capable at Tier 4/5</div>
+      <div class="as-text">Job sites in Arizona and rural Texas have unreliable connectivity. The reference card works offline. The foreman script works offline. The printed comparison sheet works offline. For Tier 4 employees who have smartphones but limited data: the 90-second benefit video is available for download from the Champion's QR card so it can be viewed offline. The education does not assume a reliable data connection for anyone outside an office.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. MEASURING EDUCATION ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">08 —</span>
+    <span class="sec-title">Measuring education success — per tier, per wave</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--ph2);border-color:var(--ph2b);background:var(--ph2l)">Success metrics</span>
+  </div>
+
+  <p class="prose">Education measurement is not module completion rates. Completion is a proxy metric that organisations use because the real metric — behavioural change — is harder to collect. For each tier, the success metric is a behavioural observation or a data point, not a completion record. The question is always: "Has this person changed how they work because of what they learned?" — not "Did they finish the module?"</p>
+
+  <table class="meas-table">
+    <thead><tr><th style="width:12%">Tier</th><th style="width:20%">Primary success metric</th><th style="width:20%">Secondary metric</th><th style="width:23%">How measured</th><th style="width:25%">At what point is education "complete"?</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Tier 1</strong><br>Power users</td>
+        <td>North-star scenario passed — independently, without help, within 30 days of go-live</td>
+        <td>Day 60 VoP: "Name one thing IES shows you that QBDT didn't." — answer names a current-period insight</td>
+        <td>Champion runs the north-star scenario with the user. Pass/fail. Usage log confirms independent repeat usage within 14 days.</td>
+        <td>When the user can perform their 3 most critical IES tasks without opening QBDT to check anything. Not a date — a capability milestone.</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 2</strong><br>Regular users</td>
+        <td>IES opened at least 3× per week in usage logs for 4 consecutive weeks</td>
+        <td>Day 30 VoP: "If IES went offline, which of your tasks would stop?" — names 2+ relevant tasks</td>
+        <td>IES usage log (automated). Champion conducts VoP at Day 7 and Day 30. Branch Manager confirms "quiet first week" at the 14-day check-in.</td>
+        <td>When regular-use IES tasks (approvals, dashboard review, Project check) are habitual — not effortful. Typically 6–8 weeks.</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 3</strong><br>Light users</td>
+        <td>Has not requested the Excel consolidated P&L from Controller in 14+ consecutive days</td>
+        <td>Monthly digest is referenced in leadership meetings unprompted — CFO cites IES data, not Excel</td>
+        <td>Controller VoP at Day 14: "Has the CFO asked for the Excel P&L since go-live?" If no = Tier 3 education succeeded.</td>
+        <td>When the CFO navigates the IES multi-entity dashboard independently on a Monday morning. Once observed by Programme Manager — confirmed.</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 4</strong><br>Self-service users</td>
+        <td>IES self-service accessed on personal device within 7 days of first IES payroll</td>
+        <td>HR call volume for "what's on my pay stub?" drops to near zero by Week 4 for each branch</td>
+        <td>IES usage log (automated per employee). HR tallies inbound pay stub queries per week per branch. Champion confirms via observation at Day 14.</td>
+        <td>When the employee never needs to call HR for a pay stub. For Tier 4, this is typically after 2–3 successful independent self-service accesses. Target: by Week 3.</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 5</strong><br>IES-ambient</td>
+        <td>Zero paycheck complaints in 48 hours after first IES payroll run per wave</td>
+        <td>Foreman reports zero escalations about paycheck format confusion after first payroll</td>
+        <td>Foreman verbal report to Branch Manager at 48-hour mark. Branch Manager reports to Champion. Any complaint is specifically documented — not a count, a description.</td>
+        <td>Education is complete when the first IES paycheck arrives and nobody asks "what's different about my paycheck?" For Tier 5, success is silence — not engagement.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout co-ok">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 7l3 3 5.5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The programme-level education success metric</strong> is a single number: the percentage of Meridian's 210 employees who, at 90 days post full go-live, would describe their relationship with IES (directly or through its outputs) as "working correctly for them." This includes Tier 5 workers who never log in — for them, "working correctly" means their paycheck is right and they know who to call if it isn't. That is a successful education outcome. The programme is not complete until this number is ≥90% across all five tiers.</div>
+  </div>
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group</strong> · IES Education Rollout — Full Workforce · 5 tiers · 210 employees · 10 states</div>
+  <div class="df-t">Discover → Understand in context → Confirm · Wave-aligned · Bilingual · Tier-differentiated</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><span class="rn-doc cur">07·Rollout</span></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="concept-translation-education.html">← 06</a></div></div>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian IES Migration — Research Hub</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F3F5F9;--s:#FFF;--s2:#EEF1F8;--s3:#E2E6F2;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);
+  --ink:#13202E;--ink2:#384E68;--ink3:#677A96;--ink4:#A2B2C6;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  /* Part colours */
+  --p1:#1E40AF; --p1l:#EFF2FF; --p1b:rgba(30,64,175,.18);
+  --p2:#065F46; --p2l:#ECFDF5; --p2b:rgba(6,95,70,.18);
+  --p3:#6D28D9; --p3l:#F5F3FF; --p3b:rgba(109,40,217,.18);
+  --ps:#374151; --psl:#F9FAFB; --psb:rgba(55,65,81,.15);
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* ── NAV ── */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 36px;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.05)}
+.nav-mark{width:30px;height:30px;background:var(--p1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-mark svg{width:16px;height:16px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-co{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-meta{font-size:11px;color:rgba(255,255,255,.3);font-family:var(--mono)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(160deg,var(--navy) 0%,#192E50 55%,#1D3860 100%);padding:64px 36px 52px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 85% 50%,rgba(30,64,175,.12) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:rgba(255,255,255,.06)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.hero-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.hero-kicker::before{content:'';display:inline-block;width:24px;height:1px;background:rgba(255,255,255,.3)}
+.hero-h1{font-family:var(--serif);font-size:clamp(30px,4vw,48px);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-.02em}
+.hero-h1 em{font-style:italic;color:#93C5FD}
+.hero-lead{font-size:14px;color:rgba(255,255,255,.5);line-height:1.78;max-width:640px;margin-bottom:28px}
+.hero-narrative{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px 20px;max-width:820px;margin-bottom:28px}
+.hn-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.28);margin-bottom:10px}
+.hn-thread{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hn-node{font-size:12px;font-weight:500;padding:5px 12px;border-radius:5px;border:1px solid;white-space:nowrap}
+.hn-n1{background:rgba(30,64,175,.2);border-color:rgba(30,64,175,.35);color:#93C5FD}
+.hn-n2{background:rgba(6,95,70,.2);border-color:rgba(6,95,70,.35);color:#6EE7B7}
+.hn-n3{background:rgba(109,40,217,.2);border-color:rgba(109,40,217,.35);color:#C4B5FD}
+.hn-arrow{font-size:14px;color:rgba(255,255,255,.2)}
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:22px}
+.hs-val{font-family:var(--serif);font-size:22px;color:#fff;line-height:1;margin-bottom:3px}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.07em}
+
+/* ── PAGE ── */
+.page{max-width:1100px;margin:0 auto;padding:48px 36px 96px}
+
+/* ── PART HEADER ── */
+.part{margin-bottom:48px}
+.part-hdr{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.part-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;padding:4px 12px;border-radius:5px;border:1px solid}
+.part-title{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--ink)}
+.part-sub{font-size:13px;color:var(--ink3);line-height:1.65;max-width:760px;margin-bottom:18px;padding-left:2px}
+.part-line{height:1px;background:var(--s3);margin-bottom:20px}
+
+/* ── DOC CARDS ── */
+.doc-list{display:flex;flex-direction:column;gap:10px}
+.doc-card{background:var(--s);border:1px solid var(--b);border-radius:12px;overflow:hidden;box-shadow:var(--sh);transition:border-color .18s,box-shadow .18s;text-decoration:none;display:block;color:inherit}
+.doc-card:hover{border-color:var(--b2);box-shadow:var(--sh2)}
+.doc-card-inner{display:grid;grid-template-columns:72px 1fr auto;gap:0;align-items:stretch}
+.dc-num{background:var(--pcol-l, var(--s2));border-right:1px solid var(--b);display:flex;align-items:center;justify-content:center;padding:20px 0;flex-direction:column;gap:3px}
+.dc-num-val{font-family:var(--serif);font-size:22px;font-weight:400;line-height:1;color:var(--pcol,var(--p1))}
+.dc-num-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pcol,var(--p1));opacity:.6}
+.dc-body{padding:16px 20px;flex:1}
+.dc-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.dc-part-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:3px;border:1px solid}
+.dc-type-tag{font-size:10px;color:var(--ink4);background:var(--s2);padding:2px 7px;border-radius:3px;border:1px solid var(--b)}
+.dc-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px;line-height:1.3}
+.dc-desc{font-size:12px;color:var(--ink3);line-height:1.6;max-width:680px}
+.dc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.dc-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--s2);color:var(--ink3);border:1px solid var(--b)}
+.dc-right{padding:16px 18px 16px 10px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:10px;min-width:120px}
+.dc-open{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid;white-space:nowrap;transition:opacity .15s}
+.dc-card:hover .dc-open{opacity:.85}
+.dc-status{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;border:1px solid}
+.ds-complete{background:var(--p2l);color:var(--p2);border-color:var(--p2b)}
+.ds-interactive{background:var(--p3l);color:var(--p3);border-color:var(--p3b)}
+.ds-reference{background:var(--s2);color:var(--ink3);border-color:var(--b)}
+
+/* ── SUPPLEMENTARY ── */
+.supp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.supp-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px 16px;box-shadow:var(--sh);text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s;display:block}
+.supp-card:hover{border-color:var(--b2);box-shadow:var(--sh2)}
+.supp-num{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:5px}
+.supp-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;line-height:1.3}
+.supp-desc{font-size:11px;color:var(--ink3);line-height:1.55}
+.supp-link{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--ps);margin-top:8px}
+.supp-link svg{width:10px;height:10px}
+
+/* ── JOURNEY STRIP ── */
+.journey-strip{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:18px 22px;margin-bottom:32px;box-shadow:var(--sh)}
+.js-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:12px}
+.js-nodes{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:4px}
+.js-node{display:flex;flex-direction:column;align-items:center;cursor:pointer;flex-shrink:0;text-decoration:none;transition:opacity .15s}
+.js-node:hover{opacity:.75}
+.js-node-circle{width:36px;height:36px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);background:var(--s);margin-bottom:5px;transition:background .15s}
+.js-node-label{font-size:10px;color:var(--ink3);text-align:center;max-width:68px;line-height:1.3}
+.js-connector{flex-shrink:0;display:flex;align-items:center;margin-bottom:18px}
+.js-connector-line{width:28px;height:1px;background:var(--s3)}
+.js-connector-arrow{width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:5px solid var(--s3)}
+
+/* ── CALLOUT ── */
+.callout{border-radius:8px;padding:12px 16px;margin-bottom:24px;display:flex;gap:10px;align-items:flex-start}
+.callout svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65;color:var(--ink2)}
+.callout-text strong{font-weight:600;color:var(--ink)}
+.co-ai{background:var(--p3l);border:1px solid var(--p3b)} .co-ai svg{color:var(--p3)}
+
+/* ── FOOTER ── */
+.doc-footer{background:var(--navy);padding:22px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:840px){
+  .nav,.hero,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .doc-card-inner{grid-template-columns:56px 1fr}
+  .dc-right{display:none}
+  .supp-grid{grid-template-columns:1fr}
+  .hero-h1{font-size:28px}
+  .hn-thread{gap:4px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4.5v7L8 15l6-3.5v-7L8 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 1v14M2 4.5l6 3.5 6-3.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Intuit Enterprise Suite</span>
+  <div class="nav-sep"></div>
+  <span class="nav-co">Meridian Building Group</span>
+  <div class="nav-sp"></div>
+  <span class="nav-meta">Research Hub · 10 documents</span>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker">QBDT → IES Migration · UX Research &amp; Strategy</div>
+    <h1 class="hero-h1">Meridian Building Group<br><em>Migration research hub</em></h1>
+    <p class="hero-lead">A sequenced body of work covering assessment, flow design, progress tracking, and education strategy for a 10-state, 210-employee, multi-entity construction company migrating from QuickBooks Desktop Enterprise to Intuit Enterprise Suite.</p>
+    <div class="hero-narrative">
+      <div class="hn-label">The research narrative — read in this order</div>
+      <div class="hn-thread">
+        <span class="hn-node hn-n1">Assess the reality</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n1">Understand the history</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n2">Design the journey</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n2">Track acceptability</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n3">Educate per phase</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n3">Translate concepts</span>
+        <span class="hn-arrow">→</span>
+        <span class="hn-node hn-n3">Scale to all 210</span>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hs-val">3</div><div class="hs-lbl">Research parts</div></div>
+      <div><div class="hs-val">7</div><div class="hs-lbl">Core documents</div></div>
+      <div><div class="hs-val">3</div><div class="hs-lbl">Supplementary</div></div>
+      <div><div class="hs-val">14</div><div class="hs-lbl">Personas mapped</div></div>
+      <div><div class="hs-val">210</div><div class="hs-lbl">Employees covered</div></div>
+      <div><div class="hs-val">18+</div><div class="hs-lbl">Month programme</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- JOURNEY STRIP -->
+  <div class="journey-strip">
+    <div class="js-label">Sequential document map — click any node to open</div>
+    <div class="js-nodes">
+      <a class="js-node" href="meridian-migration-assessment.html">
+        <div class="js-node-circle" style="border-color:var(--p1);color:var(--p1)">01</div>
+        <div class="js-node-label">Migration Assessment</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="meridian-historical-analysis.html">
+        <div class="js-node-circle" style="border-color:var(--p1);color:var(--p1)">02</div>
+        <div class="js-node-label">Historical Analysis</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="meridian-flow-strategy.html">
+        <div class="js-node-circle" style="border-color:var(--p2);color:var(--p2)">03</div>
+        <div class="js-node-label">Flow Strategy</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="meridian-progress-strategy.html">
+        <div class="js-node-circle" style="border-color:var(--p2);color:var(--p2)">04</div>
+        <div class="js-node-label">Progress &amp; Acceptability</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="ies-education-strategy.html">
+        <div class="js-node-circle" style="border-color:var(--p3);color:var(--p3)">05</div>
+        <div class="js-node-label">Education Strategy</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="concept-translation-education.html">
+        <div class="js-node-circle" style="border-color:var(--p3);color:var(--p3)">06</div>
+        <div class="js-node-label">Concept Translation</div>
+      </a>
+      <div class="js-connector"><div class="js-connector-line"></div><div class="js-connector-arrow"></div></div>
+      <a class="js-node" href="ies-education-rollout.html">
+        <div class="js-node-circle" style="border-color:var(--p3);color:var(--p3)">07</div>
+        <div class="js-node-label">Education Rollout</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ PART 1 ═══ -->
+  <div class="part">
+    <div class="part-hdr">
+      <span class="part-badge" style="color:var(--p1);border-color:var(--p1b);background:var(--p1l)">Part 1 · Assessment</span>
+      <span class="part-title">Understanding the real situation</span>
+    </div>
+    <div class="part-sub">Start here. Before any UX strategy can be designed, the migration complexity, business profile, and historical data intelligence must be fully understood. These two documents establish the honest ground truth for everything that follows — including the things that are uncomfortable to acknowledge.</div>
+    <div class="part-line"></div>
+
+    <div class="doc-list">
+      <!-- Doc 01 -->
+      <a class="doc-card" href="meridian-migration-assessment.html" style="--pcol:var(--p1);--pcol-l:var(--p1l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">01</div><div class="dc-num-label">Part 1</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p1);border-color:var(--p1b);background:var(--p1l)">Assessment</span>
+              <span class="dc-type-tag">38 pages · 10 states · 14 personas</span>
+            </div>
+            <div class="dc-title">Multi-State QBDT → IES Migration Assessment</div>
+            <div class="dc-desc">The complete migration reality for Meridian Building Group — a $75M commercial contractor operating across 10 states with ~210 employees, 3 legal entities, 10 QBDT files, union payroll in 5 states, and active federal contracts requiring certified payroll. Covers state-by-state compliance complexity, all 14 personas and what they own, the 18-month phased programme, 17 critical migration challenges, 23 IES feature gaps, and the honest post go-live architecture.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">10 states mapped</span><span class="dc-tag">14 personas</span><span class="dc-tag">23 IES gaps</span><span class="dc-tag">17 challenges</span><span class="dc-tag">WA L&amp;I blocker</span><span class="dc-tag">LCPtracker dependency</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p1);border-color:var(--p1b);background:var(--p1l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Doc 02 -->
+      <a class="doc-card" href="meridian-historical-analysis.html" style="--pcol:var(--p1);--pcol-l:var(--p1l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">02</div><div class="dc-num-label">Part 1</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p1);border-color:var(--p1b);background:var(--p1l)">Assessment</span>
+              <span class="dc-type-tag">Critical opinion · Predictive analysis · Unfiltered</span>
+            </div>
+            <div class="dc-title">Historical Data Intelligence &amp; Critical Assessment</div>
+            <div class="dc-desc">Nine years of QBDT data contains an extraordinary amount of predictive signal that Meridian has never seen in aggregate — because it has always been siloed across 10 disconnected files. This document surfaces what that data almost certainly shows (Pareto job profitability, structural cash compression, retainage collection cycles, labour cost by state) and delivers an honest critical opinion about the business: the Controller is a single point of failure, LCPtracker must start Month 2, and the three Month-1 decisions that determine whether this migration succeeds or fails.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">9-year data signals</span><span class="dc-tag">Predictive patterns</span><span class="dc-tag">Critical opinion</span><span class="dc-tag">Migration scenarios</span><span class="dc-tag">28% success probability</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p1);border-color:var(--p1b);background:var(--p1l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ PART 2 ═══ -->
+  <div class="part">
+    <div class="part-hdr">
+      <span class="part-badge" style="color:var(--p2);border-color:var(--p2b);background:var(--p2l)">Part 2 · Migration flow</span>
+      <span class="part-title">Designing the journey</span>
+    </div>
+    <div class="part-sub">With the reality established, the next two documents design how the migration journey is structured and measured. The flow strategy expands the single-actor Hartwell model into a 14-persona collaborative programme. The progress strategy introduces the dual-axis model: technical completion is not the same as participant acceptability — and the gap between them is the real risk metric.</div>
+    <div class="part-line"></div>
+
+    <div class="doc-list">
+      <!-- Doc 03 -->
+      <a class="doc-card" href="meridian-flow-strategy.html" style="--pcol:var(--p2);--pcol-l:var(--p2l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">03</div><div class="dc-num-label">Part 2</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p2);border-color:var(--p2b);background:var(--p2l)">Flow design</span>
+              <span class="dc-type-tag">UX strategy · Pre-implementation · For design team</span>
+            </div>
+            <div class="dc-title">Multi-Persona Migration Flow — UX Strategy</div>
+            <div class="dc-desc">The strategy for expanding the single-actor Hartwell migration flow into a 14-persona, 3-wave, multi-entity programme. Covers the 4-layer navigation architecture (Programme → Wave → Stage → Step), the 4 persona view types (Programme / Deep domain / Gate-only / Minimal-mobile), 4 collaboration patterns (Sequential handoff, Parallel workstream, Gate convergence, Expert consultation), Wave 0 as a new concept, 12 new UI components, the extended content model with 7 new fields, and 5 open questions requiring QBO Payroll alignment before implementation begins.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">4 navigation layers</span><span class="dc-tag">4 collab patterns</span><span class="dc-tag">12 new components</span><span class="dc-tag">Wave 0 concept</span><span class="dc-tag">5 open questions</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p2);border-color:var(--p2b);background:var(--p2l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Doc 04 -->
+      <a class="doc-card" href="meridian-progress-strategy.html" style="--pcol:var(--p2);--pcol-l:var(--p2l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">04</div><div class="dc-num-label">Part 2</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p2);border-color:var(--p2b);background:var(--p2l)">Flow design</span>
+              <span class="dc-type-tag">Dual-axis model · Acceptability gates · For PM</span>
+            </div>
+            <div class="dc-title">Progress Tracking &amp; Acceptability Strategy</div>
+            <div class="dc-desc">Progress is not completion. Acceptability is progress. This document defines how both axes are tracked simultaneously — technical completion (has the work been done?) and participant acceptability (do the people believe it is working for them?) — and why divergence between the two is the real risk metric. Covers the 4-state divergence matrix, per-persona acceptability definitions pre-agreed in Month 1, 3 signal types (Behavioural 50% / Data comparison 35% / Voice of participant 15%), acceptability gates per wave, the 4-threshold divergence escalation model, and 8 Voice of Participant moments.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">Dual-axis model</span><span class="dc-tag">14 acceptability definitions</span><span class="dc-tag">8 VoP moments</span><span class="dc-tag">4 divergence thresholds</span><span class="dc-tag">North-star scenarios</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p2);border-color:var(--p2b);background:var(--p2l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ PART 3 ═══ -->
+  <div class="part">
+    <div class="part-hdr">
+      <span class="part-badge" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Part 3 · Education</span>
+      <span class="part-title">Teaching the change</span>
+    </div>
+    <div class="part-sub">The three education documents scale from strategy (how to teach, when, and to whom) through concept translation (the AI-done-for-you interactive layer for Projects, Dimensions, and Price Rules) to full workforce rollout (extending the Discover → Understand in context → Confirm model from 14 migration personas to all 210 Meridian employees across 5 tiers — including those who never log into IES).</div>
+    <div class="part-line"></div>
+
+    <div class="doc-list">
+      <!-- Doc 05 -->
+      <a class="doc-card" href="ies-education-strategy.html" style="--pcol:var(--p3);--pcol-l:var(--p3l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">05</div><div class="dc-num-label">Part 3</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Education</span>
+              <span class="dc-type-tag">3 phases · 9 delivery formats · Champion-led</span>
+            </div>
+            <div class="dc-title">Self-Serve User Education Strategy</div>
+            <div class="dc-desc">The governing education strategy across three phases — pre-migration (curiosity before anxiety), during migration (just-in-time not just-in-case), and post go-live (capability build, not catch-up). Establishes the benefit-first principle that shapes all education: never ask someone to learn something before they understand why their life will be better because of it. Covers cognitive load budgets per persona, the Champion network as the highest-leverage investment, 9 delivery formats matched to context and device, 8 Voice of Participant moments, and 6 design principles for the education system.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">Pre · During · Post phases</span><span class="dc-tag">9 delivery formats</span><span class="dc-tag">Champion network</span><span class="dc-tag">Cognitive load budgets</span><span class="dc-tag">Benefit before instruction</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Doc 06 -->
+      <a class="doc-card" href="concept-translation-education.html" style="--pcol:var(--p3);--pcol-l:var(--p3l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">06</div><div class="dc-num-label">Part 3</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Education</span>
+              <span class="dc-type-tag">Interactive · Role-adaptive · AI-done-for-you</span>
+            </div>
+            <div class="dc-title">Concept Translation Education Layer</div>
+            <div class="dc-desc">The interactive education experience for the four core QBDT → IES concept translations: Customer:Jobs → Projects, Classes &amp; Locations → Dimensions, and Price Levels → Price Rules. Built on the Discover → Understand in context → Confirm sequence — the cognitive model is inverted from traditional training: AI has already mapped all 187 Meridian jobs, 9 segment values, and 42 client pricing assignments. Users confirm what AI has done, not configure from scratch. Role selector (CFO / Controller / PM / Estimator / Payroll Manager) adapts every aha moment and construction use case to the user's specific daily work. All examples use real Meridian project data: Copper Ridge, CalTrans I-15, Midtown Office Fit-out, NV DOT US-95.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">Interactive role selector</span><span class="dc-tag">3 concept translations</span><span class="dc-tag">5 role-specific framings</span><span class="dc-tag">Real Meridian data</span><span class="dc-tag">Discover → Understand → Confirm</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-interactive">Interactive</span>
+            <span class="dc-open" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Doc 07 -->
+      <a class="doc-card" href="ies-education-rollout.html" style="--pcol:var(--p3);--pcol-l:var(--p3l)">
+        <div class="doc-card-inner">
+          <div class="dc-num"><div class="dc-num-val">07</div><div class="dc-num-label">Part 3</div></div>
+          <div class="dc-body">
+            <div class="dc-meta">
+              <span class="dc-part-tag" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Education</span>
+              <span class="dc-type-tag">5 tiers · 210 employees · Full workforce</span>
+            </div>
+            <div class="dc-title">IES Education Rollout — Full Workforce Strategy</div>
+            <div class="dc-desc">Extends the DSU model beyond the migration team to all 210 Meridian employees — including those who never log into IES. Defines 5 workforce tiers by IES relationship (not org chart position): Power users (35), Regular users (60), Light users (15), Self-service users (115), and IES-ambient users (40+) who are affected by IES but never touch it. For each tier: a calibrated DSU sequence, the right channel and format, wave-aligned rollout timing, language and literacy adaptations, and a behavioural success metric. Includes the IES-ambient education strategy — oral delivery, foreman script, bilingual printed card, union steward co-delivery for Wave 3.</div>
+            <div class="dc-tags">
+              <span class="dc-tag">5 workforce tiers</span><span class="dc-tag">7 delivery channels</span><span class="dc-tag">12 trigger moments</span><span class="dc-tag">Bilingual English/Spanish</span><span class="dc-tag">Wave-aligned rollout</span><span class="dc-tag">Tier 5 ambient model</span>
+            </div>
+          </div>
+          <div class="dc-right">
+            <span class="dc-status ds-complete">Complete</span>
+            <span class="dc-open" style="color:var(--p3);border-color:var(--p3b);background:var(--p3l)">Open <svg viewBox="0 0 10 10" fill="none" width="10" height="10"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ SUPPLEMENTARY ═══ -->
+  <div class="part">
+    <div class="part-hdr">
+      <span class="part-badge" style="color:var(--ps);border-color:var(--psb);background:var(--psl)">Supplementary</span>
+      <span class="part-title">Additional reference documents</span>
+    </div>
+    <div class="part-sub">Earlier or parallel work that provides technical depth on specific aspects of the migration — the Hartwell single-entity interactive flow (the reference implementation the Meridian flow strategy builds from), the paycheck migration bifurcation model, and the IES feature gaps pipeline.</div>
+    <div class="part-line"></div>
+
+    <div class="supp-grid">
+      <a class="supp-card" href="qbdt-ies-migration-flow-v2.html">
+        <div class="supp-num">Supplementary A</div>
+        <div class="supp-title">Hartwell Interactive Migration Flow</div>
+        <div class="supp-desc">The single-entity reference implementation. Hartwell Construction &amp; Supply — 24 employees, Austin TX. The flow Doc 03 is designed to extend. Interactive step-by-step with AI task blocks, concept bridges, and real payroll data.</div>
+        <div class="supp-link">Open <svg viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </a>
+      <a class="supp-card" href="meridian-progress-strategy.html">
+        <div class="supp-num">Supplementary B</div>
+        <div class="supp-title">Paycheck Migration Bifurcation</div>
+        <div class="supp-desc">Deep technical exploration of the priority lane vs historical lane paycheck migration model. HistoricalPaycheck API vs Archive API. 8 configurable parameters, 12 paycheck categories, voided and amended paycheck handling, W-2 accuracy implications.</div>
+        <div class="supp-link">Open <svg viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </a>
+      <a class="supp-card" href="qbdte-ies-migration-gaps-pipeline.html">
+        <div class="supp-num">Supplementary C</div>
+        <div class="supp-title">QBDT → IES Critical Gaps &amp; AI Pipeline</div>
+        <div class="supp-desc">Technical feature gap analysis and the 6-stage collaborative AI pipeline for the migration. Covers WH-347 certified payroll, WA L&amp;I, assembly BOM, serial/lot tracking, memorised reports, AIA billing, Ohio school district tax, and multi-state WC classification.</div>
+        <div class="supp-link">Open <svg viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ READING GUIDE ═══ -->
+  <div class="callout co-ai">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M6 1v2M6 9v2M1 6h2M9 6h2M2.5 2.5l1.4 1.4M8.1 8.1l1.4 1.4M2.5 9.5l1.4-1.4M8.1 3.9l1.4-1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Reading guide:</strong> Documents 01 and 02 can be read independently. Documents 03 and 04 build on each other — the flow strategy defines how the journey is structured; the progress strategy defines how success is measured inside that structure. Documents 05, 06, and 07 form a single education arc: strategy → concept translation → workforce rollout. If you are new to this research, start with 01. If you are the QBO Payroll design team, start with 03 and 04. If you are the education or Champion team, start with 05.</div>
+  </div>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group</strong> · QBDT → IES Migration Research Hub · Intuit Enterprise Suite</div>
+  <div class="df-t">7 core documents · 3 supplementary · 10 states · 18-month programme</div>
+</footer>
+
+</body>
+</html>

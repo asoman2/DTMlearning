@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Migration Flow — UX Strategy Document</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F4F5F9;--s:#FFF;--s2:#F0F2F7;--s3:#E6E9F2;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.17);
+  --ink:#14202E;--ink2:#3A5068;--ink3:#6B80A0;--ink4:#A4B4C8;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  --blue:#1E40AF;--bluel:#EFF2FF;--blueb:rgba(30,64,175,.18);
+  --green:#065F46;--greenl:#ECFDF5;--greenb:rgba(6,95,70,.18);
+  --violet:#4C1D95;--violetl:#F5F3FF;--violetb:rgba(76,29,149,.18);
+  --amber:#78350F;--amberl:#FFFBEB;--amberb:rgba(120,53,15,.18);
+  --teal:#0E7490;--teall:#ECFEFF;--tealb:rgba(14,116,144,.16);
+  --red:#991B1B;--redl:#FEF2F2;--redb:rgba(153,27,27,.15);
+  --gold:#92680A;--goldl:#FEFCE8;--goldb:rgba(146,104,10,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 36px;gap:14px;position:sticky;top:0;z-index:100}
+.nav-mark{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:14px;height:14px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-chip{font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+
+/* MASTHEAD */
+.mast{background:linear-gradient(160deg,var(--navy) 0%,#1A2E52 70%,#203660 100%);padding:72px 36px 56px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;top:-60px;right:-80px;width:400px;height:400px;border-radius:50%;border:1px solid rgba(255,255,255,.04)}
+.mast-inner{max-width:1120px;margin:0 auto;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:20px}
+.mast-h1{font-family:var(--serif);font-size:clamp(32px,4.5vw,52px);font-weight:400;color:#fff;line-height:1.08;margin-bottom:16px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-lead{font-size:15px;color:rgba(255,255,255,.5);line-height:1.78;max-width:700px;margin-bottom:36px}
+.mast-contrast{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:20px 24px;max-width:800px;margin-bottom:32px}
+.mc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-bottom:12px}
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mc-col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.mc-col-title-blue{color:#93C5FD} .mc-col-title-amber{color:#FCD34D}
+.mc-items{display:flex;flex-direction:column;gap:5px}
+.mc-item{font-size:12px;color:rgba(255,255,255,.6);display:flex;gap:7px;align-items:flex-start;line-height:1.45}
+.mc-item::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.mc-item.blue::before{background:#93C5FD} .mc-item.amber::before{background:#FCD34D}
+.mast-stats{display:flex;gap:28px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:24px}
+.ms-val{font-family:var(--serif);font-size:26px;font-weight:400;color:#fff;line-height:1;margin-bottom:3px}
+.ms-lbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em}
+
+/* PAGE */
+.page{max-width:1120px;margin:0 auto;padding:52px 36px 100px}
+
+/* SECTION */
+.sec{margin-bottom:60px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:12px;border-bottom:1.5px solid var(--s3)}
+.sec-n{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.07em}
+.sec-title{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1}
+.sec-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid}
+
+/* PROSE */
+.prose{font-size:14px;color:var(--ink2);line-height:1.82;margin-bottom:22px;max-width:820px}
+.prose strong{color:var(--ink);font-weight:600}
+.prose em{font-style:italic}
+
+/* ARCHITECTURE DIAGRAM (CSS) */
+.arch-diagram{background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:28px 32px;margin-bottom:28px;box-shadow:var(--sh)}
+.arch-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:20px}
+.arch-layers{display:flex;flex-direction:column;gap:10px}
+.arch-layer{display:grid;grid-template-columns:160px 1fr;gap:14px;align-items:start}
+.al-label{font-size:12px;font-weight:600;color:var(--ink2);padding-top:4px}
+.al-row{display:flex;gap:8px;flex-wrap:wrap}
+.al-node{padding:8px 14px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid}
+.an-prog{background:var(--navy);color:#fff;border-color:var(--navy)}
+.an-wave0{background:var(--bluel);color:var(--blue);border-color:var(--blueb)}
+.an-wave1{background:var(--greenl);color:var(--green);border-color:var(--greenb)}
+.an-wave2{background:var(--amberl);color:var(--amber);border-color:var(--amberb)}
+.an-wave3{background:var(--redl);color:var(--red);border-color:var(--redb)}
+.an-stage{background:var(--s2);color:var(--ink2);border-color:var(--b2);font-size:11px;padding:6px 10px}
+.an-step{background:var(--s);color:var(--ink3);border-color:var(--b);font-size:10px;padding:4px 8px}
+.arch-arrow{text-align:center;font-size:11px;color:var(--ink4);padding:2px 0}
+
+/* PERSONA MAP */
+.persona-map{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
+.pm-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px 14px;box-shadow:var(--sh)}
+.pm-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pm-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;font-family:var(--serif)}
+.pm-role{font-size:12px;font-weight:600;color:var(--ink);line-height:1.2}
+.pm-dept{font-size:10px;color:var(--ink3)}
+.pm-view{font-size:10px;font-weight:600;margin-top:6px;padding:2px 7px;border-radius:3px;border:1px solid;display:inline-block}
+.pm-view-prog{background:var(--bluel);color:var(--blue);border-color:var(--blueb)}
+.pm-view-deep{background:var(--violetl);color:var(--violet);border-color:var(--violetb)}
+.pm-view-gate{background:var(--goldl);color:var(--gold);border-color:var(--goldb)}
+.pm-view-minimal{background:var(--greenl);color:var(--green);border-color:var(--greenb)}
+
+/* COLLABORATION PATTERNS */
+.collab-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.collab-card{background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+.cc-head{padding:14px 16px 10px;border-bottom:1px solid var(--b)}
+.cc-pattern-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.cc-title{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
+.cc-body{padding:12px 16px}
+.cc-desc{font-size:12px;color:var(--ink3);line-height:1.65;margin-bottom:10px}
+.cc-example{font-size:11px;background:var(--s2);border-radius:5px;padding:7px 10px;border-left:2px solid;color:var(--ink2);line-height:1.5;font-style:italic}
+.cc-actors{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.cc-actor{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--s2);color:var(--ink3);border:1px solid var(--b)}
+
+/* SWIM LANE SKETCH */
+.swim-wrap{background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:24px;margin-bottom:28px;overflow-x:auto}
+.swim-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:16px}
+.swim-svg{width:100%;min-width:700px;height:auto}
+
+/* WAVE CARDS */
+.wave-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+.wave-card{background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+.wc-head{padding:14px 16px 10px}
+.wc-num{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.wc-title{font-size:14px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.wc-sub{font-size:11px;color:var(--ink3);line-height:1.5}
+.wc-body{padding:10px 16px;border-top:1px solid var(--b);background:var(--s2)}
+.wc-body-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px}
+.wc-complexity-adds{display:flex;flex-direction:column;gap:4px}
+.wca{display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink2);line-height:1.4}
+.wca-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px}
+
+/* COMPONENT SPEC TABLE */
+.comp-table{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.comp-table th{background:var(--s2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--b2)}
+.comp-table td{padding:9px 14px;border-bottom:1px solid var(--b);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tr:hover td{background:var(--s2)}
+.ctag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid}
+.ctag-new{background:var(--bluel);color:var(--blue);border-color:var(--blueb)}
+.ctag-extend{background:var(--greenl);color:var(--green);border-color:var(--greenb)}
+.ctag-reuse{background:var(--s2);color:var(--ink3);border-color:var(--b2)}
+.ctag-crit{background:var(--redl);color:var(--red);border-color:var(--redb)}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:13px 17px;margin-bottom:18px;display:flex;gap:11px;align-items:flex-start}
+.callout svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-blue{background:var(--bluel);border:1px solid var(--blueb)} .co-blue svg,.co-blue .callout-text{color:#1E3A8A} .co-blue .callout-text strong{color:var(--blue)}
+.co-amber{background:var(--amberl);border:1px solid var(--amberb)} .co-amber svg{color:var(--amber)} .co-amber .callout-text{color:#451A03} .co-amber .callout-text strong{color:var(--amber)}
+.co-red{background:var(--redl);border:1px solid var(--redb)} .co-red svg{color:var(--red)} .co-red .callout-text{color:#7F1D1D} .co-red .callout-text strong{color:var(--red)}
+.co-green{background:var(--greenl);border:1px solid var(--greenb)} .co-green svg{color:var(--green)} .co-green .callout-text{color:#064E3B} .co-green .callout-text strong{color:var(--green)}
+
+/* PRINCIPLES GRID */
+.prin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.prin{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;border-left:3px solid;box-shadow:var(--sh)}
+.prin-n{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:5px}
+.prin-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.prin-text{font-size:12px;color:var(--ink3);line-height:1.65}
+.prin-text strong{color:var(--ink2);font-weight:500}
+
+/* CONTENT MODEL */
+.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.cm-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.cm-card-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--b)}
+.cm-fields{display:flex;flex-direction:column;gap:6px}
+.cm-field{display:flex;gap:8px;align-items:flex-start}
+.cmf-name{font-size:11px;font-weight:600;font-family:var(--mono);color:var(--blue);flex-shrink:0;width:160px}
+.cmf-desc{font-size:11px;color:var(--ink3);line-height:1.5}
+.cmf-new{font-size:9px;font-weight:700;color:var(--blue);background:var(--bluel);border:1px solid var(--blueb);padding:1px 5px;border-radius:2px;flex-shrink:0;align-self:flex-start;margin-top:1px}
+
+/* BUILD PRIORITY */
+.priority-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.prio-item{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--sh)}
+.prio-num{font-family:var(--mono);font-size:16px;font-weight:400;color:var(--ink4);flex-shrink:0;min-width:28px}
+.prio-body{flex:1}
+.prio-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.prio-text{font-size:12px;color:var(--ink3);line-height:1.6}
+.prio-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.prio-effort{font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px}
+.pe-high{background:var(--redl);color:var(--red)}
+.pe-med{background:var(--amberl);color:var(--amber)}
+.pe-low{background:var(--greenl);color:var(--green)}
+.prio-tag{font-size:10px;color:var(--ink4);background:var(--s2);border:1px solid var(--b);border-radius:3px;padding:2px 7px}
+
+/* FOOTER */
+.doc-footer{background:var(--navy);padding:24px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:860px){
+  .nav,.mast,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .persona-map,.wave-grid,.collab-grid,.prin-grid,.cm-grid,.mc-grid{grid-template-columns:1fr 1fr}
+  .arch-layer{grid-template-columns:100px 1fr}
+  .mast-h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L2 4v6l5 3 5-3V4L7 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 1v12M2 4l5 3 5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Meridian Building Group</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">Multi-Persona Migration Flow — UX Strategy</span>
+  <div class="nav-sp"></div>
+  <span class="nav-chip">For UX team review · Not an implementation</span>
+</nav>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-kicker">UX strategy document · Pre-implementation · For internal design review</div>
+    <h1 class="mast-h1">From a single actor<br>to a <em>collaborative programme</em></h1>
+    <p class="mast-lead">The Hartwell flow works because it assumes one person, one file, one go-live. Meridian breaks every one of those assumptions simultaneously. This document defines the strategy for a migration flow that handles 14 personas, 10 QBDT files, 3 legal entities, and 3 staggered go-live waves — without collapsing under the weight of its own complexity.</p>
+
+    <div class="mast-contrast">
+      <div class="mc-label">The fundamental design shift — Hartwell vs Meridian</div>
+      <div class="mc-grid">
+        <div>
+          <div class="mc-col-title mc-col-title-blue">Hartwell Construction (current flow)</div>
+          <div class="mc-items">
+            <div class="mc-item blue">1 actor — the business owner</div>
+            <div class="mc-item blue">1 QBDT file, 1 legal entity</div>
+            <div class="mc-item blue">1 go-live date for all 24 employees</div>
+            <div class="mc-item blue">Linear: Stage 1 → 2 → 3 → 4 → 5</div>
+            <div class="mc-item blue">AI works for "the customer" generically</div>
+            <div class="mc-item blue">No collaboration moments</div>
+            <div class="mc-item blue">2 navigation layers: Stage, Step</div>
+          </div>
+        </div>
+        <div>
+          <div class="mc-col-title mc-col-title-amber">Meridian Building Group (new flow)</div>
+          <div class="mc-items">
+            <div class="mc-item amber">14 actors — each with distinct responsibilities</div>
+            <div class="mc-item amber">10 QBDT files, 3 legal entities</div>
+            <div class="mc-item amber">3 staggered go-live waves over 6 months</div>
+            <div class="mc-item amber">Non-linear: parallel workstreams, handoffs, gates</div>
+            <div class="mc-item amber">AI tailored per persona and per wave complexity</div>
+            <div class="mc-item amber">4 collaboration patterns at defined moments</div>
+            <div class="mc-item amber">4 navigation layers: Programme, Wave, Stage, Step</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mast-stats">
+      <div><div class="ms-val">4</div><div class="ms-lbl">Navigation layers</div></div>
+      <div><div class="ms-val">14</div><div class="ms-lbl">Personas with views</div></div>
+      <div><div class="ms-val">3</div><div class="ms-lbl">Go-live waves</div></div>
+      <div><div class="ms-val">4</div><div class="ms-lbl">Collaboration patterns</div></div>
+      <div><div class="ms-val">12</div><div class="ms-lbl">New UI components</div></div>
+      <div><div class="ms-val">18+</div><div class="ms-lbl">Month programme</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<!-- ══ 1. NAVIGATION ARCHITECTURE ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">01 —</span>
+    <span class="sec-title">Navigation architecture — 4 layers, not 2</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--blue);border-color:var(--blueb);background:var(--bluel)">Foundation decision</span>
+  </div>
+
+  <p class="prose">The Hartwell flow has two navigation layers: Stage (5 stages) and Step (steps within a stage). This architecture fails for Meridian because the programme itself has structure above the stage level — three waves of go-live with dependencies between them — and step-level content has a persona dimension that Hartwell never needed. The Meridian flow needs four explicit layers, each with its own navigation treatment and its own purpose.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-title">4-layer navigation architecture</div>
+    <div class="arch-layers">
+      <div class="arch-layer">
+        <div class="al-label" style="color:var(--blue)">Layer 1 · Programme</div>
+        <div class="al-row">
+          <span class="al-node an-prog">Programme dashboard</span>
+          <span class="al-node an-prog">Overall progress · Go/no-go status · Wave dependencies</span>
+        </div>
+      </div>
+      <div class="arch-arrow">↓ drill into</div>
+      <div class="arch-layer">
+        <div class="al-label" style="color:var(--blue)">Layer 2 · Wave</div>
+        <div class="al-row">
+          <span class="al-node an-wave0">Wave 0 · Programme setup</span>
+          <span class="al-node an-wave1">Wave 1 · TX/AZ/GA/NC</span>
+          <span class="al-node an-wave2">Wave 2 · FL/CO/OH</span>
+          <span class="al-node an-wave3">Wave 3 · CA/NY/WA</span>
+        </div>
+      </div>
+      <div class="arch-arrow">↓ drill into</div>
+      <div class="arch-layer">
+        <div class="al-label" style="color:var(--ink3)">Layer 3 · Stage</div>
+        <div class="al-row">
+          <span class="al-node an-stage">Discovery</span>
+          <span class="al-node an-stage">Concept translation</span>
+          <span class="al-node an-stage">Data prep</span>
+          <span class="al-node an-stage">Migration</span>
+          <span class="al-node an-stage">Validation</span>
+          <span class="al-node an-stage">Go-live</span>
+        </div>
+      </div>
+      <div class="arch-arrow">↓ drill into</div>
+      <div class="arch-layer">
+        <div class="al-label" style="color:var(--ink3)">Layer 4 · Step</div>
+        <div class="al-row">
+          <span class="al-node an-step">AI task block</span>
+          <span class="al-node an-step">Concept bridge</span>
+          <span class="al-node an-step">Persona tag(s)</span>
+          <span class="al-node an-step">Collaboration type</span>
+          <span class="al-node an-step">Wave complexity adds</span>
+          <span class="al-node an-step">Gate condition</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-blue">
+    <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 5.5v3.5M6.5 4v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Layer 1 (Programme) is new and critical.</strong> This is the view the CFO and Programme Manager live in. It shows all three waves simultaneously — like a Gantt view but expressed in the journey language of the flow — with dependency arrows showing why Wave 3 cannot begin until Wave 1 has 30 days of stable operation. No equivalent exists in the Hartwell flow. This is the most important new component to design first.</div>
+  </div>
+
+  <div class="callout co-amber">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1 12h11L6.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.5 5v3.5M6.5 10v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Layer 2 (Wave) is where Meridian's complexity lives.</strong> The same stage structure (Discovery → Concept → Data prep → Migration → Validation → Go-live) repeats across all three waves — but Wave 3 is not Wave 1 with more states. It is fundamentally more complex: union CBAs, certified payroll, Washington L&I. The stage structure is the same; the step content within each stage must reflect the additive complexity of each wave. This is not a copy-paste — it is a layered inheritance model.</div>
+  </div>
+</section>
+
+<!-- ══ 2. PERSONA DIMENSION ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">02 —</span>
+    <span class="sec-title">The persona dimension — 14 actors, 4 view types</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--violet);border-color:var(--violetb);background:var(--violetl)">Design challenge</span>
+  </div>
+
+  <p class="prose">The hardest design problem in the Meridian flow is persona representation. Not every step is relevant to every persona. A field supervisor does not need to see the CoA consolidation steps. The Controller does not need to see the field crew direct deposit orientation. But the flow must feel like a coherent programme — not 14 separate journeys that happen to share a database. The solution is a single unified flow with a persona filter layer: the primary view shows all steps; activating a persona filter dims non-relevant steps and highlights the active persona's responsibilities.</p>
+
+  <p class="prose">Personas are grouped into <strong>4 view types</strong> based on their relationship to the migration flow — not their seniority or their job title.</p>
+
+  <div class="persona-map">
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--bluel);color:var(--blue)">CFO</div><div><div class="pm-role">CFO</div><div class="pm-dept">Executive</div></div></div>
+      <div class="pm-view pm-view-prog">Programme view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--bluel);color:var(--blue)">PM</div><div><div class="pm-role">Programme Manager</div><div class="pm-dept">External / Internal</div></div></div>
+      <div class="pm-view pm-view-prog">Programme view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">CON</div><div><div class="pm-role">Controller</div><div class="pm-dept">Finance</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">PAY</div><div><div class="pm-role">Payroll Manager</div><div class="pm-dept">Finance</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">HR</div><div><div class="pm-role">HR Director</div><div class="pm-dept">HR</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">IT</div><div><div class="pm-role">IT Director</div><div class="pm-dept">Technology</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">VPO</div><div><div class="pm-role">VP Operations</div><div class="pm-dept">Operations ×4</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--violetl);color:var(--violet)">CPO</div><div><div class="pm-role">Certified Payroll Officer</div><div class="pm-dept">Compliance</div></div></div>
+      <div class="pm-view pm-view-deep">Deep domain view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--goldl);color:var(--gold)">CPA</div><div><div class="pm-role">External CPA</div><div class="pm-dept">Mitchell & Park LLP</div></div></div>
+      <div class="pm-view pm-view-gate">Gate-only view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--goldl);color:var(--gold)">IPS</div><div><div class="pm-role">Intuit PS Team</div><div class="pm-dept">External</div></div></div>
+      <div class="pm-view pm-view-gate">Gate-only view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--goldl);color:var(--gold)">UNI</div><div><div class="pm-role">Union Steward</div><div class="pm-dept">Wave 3 only</div></div></div>
+      <div class="pm-view pm-view-gate">Gate-only view · Wave 3</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--greenl);color:var(--green)">BRM</div><div><div class="pm-role">Branch Managers ×10</div><div class="pm-dept">Regional</div></div></div>
+      <div class="pm-view pm-view-minimal">Minimal view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--greenl);color:var(--green)">FLD</div><div><div class="pm-role">Field Supervisors</div><div class="pm-dept">On-site</div></div></div>
+      <div class="pm-view pm-view-minimal">Mobile-only view</div>
+    </div>
+    <div class="pm-card">
+      <div class="pm-card-top"><div class="pm-avatar" style="background:var(--greenl);color:var(--green)">EST</div><div><div class="pm-role">Estimating team</div><div class="pm-dept">Pre-construction</div></div></div>
+      <div class="pm-view pm-view-minimal">Minimal view</div>
+    </div>
+  </div>
+
+  <div class="prose">The four view types determine the UI treatment each persona receives when they filter the flow to their perspective:</div>
+
+  <table class="comp-table">
+    <thead><tr><th style="width:15%">View type</th><th style="width:20%">Who</th><th style="width:30%">What they see</th><th style="width:35%">Design treatment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Programme view</strong></td>
+        <td>CFO, Programme Manager</td>
+        <td>All 3 waves simultaneously. Go/no-go gates. Overall % by wave and stage. Critical path dependencies. Red-flag surfacing only — no step detail unless requested.</td>
+        <td>Layer 1 (Programme) is their default landing. They drill into Wave level only when investigating a specific issue. Steps are summarised at stage level, not shown individually.</td>
+      </tr>
+      <tr>
+        <td><strong>Deep domain view</strong></td>
+        <td>Controller, Payroll Manager, HR, IT, VP Ops, CPO</td>
+        <td>All steps in their domain across all 3 waves. AI task blocks specific to their role. Collaboration moments where they hand off to or receive from another persona. Full step detail.</td>
+        <td>Persona filter dimms steps not tagged to their role. Their steps are full-opacity with coloured persona badge. Collaboration moments are visually distinct — not a regular step card.</td>
+      </tr>
+      <tr>
+        <td><strong>Gate-only view</strong></td>
+        <td>External CPA, Intuit PS, Union Steward (Wave 3)</td>
+        <td>Only the steps that require their sign-off or review. Each gate card shows exactly what is being asked of them, the data package to review, and the consequence of approving or blocking.</td>
+        <td>Simplified flow showing only gate cards with their status. No AI task blocks, no concept bridges. Just: "Here is what you need to review. Here is what you need to confirm. Here is who is waiting." Email-accessible, no login required for review.</td>
+      </tr>
+      <tr>
+        <td><strong>Minimal / Mobile view</strong></td>
+        <td>Branch Managers, Field Supervisors, Estimators</td>
+        <td>3–5 steps maximum. Mobile-first. Benefit-led: "Here is what changes for you. Here is what you need to do. Here is where to get help." No AI task blocks, no concept bridges. Action and deadline only.</td>
+        <td>Separate mobile-optimised path. Not a filtered version of the full flow — a purpose-built minimal interface. Field supervisor view: direct deposit re-entry, pay stub access, and who to call. Bilingual.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 3. COLLABORATION PATTERNS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">03 —</span>
+    <span class="sec-title">Collaboration patterns — 4 types, each with its own UI treatment</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--green);border-color:var(--greenb);background:var(--greenl)">New design language</span>
+  </div>
+
+  <p class="prose">The Hartwell flow has no language for collaboration — every step has one actor. Meridian's migration has four distinct types of collaboration moment, each with different cognitive and process implications. These cannot all look like a regular step card. They need a distinct visual treatment that signals: "this is a handoff / this is a convergence / this is a parallel track / this is an expert consultation."</p>
+
+  <div class="collab-grid">
+    <div class="collab-card">
+      <div class="cc-head">
+        <div class="cc-pattern-label" style="color:var(--blue)">Pattern 1 · Sequential Handoff</div>
+        <div class="cc-title">Persona A completes → Persona B receives and continues</div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-desc">The most common collaboration type. One persona finishes their portion of a step and the responsibility transfers to another. The transfer is explicit — Persona B receives a notification and sees the output of Persona A's work before continuing. The step is not complete until Persona B has accepted the handoff.</div>
+        <div class="cc-example">"Controller completes CoA consolidation → sends to Karen Alvarez (CPA) for opening balance sign-off → CPA reviews and confirms → Controller is notified and Stage 4 unlocks."</div>
+        <div class="cc-actors">
+          <span class="cc-actor">Visual: split step card with → arrow between personas</span>
+          <span class="cc-actor">Status: A working → A complete → B reviewing → B confirmed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collab-card">
+      <div class="cc-head">
+        <div class="cc-pattern-label" style="color:var(--green)">Pattern 2 · Parallel Workstream</div>
+        <div class="cc-title">Two personas work simultaneously — outputs merge at a gate</div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-desc">Two or more personas execute independent work concurrently. Their outputs are independent but must both be complete before the programme can advance. The UI shows both workstreams simultaneously with a visual merge point at the gate. Critically: delay by either persona blocks both.</div>
+        <div class="cc-example">"IT Director builds LCPtracker IES integration (Months 2–7) in parallel with Payroll Manager mapping union CBA pay items (Months 4–6). Both must be complete before Wave 3 go-live can be cleared."</div>
+        <div class="cc-actors">
+          <span class="cc-actor">Visual: two parallel swim lanes converging at a gate node</span>
+          <span class="cc-actor">Status: both tracks show independent progress bars</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collab-card">
+      <div class="cc-head">
+        <div class="cc-pattern-label" style="color:var(--violet)">Pattern 3 · Gate Convergence</div>
+        <div class="cc-title">Multiple personas must all sign off before the programme advances</div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-desc">A critical gate that requires explicit confirmation from multiple named personas before any work proceeds. Each signatory has a distinct domain responsibility for their sign-off. One missing sign-off blocks all others from proceeding — no partial approval. The gate card shows named individuals, their status, and what specifically they are confirming.</div>
+        <div class="cc-example">"Wave 1 go-live gate: CFO (business approval) + Controller (financial accuracy) + Payroll Manager (YTD validation) + Karen Alvarez CPA (opening balances) + Branch Managers TX/AZ/GA/NC (local readiness) — all 7 must confirm."</div>
+        <div class="cc-actors">
+          <span class="cc-actor">Visual: gate card with named avatar row — each showing pending/confirmed</span>
+          <span class="cc-actor">Behaviour: gate unlocks only when last confirmation received</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collab-card">
+      <div class="cc-head">
+        <div class="cc-pattern-label" style="color:var(--amber)">Pattern 4 · Expert Consultation</div>
+        <div class="cc-title">A specialist is brought in for a specific review — then exits</div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-desc">A persona who is not part of the day-to-day programme is brought in for one specific expertise-dependent review. They receive a purpose-built package (the Gate-only view), review it, confirm or flag, and exit. They do not navigate the full flow. Their involvement is time-boxed and defined. Examples: Union Steward reviewing fringe benefit configuration; external auditor reviewing WIP schedule.</div>
+        <div class="cc-example">"Union Steward (Local 520, NY) receives a secure link to a gate-only view showing the IES fringe benefit configuration for their agreement. Confirms rates match CBA. Returns to normal work. No IES login required."</div>
+        <div class="cc-actors">
+          <span class="cc-actor">Visual: consultation card with external badge + email-accessible link</span>
+          <span class="cc-actor">Timeout: 48-hour response window with escalation path</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. WAVE STRUCTURE ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">04 —</span>
+    <span class="sec-title">Wave structure — additive complexity, not repetition</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--amber);border-color:var(--amberb);background:var(--amberl)">Inheritance model</span>
+  </div>
+
+  <p class="prose">The three go-live waves share the same stage structure — but they are not copies of each other. Wave 1 is the baseline. Wave 2 inherits Wave 1 and adds specific complexity for Florida, Colorado, and Ohio. Wave 3 inherits Wave 2 and adds union, certified payroll, and Washington L&I. The UI must make this additive complexity visible — a Wave 3 step should look visibly more complex than the same step in Wave 1, because it is. A "Wave complexity adds" section within each step shows what is different in Wave 2 or Wave 3 compared to the baseline.</p>
+
+  <div class="wave-grid">
+    <div class="wave-card">
+      <div class="wc-head" style="border-top:3px solid var(--green)">
+        <div class="wc-num" style="color:var(--green)">Wave 1 · Months 6–7</div>
+        <div class="wc-title">TX, AZ, GA, NC</div>
+        <div class="wc-sub">~100 employees · Non-union · No prevailing wage · Lowest compliance complexity · The learning wave</div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-body-label">Baseline — all steps at standard complexity</div>
+        <div class="wc-complexity-adds">
+          <div class="wca"><div class="wca-dot" style="background:var(--green)"></div>Standard multi-state payroll (TX, AZ, GA, NC — straightforward)</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--green)"></div>Non-union pay items — standard IES mapping</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--green)"></div>No prevailing wage, no certified payroll</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--green)"></div>Every mistake here is a lesson for Wave 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave-card">
+      <div class="wc-head" style="border-top:3px solid var(--amber)">
+        <div class="wc-num" style="color:var(--amber)">Wave 2 · Months 9–10</div>
+        <div class="wc-title">FL, CO, OH</div>
+        <div class="wc-sub">~60 employees · Some union (OH) · CO FAMLI · OH municipal tax · Medium complexity</div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-body-label">Adds on top of Wave 1 baseline</div>
+        <div class="wc-complexity-adds">
+          <div class="wca"><div class="wca-dot" style="background:var(--amber)"></div>CO FAMLI — EE/ER paid family leave contributions (new pay item type)</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--amber)"></div>OH municipal income tax — 600+ jurisdictions, per work location</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--amber)"></div>OH union trades (Cleveland Building Trades) — one CBA</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--amber)"></div>FL lien law — 45-day preliminary notice workflow</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave-card">
+      <div class="wc-head" style="border-top:3px solid var(--red)">
+        <div class="wc-num" style="color:var(--red)">Wave 3 · Months 12–13</div>
+        <div class="wc-title">CA, NY, WA</div>
+        <div class="wc-sub">~50 employees · Heavy union · Prevailing wage · Certified payroll · WA L&I · Highest compliance risk</div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-body-label">Adds on top of Wave 2 + Union collaboration pattern</div>
+        <div class="wc-complexity-adds">
+          <div class="wca"><div class="wca-dot" style="background:var(--red)"></div>LCPtracker certified payroll integration — CPO holds go-live veto</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--red)"></div>5 union CBAs — Expert Consultation pattern with each steward</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--red)"></div>WA L&I — permanent manual process, no IES native solution</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--red)"></div>CA DIR certified payroll portal — test submission required pre-go-live</div>
+          <div class="wca"><div class="wca-dot" style="background:var(--red)"></div>NY prevailing wage (NYPL) — wage determination update process</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-red">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1 12h11L6.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.5 5v3.5M6.5 10v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Wave 3 has a blocking dependency on Month 2 that the flow must surface immediately.</strong> The LCPtracker certified payroll integration must begin in Programme Month 2 — not Month 10. This is not a Wave 3 step. It is a Wave 0 (programme setup) step that is a prerequisite for Wave 3. The flow must show this cross-wave dependency visibly: a red thread connecting the LCPtracker step in Wave 0 to the Wave 3 go-live gate, with a countdown showing how much time remains before the integration start date makes the Wave 3 timeline impossible.</div>
+  </div>
+</section>
+
+<!-- ══ 5. WAVE 0 — PROGRAMME SETUP ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">05 —</span>
+    <span class="sec-title">Wave 0 — the pre-wave that makes everything else possible</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--blue);border-color:var(--blueb);background:var(--bluel)">Does not exist in Hartwell</span>
+  </div>
+
+  <p class="prose">Wave 0 is an entirely new concept with no equivalent in the Hartwell flow. It is the programme-level setup work that must happen before any wave's Discovery stage can begin. It crosses all 10 states, all 14 personas, and all 3 legal entities simultaneously. Many of its steps are blocking for Wave 1, some are blocking for Wave 3, and the LCPtracker integration must be treated as a Wave 0 step that begins in Month 2 regardless of when Wave 3 goes live.</p>
+
+  <table class="comp-table">
+    <thead><tr><th style="width:25%">Wave 0 step</th><th style="width:12%">Owning persona(s)</th><th style="width:20%">Collaboration type</th><th style="width:20%">Blocking for</th><th style="width:23%">Why it must be Wave 0</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Multi-entity IES architecture decision</strong><br><small>Single account vs separate per EIN</small></td><td>CFO + IPS</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--goldl);color:var(--gold);border:1px solid var(--goldb)">Expert Consultation</span></td><td>Everything. All waves.</td><td>Wrong architecture cannot be undone after IES environment is built. This decision shapes every other configuration choice.</td></tr>
+      <tr><td><strong>10-file AI diagnostic scan</strong></td><td>IPS + IT Director</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--greenl);color:var(--green);border:1px solid var(--greenb)">Parallel</span></td><td>Wave 1 Discovery</td><td>All 10 QBDT files must be scanned before wave sequencing can be confirmed. One file may reveal a complexity that changes the wave plan.</td></tr>
+      <tr><td><strong>Consolidated CoA design</strong><br><small>10 files → 1 IES structure</small></td><td>Controller + CPA + IPS</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--bluel);color:var(--blue);border:1px solid var(--blueb)">Sequential Handoff</span></td><td>Wave 1 Data prep (accounting)</td><td>The Controller cannot build IES accounting for Wave 1 until the consolidated CoA design is agreed. This is a 6-week design process, not a migration task.</td></tr>
+      <tr><td><strong>LCPtracker IES integration</strong><br><small>Must start Month 2</small></td><td>IT Director + CPO</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--greenl);color:var(--green);border:1px solid var(--greenb)">Parallel workstream</span></td><td>Wave 3 go-live gate</td><td>5–6 months to integrate, test, and CPO-validate. If it starts in Month 2, it's ready for Wave 3. If it starts in Month 8, Wave 3 slips 6 months or goes live without certified payroll — which is legally unacceptable.</td></tr>
+      <tr><td><strong>Union CBA extraction</strong><br><small>NY, CA, WA, OH, CO — 5 CBAs</small></td><td>Payroll Manager + HR + Union Stewards</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--goldl);color:var(--gold);border:1px solid var(--goldb)">Expert Consultation ×5</span></td><td>Wave 2 & 3 payroll config</td><td>Current CBA fringe benefit rates must be pulled from the actual signed agreement — not from QBDT. Takes 1 week per CBA to obtain, verify, and prepare for IES configuration.</td></tr>
+      <tr><td><strong>BI tool selection and IES API connection</strong></td><td>IT Director + Controller + CFO</td><td><span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--greenl);color:var(--green);border:1px solid var(--greenb)">Parallel workstream</span></td><td>Wave 1 QBDT decommission</td><td>The CFO cannot approve QBDT decommission if the consolidated P&L report doesn't exist in IES. The BI tool (Power BI or Tableau connected to IES API) takes 8–10 weeks to build.</td></tr>
+      <tr><td><strong>Programme manager appointment</strong></td><td>CFO decision</td><td>Single actor</td><td>All waves. Immediately.</td><td>Without a dedicated PM, the Controller and Payroll Manager run this project on top of their day jobs. They will not be able to. The PM must be named and contracted before Month 2 begins.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 6. NEW UI COMPONENTS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">06 —</span>
+    <span class="sec-title">New UI components — what must be designed and built</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--blue);border-color:var(--blueb);background:var(--bluel)">Component spec</span>
+  </div>
+
+  <p class="prose">The Hartwell flow established a strong component library: step cards, AI task blocks, concept bridges, mapping tables, decision prompts, dependency strips, and completion rows. Meridian inherits all of these — but requires 12 additional components that do not exist in the Hartwell model. These must be designed before implementation begins.</p>
+
+  <table class="comp-table">
+    <thead><tr><th style="width:22%">Component</th><th style="width:8%">Status</th><th style="width:30%">Description</th><th style="width:20%">Appears at layer</th><th style="width:20%">Critical design requirements</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Programme Dashboard</strong></td><td><span class="ctag ctag-new">New</span></td><td>Top-level view showing all 3 waves simultaneously. Timeline format with wave blocks, dependency arrows, go/no-go gate indicators, and overall completion %. CFO's default landing view.</td><td>Layer 1 (Programme)</td><td>Must show cross-wave dependencies visually. Wave 3 must show "blocked until Wave 1 Day 30" with a countdown. Gate status for each wave visible without drilling in.</td></tr>
+      <tr><td><strong>Wave Selector</strong></td><td><span class="ctag ctag-new">New</span></td><td>Navigation element for switching between Wave 0, Wave 1, Wave 2, Wave 3. Shows completion % and health status per wave. Current wave highlighted. Disabled state for waves not yet unlocked.</td><td>Layer 2 (Wave)</td><td>Waves must show dependency lock state — Wave 3 is visually locked until Wave 1 has 30 clean days. Lock is not just a disabled button — it explains why and shows what must happen.</td></tr>
+      <tr><td><strong>Persona Filter Bar</strong></td><td><span class="ctag ctag-new">New</span></td><td>A horizontal filter rail above the step list. Selecting a persona dims all steps not tagged to them. Relevant steps remain full opacity with persona badge. "All" shows every step. Can filter to multiple personas simultaneously.</td><td>Layer 3 (Stage) and Layer 4 (Step)</td><td>Dimming must feel like focus, not removal — dimmed steps are still visible because the programme context matters. Do not hide them. Persona avatars in the filter bar, not text labels.</td></tr>
+      <tr><td><strong>Sequential Handoff Card</strong></td><td><span class="ctag ctag-new">New</span></td><td>A step card variant showing two (or more) personas in sequence. Persona A's action shown on the left, Persona B's action shown on the right, with a visual arrow and status indicator between them.</td><td>Layer 4 (Step)</td><td>Each side has its own "Mark as confirmed" button. The step is not complete until both sides are confirmed. Status must be clear: A pending / A complete / B pending / B complete / Both complete.</td></tr>
+      <tr><td><strong>Parallel Workstream Block</strong></td><td><span class="ctag ctag-new">New</span></td><td>A dual-column block showing two concurrent workstreams with separate progress indicators, separate AI task lists, and a merge node at the bottom where both outputs converge.</td><td>Layer 3 (Stage) and Layer 4 (Step)</td><td>Both tracks must show independent completion status. If Track A is done but Track B is delayed, the merge node must clearly show the blocker is Track B — not a generic "waiting" state.</td></tr>
+      <tr><td><strong>Gate Convergence Card</strong></td><td><span class="ctag ctag-new">New</span></td><td>A special card variant for multi-persona sign-off moments. Shows named avatars for each required signatory, their domain responsibility, their current status (pending/reviewing/confirmed/blocked), and a countdown to deadline.</td><td>Layer 4 (Step)</td><td>Each signatory must have a named person (not just a role). The consequence of blocking must be shown: "If CPO sign-off is not received by [date], Wave 3 go-live moves from Month 12 to Month 18." This is not optional copy.</td></tr>
+      <tr><td><strong>Expert Consultation Card</strong></td><td><span class="ctag ctag-new">New</span></td><td>A card type for external specialist engagement. Contains a "Send review package" button that generates an email-accessible gate-only view for the specialist. Shows their status (invited / opened / confirmed / flagged) without requiring them to log into IES.</td><td>Layer 4 (Step)</td><td>The external specialist must be able to complete their review without an IES login. The review package is a self-contained document (shareable link) with the specific data they need to review and the specific question they need to answer.</td></tr>
+      <tr><td><strong>Wave Complexity Adds</strong></td><td><span class="ctag ctag-new">New</span></td><td>A section within each step body that shows what is different about this step in Wave 2 or Wave 3 compared to the Wave 1 baseline. Collapsed by default. Expands to show the specific additions with their owners and dependencies.</td><td>Layer 4 (Step)</td><td>Must be wave-context-aware: when you are viewing Wave 3, this section shows Wave 2 adds AND Wave 3 adds. When viewing Wave 1, this section is hidden (it is the baseline). Content is not generic — it names specific complexity (e.g., "CA DIR certified payroll portal requires test submission before go-live").</td></tr>
+      <tr><td><strong>Mobile / Field View</strong></td><td><span class="ctag ctag-new">New</span></td><td>A completely separate, purpose-built interface for field supervisors and foremen. Three actions maximum. Portrait orientation. Bilingual. QR-code accessible without login. Designed for a job site context.</td><td>Separate path (not a filtered version)</td><td>Must work with weak signal or offline. Critical path: (1) Direct deposit re-entry, (2) Pay stub access, (3) Who to call. Nothing else. This is not a simplified version of the full flow — it is a different product for a different context.</td></tr>
+      <tr><td><strong>Cross-Wave Dependency Thread</strong></td><td><span class="ctag ctag-new">New</span></td><td>A visual connector (red dashed line) that links a step in Wave 0 to a gate in Wave 3, showing the dependency timeline. Used specifically for the LCPtracker integration and the BI tool build.</td><td>Layer 1 (Programme) and Layer 2 (Wave)</td><td>The thread must show the elapsed time window between the two steps. "If LCPtracker integration starts now, Wave 3 can go live on schedule. If it starts in [Month X], Wave 3 moves to [Month Y]." Dynamic, not static.</td></tr>
+      <tr><td><strong>Persona Avatar Chip</strong></td><td><span class="ctag ctag-extend">Extend from Hartwell</span></td><td>Extend the Hartwell tag system to include persona chips (not just topic tags). Each step shows the owning persona(s) as avatar chips with initials and a coloured ring. Clicking a chip activates the persona filter.</td><td>Layer 4 (Step)</td><td>Must distinguish between "owns this step" (filled ring) and "collaborates on this step" (dashed ring). Maximum 3 persona chips per step card header — additional collaborators shown on expand.</td></tr>
+      <tr><td><strong>WA L&I Manual Process Card</strong></td><td><span class="ctag ctag-new">New</span></td><td>A specialised step card for permanent manual process documentation — not a "we'll build this later" note, but a designed permanent workflow. Shows the quarterly L&I calculation process, the data sources, the named owner, and the calendar reminder setup in IES.</td><td>Layer 4 (Step) — Wave 3 only</td><td>This card must not look like a gap or a failure. It is a designed workaround. The tone is: "IES cannot automate this. Here is the process Meridian will use permanently. It is documented, owned, and calendared." Not a TODO. A solution.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 7. CONTENT MODEL ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">07 —</span>
+    <span class="sec-title">Content model — what each step contains</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--violet);border-color:var(--violetb);background:var(--violetl)">Data schema</span>
+  </div>
+
+  <p class="prose">The Hartwell step has 10 fields. The Meridian step inherits all of them and adds 7 new fields specific to the multi-persona, multi-wave programme. The new fields are the minimum required to express the Meridian collaboration model — not aspirational additions.</p>
+
+  <div class="cm-grid">
+    <div class="cm-card">
+      <div class="cm-card-title">Inherited from Hartwell (10 fields)</div>
+      <div class="cm-fields">
+        <div class="cm-field"><div class="cmf-name">id</div><div class="cmf-desc">Unique step identifier</div></div>
+        <div class="cm-field"><div class="cmf-name">n</div><div class="cmf-desc">Display number within stage</div></div>
+        <div class="cm-field"><div class="cmf-name">title</div><div class="cmf-desc">Step title shown in card header</div></div>
+        <div class="cm-field"><div class="cmf-name">tags / tc</div><div class="cmf-desc">Topic tags (AI, Accounting, Payroll, etc.)</div></div>
+        <div class="cm-field"><div class="cmf-name">sub</div><div class="cmf-desc">One-sentence description</div></div>
+        <div class="cm-field"><div class="cmf-name">aiTasks</div><div class="cmf-desc">Array of AI task objects with status</div></div>
+        <div class="cm-field"><div class="cmf-name">aiResult</div><div class="cmf-desc">AI completion summary text</div></div>
+        <div class="cm-field"><div class="cmf-name">concept</div><div class="cmf-desc">QBDT → IES concept bridge object</div></div>
+        <div class="cm-field"><div class="cmf-name">decision</div><div class="cmf-desc">Decision prompt with options</div></div>
+        <div class="cm-field"><div class="cmf-name">deps</div><div class="cmf-desc">Dependency nodes array</div></div>
+      </div>
+    </div>
+
+    <div class="cm-card">
+      <div class="cm-card-title">New fields for Meridian (7 additions)</div>
+      <div class="cm-fields">
+        <div class="cm-field">
+          <div class="cmf-name">personas</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">Array of persona objects — {id, role, ownership: 'primary'|'collaborator', avatar}. Drives persona filter behaviour and chip display.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">collabType</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">One of: null | 'sequential_handoff' | 'parallel' | 'gate_convergence' | 'expert_consultation'. Determines which card variant renders.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">wave</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">Array: ['w0'] | ['w1'] | ['w2','w3'] etc. Steps can belong to one or multiple waves. Wave 0 steps show in the programme setup view.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">waveAdds</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">Object keyed by wave: {w2: {adds: [], owner: ''}, w3: {adds: [], owner: ''}}. The additional complexity content shown in the "Wave complexity adds" section.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">effort</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">Object: {hours: number, days: number, wave: 'w1'|'w2'|'w3'}. Effort estimate shown to the Programme Manager view. Drives programme timeline calculations.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">gateSignatories</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">Array for gate_convergence and expert_consultation steps: {personaId, name, email, domain, status: 'pending'|'reviewing'|'confirmed'|'blocked', deadline}.</div>
+        </div>
+        <div class="cm-field">
+          <div class="cmf-name">crossWaveDep</div>
+          <div class="cmf-new">NEW</div>
+          <div class="cmf-desc">For Wave 0 steps that are prerequisites for a later wave: {targetWave: 'w3', targetGate: 'step_id', latestStartDate: 'YYYY-MM', consequence: string}. Drives the cross-wave dependency thread visual.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. DESIGN PRINCIPLES ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">08 —</span>
+    <span class="sec-title">Design principles — what must be true of this flow</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--gold);border-color:var(--goldb);background:var(--goldl)">Non-negotiable</span>
+  </div>
+
+  <div class="prin-grid">
+    <div class="prin" style="border-left-color:var(--blue)">
+      <div class="prin-n">P.01</div>
+      <div class="prin-title">Coherent programme, not 14 parallel journeys</div>
+      <div class="prin-text">The persona filter shows each person their relevant steps — but the underlying structure is always one unified programme. <strong>Nobody should feel like they are using a different product from their colleagues.</strong> The CFO and the field foreman are both in the same migration journey — just at different levels of resolution.</div>
+    </div>
+    <div class="prin" style="border-left-color:var(--green)">
+      <div class="prin-n">P.02</div>
+      <div class="prin-title">Every collaboration moment has a named person, not a role</div>
+      <div class="prin-text">Gate convergence and sequential handoff cards must show "Karen Alvarez, Mitchell & Park LLP" — not "External CPA." <strong>Named individuals create accountability that role labels do not.</strong> The flow must be configurable with real names at the start of the programme and those names must appear throughout.</div>
+    </div>
+    <div class="prin" style="border-left-color:var(--violet)">
+      <div class="prin-n">P.03</div>
+      <div class="prin-title">Complexity is visible but not overwhelming</div>
+      <div class="prin-text">Wave 3's union and certified payroll complexity must be visible in the step cards — but collapsed by default. A payroll manager viewing Wave 3 can see that this step is more complex than Wave 1 <strong>without being overwhelmed by every detail before they need it.</strong> Wave complexity adds are collapsed; a single sentence signals the addition; expansion reveals the detail.</div>
+    </div>
+    <div class="prin" style="border-left-color:var(--amber)">
+      <div class="prin-n">P.04</div>
+      <div class="prin-title">Gates are consequences, not checkboxes</div>
+      <div class="prin-text">Every gate in the flow must show what happens if it is not cleared — not just that it is "required." "If LCPtracker integration does not begin by Month 2, Wave 3 moves from Month 12 to Month 18." <strong>The consequence is the motivation.</strong> A gate without a named consequence is a checkbox that people talk themselves into skipping.</div>
+    </div>
+    <div class="prin" style="border-left-color:var(--teal)">
+      <div class="prin-n">P.05</div>
+      <div class="prin-title">The flow speaks QBDT first, IES second — in every translation</div>
+      <div class="prin-text">Every concept bridge, tooltip, and mapping table must frame the IES concept in QBDT language first. The 10-state programme has people who have used QBDT Enterprise for 5–15 years. <strong>Their mental model is an asset, not a barrier.</strong> "Projects (like your Customer:Jobs)" always before "Projects." This is especially critical for Wave 3 personas who have the most complex mental model transitions.</div>
+    </div>
+    <div class="prin" style="border-left-color:var(--red)">
+      <div class="prin-n">P.06</div>
+      <div class="prin-title">The WA L&I manual process is a designed solution, not a gap</div>
+      <div class="prin-text">Washington State's L&I workers' comp system has no IES equivalent. This will never be automated. The flow must present the manual process as <strong>a permanent, documented, designed workflow — not as a missing feature or a future fix.</strong> Tone: "IES cannot automate this. Here is the process Meridian will use. It is owned, calendared, and requires no IES configuration." Not a TODO. A solution.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. BUILD PRIORITIES ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">09 —</span>
+    <span class="sec-title">Build sequence — what to design first</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--green);border-color:var(--greenb);background:var(--greenl)">Recommended order</span>
+  </div>
+
+  <p class="prose">Not all 12 new components are equally important or equally complex to build. The following sequence prioritises by two criteria: which components are blocking (other components cannot be built until they exist) and which components have the highest decision risk (wrong design requires rebuilding the most). The programme dashboard and the gate convergence card are the two highest-priority, highest-risk components in the entire build.</p>
+
+  <div class="priority-list">
+    <div class="prio-item">
+      <div class="prio-num">01</div>
+      <div class="prio-body">
+        <div class="prio-title">Programme Dashboard (Layer 1)</div>
+        <div class="prio-text">The CFO's view. Shows all 3 waves simultaneously with cross-wave dependency threads and go/no-go gate status. Design this first because it defines the information architecture that all other layers must conform to. If the Programme Dashboard's mental model is wrong, every layer beneath it inherits the error. This is the highest-risk design decision in the entire project.</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-high">Design risk: High</span>
+        <span class="prio-tag">Blocks: Wave Selector</span>
+      </div>
+    </div>
+
+    <div class="prio-item">
+      <div class="prio-num">02</div>
+      <div class="prio-body">
+        <div class="prio-title">Gate Convergence Card (Layer 4)</div>
+        <div class="prio-text">The most frequently appearing new component in the flow. Every major programme gate uses it: Wave 1 go-live gate (7 signatories), Wave 3 certified payroll gate (CPO + PS + Union Stewards), QBDT decommission gate (CFO + Controller + CPA). If the gate convergence card is poorly designed, every critical moment in the programme feels bureaucratic rather than clear. Design it second because it must be right before Wave 0 steps can be fully specced.</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-high">Design risk: High</span>
+        <span class="prio-tag">Blocks: Wave 0 content</span>
+      </div>
+    </div>
+
+    <div class="prio-item">
+      <div class="prio-num">03</div>
+      <div class="prio-body">
+        <div class="prio-title">Persona Filter Bar + Persona Avatar Chip (Layer 3–4)</div>
+        <div class="prio-text">The persona filter is the primary navigation mechanism for the 8 deep-domain-view personas. Design the filter bar and avatar chip system before writing any step content — because the persona tagging system determines how steps are authored. Every step must be tagged to its personas before the filter can work. If the tagging system changes after steps are written, every step must be reauthored.</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-high">Design risk: Med</span>
+        <span class="prio-tag">Blocks: Step authoring</span>
+      </div>
+    </div>
+
+    <div class="prio-item">
+      <div class="prio-num">04</div>
+      <div class="prio-body">
+        <div class="prio-title">Wave 0 steps — content before UI</div>
+        <div class="prio-text">Write all Wave 0 step content (multi-entity architecture decision, 10-file AI scan, CoA design, LCPtracker integration start, CBA extraction, BI tool selection) before finalising the UI that hosts them. Wave 0 is the most unfamiliar territory — it has no equivalent in the Hartwell flow and its steps involve the most complex collaboration patterns. Getting the content right informs the UI. Getting the UI right without content risks designing for the wrong use cases.</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-med">Design risk: Med</span>
+        <span class="prio-tag">Informs: LCPtracker cross-wave thread</span>
+      </div>
+    </div>
+
+    <div class="prio-item">
+      <div class="prio-num">05</div>
+      <div class="prio-body">
+        <div class="prio-title">Wave Complexity Adds section (Layer 4)</div>
+        <div class="prio-text">The component that makes Wave 3 visibly different from Wave 1. Design the collapsed/expanded treatment and the content schema for waveAdds before writing Wave 2 and Wave 3 step content. The design must answer: how much does a collapsed Wave 3 complexity indicator show? (Answer: one sentence naming the most significant addition.) How does expanding behave? (Answer: shows additions one by one, each with its owner and any new gate it introduces.)</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-med">Design risk: Med</span>
+        <span class="prio-tag">Enables: Wave 2 & 3 content</span>
+      </div>
+    </div>
+
+    <div class="prio-item">
+      <div class="prio-num">06</div>
+      <div class="prio-body">
+        <div class="prio-title">Mobile / Field View (separate path)</div>
+        <div class="prio-text">The field supervisor's view is not a filtered version of the main flow — it is a separate product. Design it last (in the main build sequence) but design it from first principles, not as a responsive adaptation of the desktop flow. The constraints are: weak signal or offline, portrait phone, 3 actions maximum, bilingual. Build with the Branch Champion use case in mind — this is what the Champion shows a foreman on a job site, not what a foreman navigates alone.</div>
+      </div>
+      <div class="prio-right">
+        <span class="prio-effort pe-low">Design risk: Low</span>
+        <span class="prio-tag">Separate build track</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-green">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 7l3 3 5.5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The fastest path to a shippable v1:</strong> Programme Dashboard + Gate Convergence Card + Persona Filter Bar, populated with Wave 0 and Wave 1 content only. Wave 2 and Wave 3 steps can be locked/greyed out in v1 — their content is authored but not yet accessible. This gives the CFO, Controller, and Payroll Manager a working flow for the first 6 months of the programme while Wave 2 and Wave 3 content is being authored and reviewed. It is better to ship Wave 0 + Wave 1 correctly than to ship all 3 waves partially.</div>
+  </div>
+</section>
+
+<!-- ══ 10. OPEN QUESTIONS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">10 —</span>
+    <span class="sec-title">Open questions — decisions needed before implementation begins</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--red);border-color:var(--redb);background:var(--redl)">Needs alignment</span>
+  </div>
+
+  <p class="prose">These are the design decisions that cannot be made by the UX team alone — they require alignment with the QBO Payroll team, the PS team, and the product organisation before implementation begins. Opening these questions in the next QBO Payroll design team session is the most valuable use of the alignment meeting.</p>
+
+  <table class="comp-table">
+    <thead><tr><th style="width:30%">Open question</th><th style="width:20%">Who must decide</th><th style="width:25%">Why it blocks design</th><th style="width:25%">Options to present</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Does the gate-only view for external reviewers (CPA, Union Steward) require an IES account?</strong></td><td>QBO Product + Legal + Security</td><td>If yes, the Expert Consultation card must include an account provisioning flow. If no, the secure shareable link model is sufficient. This affects 4 components.</td><td>Option A: Email-accessible review link (no login, time-limited). Option B: Guest IES access with limited permissions. Option C: PDF export + confirmation email.</td></tr>
+      <tr><td><strong>How does the paycheck migration (priority lane vs historical lane) surface across all 10 states and 3 waves in the flow?</strong></td><td>QBO Payroll team + UX team</td><td>The Hartwell flow has one paycheck migration step. Meridian has paycheck migration steps in all 3 waves — each with different complexity. The QBO Payroll team must confirm whether the HistoricalPaycheck API behaves differently for union vs non-union payroll, and whether the bifurcation UI changes for Wave 3.</td><td>Option A: Same bifurcation UI across all waves, wave-specific complexity in the "Wave complexity adds" section. Option B: Separate paycheck migration step variants per wave. Recommendation: Option A for v1, with Wave 3 complexity adds clearly called out.</td></tr>
+      <tr><td><strong>Can the persona filter persist across sessions?</strong></td><td>UX team + Engineering</td><td>If a Controller sets their persona filter and closes the browser, does the filter re-apply on next visit? Session persistence is important for deep domain view personas who use the flow daily. Important for Payroll Manager who may use the flow on multiple devices.</td><td>Option A: Persist persona filter in user profile (requires auth). Option B: Persist in localStorage (survives browser close, not device switch). Option C: No persistence, re-apply each session.</td></tr>
+      <tr><td><strong>What is the designed escalation path when a gate signatory is unavailable?</strong></td><td>QBO Payroll + PS team + UX team</td><td>If the External CPA is on vacation and cannot sign off on the Wave 2 opening balance, who can act as delegate? The Gate Convergence card must have a designed escalation path — not just a "waiting" state that blocks the programme indefinitely. This is a business process design question as much as a UX design question.</td><td>Option A: Named delegate per signatory, configured at programme start. Option B: Programme Manager can manually advance with documented justification. Option C: Time-out escalation to the PS team after 48 hours.</td></tr>
+      <tr><td><strong>How does the flow handle the LCPtracker integration dependency — does it live in the migration flow itself or link out to a separate integration project?</strong></td><td>UX team + IT Director persona + QBO Payroll</td><td>The LCPtracker integration is a 6-month software project that runs alongside the migration. It has its own tasks, milestones, and stakeholders. Putting its full detail inside the migration flow would overwhelm the flow. But the cross-wave dependency thread requires showing its status. Alignment needed on level of detail.</td><td>Option A: The flow shows a high-level integration milestone card with status (not started / in progress / testing / complete) and links to the integration project in a separate tool (Jira, Smartsheet). Option B: The integration's key checkpoints are modelled as steps inside the Wave 0 stage. Recommendation: Option A — the migration flow is not a project management tool.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group Migration Flow — UX Strategy</strong> · Pre-implementation · For design team review</div>
+  <div class="df-t">4 navigation layers · 14 personas · 4 collaboration patterns · 12 new components · 5 open questions</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><span class="rn-doc cur">03·Flow Strategy</span><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="meridian-historical-analysis.html">← 02</a><a class="rn-arr" href="meridian-progress-strategy.html">04 →</a></div></div>
+</body>
+</html>

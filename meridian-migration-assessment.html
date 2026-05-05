@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Building Group — Multi-State IES Migration Assessment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F6F7FA; --surface:#FFFFFF; --s2:#F0F2F7; --s3:#E8EBF2; --s4:#DDE1EB;
+  --border:rgba(0,0,0,.07); --border2:rgba(0,0,0,.11); --border3:rgba(0,0,0,.17);
+  --ink:#17233A; --ink2:#445168; --ink3:#7A8DA6; --ink4:#A8B8CC;
+  --blue:#1E4ED8; --bluel:#EEF2FF; --blueb:rgba(30,78,216,.18);
+  --teal:#0E7490; --teall:#ECFEFF; --tealb:rgba(14,116,144,.18);
+  --violet:#5B21B6; --violetl:#F5F3FF; --violetb:rgba(91,33,182,.18);
+  --amber:#92400E; --amberl:#FFFBEB; --amberb:rgba(146,64,14,.18);
+  --green:#065F46; --greenl:#ECFDF5; --greenb:rgba(6,95,70,.18);
+  --red:#991B1B; --redl:#FEF2F2; --redb:rgba(153,27,27,.18);
+  --orange:#9A3412; --orangel:#FFF7ED; --orangeb:rgba(154,52,18,.18);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --sh:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 3px 12px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;height:54px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.nav-mark{width:30px;height:30px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:16px;height:16px}
+.nav-title{font-size:13px;font-weight:600;color:var(--ink)}
+.nav-sep{width:1px;height:18px;background:var(--border2)}
+.nav-sub{font-size:12px;color:var(--ink3)}
+.nav-sp{flex:1}
+.nav-co{font-size:11px;font-weight:600;color:var(--blue);background:var(--bluel);border:1px solid var(--blueb);padding:3px 10px;border-radius:4px}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#0F1E3A 0%,#1A2E4A 60%,#1E3A5A 100%);padding:72px 40px 56px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-80px;width:400px;height:400px;border-radius:50%;border:1px solid rgba(255,255,255,.05)}
+.hero::after{content:'';position:absolute;bottom:-40px;left:-60px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(255,255,255,.04)}
+.hero-inner{max-width:1160px;margin:0 auto;position:relative;z-index:1}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:20px}
+.hero-h1{font-family:var(--serif);font-size:clamp(32px,4.5vw,52px);font-weight:400;color:#fff;line-height:1.1;margin-bottom:16px;letter-spacing:-.02em}
+.hero-h1 em{font-style:italic;color:#93C5FD}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.75;max-width:680px;margin-bottom:36px}
+.hero-stats{display:flex;gap:0;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.1);padding-top:28px}
+.hs{padding:0 32px 0 0}
+.hs:first-child{padding-left:0}
+.hs-val{font-family:var(--serif);font-size:28px;font-weight:400;color:#fff;line-height:1;margin-bottom:4px}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.07em}
+.hero-warning{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:12px 16px;margin-top:24px;display:flex;gap:10px;align-items:flex-start;max-width:800px}
+.hero-warning svg{width:14px;height:14px;color:#FCA5A5;flex-shrink:0;margin-top:2px}
+.hero-warning-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.65}
+.hero-warning-text strong{color:#FCA5A5;font-weight:600}
+
+/* BODY */
+.body{max-width:1160px;margin:0 auto;padding:48px 40px 96px}
+
+/* SECTION */
+.section{margin-bottom:56px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--s3)}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.06em}
+.sec-title{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1;height:0}
+.sec-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+
+/* INTRO PROSE */
+.prose{font-size:14px;color:var(--ink2);line-height:1.8;max-width:800px;margin-bottom:28px}
+.prose strong{color:var(--ink);font-weight:600}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:28px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--sh);transition:box-shadow .15s,border-color .15s}
+.card:hover{box-shadow:var(--sh2);border-color:var(--border2)}
+.card-top-bar{height:3px;border-radius:2px;margin-bottom:14px;margin-top:-2px;margin-left:-20px;margin-right:-20px;margin-top:-18px;border-radius:10px 10px 0 0}
+.card-eyebrow{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.card-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.3}
+.card-body{font-size:12px;color:var(--ink3);line-height:1.65}
+.card-body strong{color:var(--ink2);font-weight:500}
+
+/* PERSONA CARDS */
+.persona-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:28px}
+.persona-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .15s}
+.persona-card:hover{box-shadow:var(--sh2)}
+.persona-head{padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.persona-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-bottom:10px;font-family:var(--serif)}
+.persona-role{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.persona-dept{font-size:11px;color:var(--ink3)}
+.persona-body{padding:12px 16px}
+.persona-owns{margin-bottom:8px}
+.persona-owns-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:4px}
+.persona-owns-items{display:flex;flex-direction:column;gap:3px}
+.persona-own-item{font-size:11px;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;line-height:1.45}
+.persona-own-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--ink4);flex-shrink:0;margin-top:6px}
+.persona-pain{font-size:11px;background:var(--redl);border:1px solid var(--redb);border-radius:5px;padding:6px 9px;color:var(--red);line-height:1.5;margin-top:8px}
+.persona-pain::before{content:'⚠ ';font-size:10px}
+
+/* PHASE FLOW */
+.phase-flow{display:flex;flex-direction:column;gap:0;margin-bottom:28px}
+.phase-row{display:grid;grid-template-columns:180px 1fr;gap:0}
+.phase-connector{width:1px;height:20px;background:var(--border2);margin-left:89px}
+.phase-left{display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.phase-circle{width:44px;height:44px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);background:var(--surface)}
+.phase-label{font-size:9px;text-align:center;margin-top:6px;line-height:1.3;max-width:80px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.phase-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0 8px 16px;overflow:hidden;box-shadow:var(--sh)}
+.phase-card-head{padding:14px 18px 10px;border-bottom:1px solid var(--border)}
+.phase-card-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.phase-card-weeks{font-size:11px;color:var(--ink3)}
+.phase-card-body{padding:14px 18px}
+.phase-workstreams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pws{background:var(--s2);border-radius:7px;padding:10px 12px}
+.pws-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.pws-items{display:flex;flex-direction:column;gap:4px}
+.pws-item{font-size:11px;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;line-height:1.4}
+.pws-item::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--ink4);flex-shrink:0;margin-top:6px}
+
+/* CHALLENGE TABLE */
+.challenge-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.challenge-table th{background:var(--s2);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--border2)}
+.challenge-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.challenge-table tr:last-child td{border-bottom:none}
+.challenge-table tr:hover td{background:var(--s2)}
+.severity{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+.sv-crit{background:var(--redl);color:var(--red);border-color:var(--redb)}
+.sv-high{background:var(--orangel);color:var(--orange);border-color:var(--orangeb)}
+.sv-med{background:var(--amberl);color:var(--amber);border-color:var(--amberb)}
+.sv-info{background:var(--bluel);color:var(--blue);border-color:var(--blueb)}
+.owner-tag{font-size:10px;font-weight:500;padding:1px 7px;border-radius:3px;background:var(--s3);color:var(--ink3);border:1px solid var(--border)}
+
+/* GAP TABLE */
+.gap-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.gap-table th{background:var(--s2);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--border2)}
+.gap-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.gap-table tr:last-child td{border-bottom:none}
+.gap-table tr:hover td{background:var(--s2)}
+.gap-parity{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+.gp-none{background:var(--redl);color:var(--red);border-color:var(--redb)}
+.gp-part{background:var(--amberl);color:var(--amber);border-color:var(--amberb)}
+.gp-3rd{background:var(--bluel);color:var(--blue);border-color:var(--blueb)}
+.gp-road{background:var(--violetl);color:var(--violet);border-color:var(--violetb)}
+
+/* STATE MAP */
+.state-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:28px}
+.state-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;box-shadow:var(--sh)}
+.state-abbr{font-size:18px;font-weight:700;font-family:var(--serif);color:var(--ink);margin-bottom:3px}
+.state-name{font-size:11px;color:var(--ink3);margin-bottom:8px}
+.state-issues{display:flex;flex-direction:column;gap:3px}
+.si{font-size:10px;display:flex;gap:5px;align-items:flex-start;line-height:1.4;color:var(--ink2)}
+.si-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.si-dot-red{background:var(--red)}
+.si-dot-amber{background:#D97706}
+.si-dot-blue{background:var(--blue)}
+
+/* PARALLEL RUN */
+.parallel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.par-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--sh)}
+.par-card-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.par-items{display:flex;flex-direction:column;gap:6px}
+.par-item{font-size:12px;color:var(--ink2);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.par-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:7px}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start}
+.callout svg{width:14px;height:14px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-red{background:var(--redl);border:1px solid var(--redb)}
+.co-red svg{color:var(--red)} .co-red .callout-text{color:#7F1D1D} .co-red .callout-text strong{color:var(--red)}
+.co-amber{background:var(--amberl);border:1px solid var(--amberb)}
+.co-amber svg{color:var(--amber)} .co-amber .callout-text{color:#78350F} .co-amber .callout-text strong{color:var(--amber)}
+.co-blue{background:var(--bluel);border:1px solid var(--blueb)}
+.co-blue svg{color:var(--blue)} .co-blue .callout-text{color:#1E3A8A} .co-blue .callout-text strong{color:var(--blue)}
+.co-green{background:var(--greenl);border:1px solid var(--greenb)}
+.co-green svg{color:var(--green)} .co-green .callout-text{color:#064E3B} .co-green .callout-text strong{color:var(--green)}
+
+/* FOOTER */
+.doc-footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-text{font-size:11px;color:var(--ink3)}
+.df-text strong{color:var(--ink2)}
+
+@media(max-width:860px){
+  .nav,.hero,.body,.doc-footer{padding-left:20px;padding-right:20px}
+  .card-grid,.persona-grid,.state-grid,.parallel-grid{grid-template-columns:1fr}
+  .phase-row{grid-template-columns:1fr}
+  .phase-left{display:none}
+  .phase-card{margin-left:0}
+  .phase-workstreams{grid-template-columns:1fr}
+  .hero-h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4.5v7L8 15l6-3.5v-7L8 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 1v14M2 4.5l6 3.5 6-3.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+  <span class="nav-title">Intuit Enterprise Suite</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">Migration Assessment</span>
+  <div class="nav-sp"></div>
+  <span class="nav-co">Meridian Building Group · 10 States</span>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Confidential migration readiness assessment · For internal planning use</div>
+    <h1 class="hero-h1">QBDT Enterprise → Intuit Enterprise Suite<br><em>The real picture</em> for a multi-state construction firm</h1>
+    <p class="hero-sub">A ground-level assessment of what migrating Meridian Building Group — a $75M commercial general contractor operating across 10 states — actually involves. Who owns what. What breaks. What IES cannot do natively. And what the path to a fully integrated modern mid-market operation looks like.</p>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-val">10</div><div class="hs-lbl">States / branches</div></div>
+      <div class="hs"><div class="hs-val">~210</div><div class="hs-lbl">Employees</div></div>
+      <div class="hs"><div class="hs-val">$75M</div><div class="hs-lbl">Annual revenue</div></div>
+      <div class="hs"><div class="hs-val">18–24</div><div class="hs-lbl">Months realistic timeline</div></div>
+      <div class="hs"><div class="hs-val">14</div><div class="hs-lbl">Named personas</div></div>
+      <div class="hs"><div class="hs-val">23</div><div class="hs-lbl">IES feature gaps</div></div>
+    </div>
+    <div class="hero-warning">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L1 13h12L7 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div class="hero-warning-text"><strong>Honest framing:</strong> This is not a 6-week project. A multi-state construction company with union payroll, prevailing wage obligations, multi-EIN structure, and 10 separate QBDT files is one of the most complex migrations IES supports. Done well it transforms the business. Done poorly it disrupts payroll across 10 states simultaneously. This document does not soften that reality.</div>
+    </div>
+  </div>
+</header>
+
+<main class="body">
+
+<!-- ══ 1. COMPANY PROFILE ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">01 —</span>
+    <span class="sec-title">Company profile — Meridian Building Group</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--blue);border-color:var(--blueb);background:var(--bluel)">Assumed profile</span>
+  </div>
+  <p class="prose">Meridian Building Group is a commercial general contractor headquartered in Dallas, TX. It operates branch offices in 10 states, each functioning as a semi-autonomous profit centre with its own payroll, project portfolio, and in some cases its own legal entity. The company has grown through acquisition — meaning branch offices may have different CoA structures, QBDT versions, chart configurations, and accounting methods. <strong>This is the norm, not the exception, for companies at this scale.</strong></p>
+  <div class="card-grid">
+    <div class="card"><div class="card-top-bar" style="background:var(--blue)"></div><div class="card-eyebrow" style="color:var(--blue)">Headquarters</div><div class="card-title">Dallas, TX (primary entity)</div><div class="card-body">Parent company QBDT file · ~80 employees · Holds corporate overhead, equipment fleet, and intercompany transactions. Primary EIN. Full payroll and AP/AR operations.</div></div>
+    <div class="card"><div class="card-top-bar" style="background:var(--teal)"></div><div class="card-eyebrow" style="color:var(--teal)">Branch states</div><div class="card-title">CA, FL, NY, CO, AZ, GA, NC, OH, WA</div><div class="card-body">Each branch has 10–20 field + office employees, its own QBDT file (or shared with HQ), state-specific payroll registrations, workers' comp carriers, and possibly a separate legal entity / EIN.</div></div>
+    <div class="card"><div class="card-top-bar" style="background:var(--violet)"></div><div class="card-eyebrow" style="color:var(--violet)">Workforce composition</div><div class="card-title">~210 employees across 4 workforce types</div><div class="card-body"><strong>Salaried staff:</strong> PMs, estimators, admin (55) · <strong>Hourly non-union:</strong> field crews in TX, AZ, GA, NC (85) · <strong>Union:</strong> NY, CA, WA, OH, CO (50) · <strong>1099 subcontractors:</strong> ~120 active subs on any given month · Prevailing wage applies on ~40% of project portfolio.</div></div>
+    <div class="card"><div class="card-top-bar" style="background:var(--amber)"></div><div class="card-eyebrow" style="color:var(--amber)">Current tech stack</div><div class="card-title">QBDT Enterprise 2022 (10 files) + patchwork integrations</div><div class="card-body">Procore (project management) · LCPtracker (certified payroll, federal jobs) · Viewpoint Vista (legacy, being sunset) · MS Excel (job cost consolidation — manually updated weekly) · ADP (used by 3 branches before Meridian acquisition) · Custom SQL reporting on HQ file.</div></div>
+    <div class="card"><div class="card-top-bar" style="background:var(--green)"></div><div class="card-eyebrow" style="color:var(--green)">Revenue composition</div><div class="card-title">$75M · 3 contract types</div><div class="card-body"><strong>Federal / public works (38%):</strong> Davis-Bacon Act prevailing wage, certified payroll, AIA G702/G703 billing · <strong>Commercial private (52%):</strong> standard AIA billing, retainage, lien management · <strong>T&M and service (10%):</strong> time-and-material, monthly billing</div></div>
+    <div class="card"><div class="card-top-bar" style="background:var(--red)"></div><div class="card-eyebrow" style="color:var(--red)">Migration complicating factors</div><div class="card-title">5 factors that make this non-standard</div><div class="card-body"><strong>Multiple EINs:</strong> 3 legal entities across 10 states · <strong>Acquired branches:</strong> inconsistent CoA and payroll item naming · <strong>Active federal contracts:</strong> certified payroll cannot lapse · <strong>Union agreements:</strong> NY, CA, WA collective bargaining agreements govern payroll changes · <strong>Retainage:</strong> $4.2M held across 23 active projects</div></div>
+  </div>
+</section>
+
+<!-- ══ 2. 10-STATE COMPLEXITY ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">02 —</span>
+    <span class="sec-title">State-by-state complexity map</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--red);border-color:var(--redb);background:var(--redl)">Compliance risk</span>
+  </div>
+  <p class="prose">Every state Meridian operates in adds a distinct layer of compliance obligation. Not all states are equal in their complexity — New York and California are the most demanding; Texas and Georgia are the most straightforward. Each state requires its own payroll tax registrations, workers' comp configuration, and potentially union-specific payroll handling in IES.</p>
+  <div class="state-grid">
+    <div class="state-card"><div class="state-abbr">TX</div><div class="state-name">Texas · HQ</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-blue"></div>No state income tax — SUI only</div><div class="si"><div class="si-dot si-dot-blue"></div>Franchise tax filing (Corp)</div><div class="si"><div class="si-dot si-dot-blue"></div>Non-union · Lowest complexity</div></div></div>
+    <div class="state-card"><div class="state-abbr">CA</div><div class="state-name">California</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-red"></div>SDI + ETT on top of SUI/PIT</div><div class="si"><div class="si-dot si-dot-red"></div>Union trades · CBAs govern OT</div><div class="si"><div class="si-dot si-dot-red"></div>Prevailing wage on public works</div><div class="si"><div class="si-dot si-dot-red"></div>DIR certified payroll portal</div><div class="si"><div class="si-dot si-dot-amber"></div>Paid sick leave mandates</div></div></div>
+    <div class="state-card"><div class="state-abbr">NY</div><div class="state-name">New York</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-red"></div>NYC + NY State — dual filing</div><div class="si"><div class="si-dot si-dot-red"></div>Union heavy — IBEW, UA locals</div><div class="si"><div class="si-dot si-dot-red"></div>NY prevailing wage law (NYPL)</div><div class="si"><div class="si-dot si-dot-red"></div>Workers' comp — NYWCB strict</div><div class="si"><div class="si-dot si-dot-amber"></div>MWBE compliance requirements</div></div></div>
+    <div class="state-card"><div class="state-abbr">FL</div><div class="state-name">Florida</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-blue"></div>No state income tax</div><div class="si"><div class="si-dot si-dot-amber"></div>Workers' comp — high construction rates</div><div class="si"><div class="si-dot si-dot-amber"></div>Lien law — strict 45-day notice</div><div class="si"><div class="si-dot si-dot-blue"></div>Non-union · Moderate complexity</div></div></div>
+    <div class="state-card"><div class="state-abbr">CO</div><div class="state-name">Colorado</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-amber"></div>FAMLI — paid family leave tax</div><div class="si"><div class="si-dot si-dot-amber"></div>FMLA + state PFML both apply</div><div class="si"><div class="si-dot si-dot-amber"></div>Prevailing wage (state projects)</div><div class="si"><div class="si-dot si-dot-blue"></div>Some union trades in Denver</div></div></div>
+    <div class="state-card"><div class="state-abbr">AZ</div><div class="state-name">Arizona</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-blue"></div>No SDIT (city-level only)</div><div class="si"><div class="si-dot si-dot-blue"></div>Non-union · Lower complexity</div><div class="si"><div class="si-dot si-dot-amber"></div>TPT (transaction privilege tax) on materials</div></div></div>
+    <div class="state-card"><div class="state-abbr">GA</div><div class="state-name">Georgia</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-blue"></div>Standard state income tax</div><div class="si"><div class="si-dot si-dot-blue"></div>Non-union · Moderate complexity</div><div class="si"><div class="si-dot si-dot-amber"></div>E-Verify mandate for contractors</div></div></div>
+    <div class="state-card"><div class="state-abbr">NC</div><div class="state-name">North Carolina</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-blue"></div>Flat income tax rate</div><div class="si"><div class="si-dot si-dot-blue"></div>Non-union · Lower complexity</div><div class="si"><div class="si-dot si-dot-amber"></div>Sales tax on materials — complex rules</div></div></div>
+    <div class="state-card"><div class="state-abbr">OH</div><div class="state-name">Ohio</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-amber"></div>Municipal income tax — per city</div><div class="si"><div class="si-dot si-dot-amber"></div>Union trades in Cleveland, Columbus</div><div class="si"><div class="si-dot si-dot-red"></div>School district withholding</div></div></div>
+    <div class="state-card"><div class="state-abbr">WA</div><div class="state-name">Washington</div><div class="state-issues"><div class="si"><div class="si-dot si-dot-red"></div>L&I (workers' comp) — state fund only</div><div class="si"><div class="si-dot si-dot-red"></div>PFML — both EE and ER contributions</div><div class="si"><div class="si-dot si-dot-amber"></div>Union trades on public works</div><div class="si"><div class="si-dot si-dot-amber"></div>Prevailing wage — L&I enforcement</div></div></div>
+  </div>
+
+  <div class="callout co-red">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L1 13h12L7 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v3.5M7 10.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Washington state is a special blocker:</strong> Washington uses a state-administered workers' comp system (L&I) instead of private insurance carriers. IES handles private WC deductions natively but the Washington L&I premium calculation — which varies by risk class, hours worked, and fluctuates quarterly — is not natively automated. Meridian's Washington branch will need a manual L&I premium reconciliation process until a workaround is configured. This must be resolved before go-live in WA.</div>
+  </div>
+</section>
+
+<!-- ══ 3. PERSONAS ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">03 —</span>
+    <span class="sec-title">Personas — who owns what</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--violet);border-color:var(--violetb);background:var(--violetl)">14 personas</span>
+  </div>
+  <p class="prose">Migrations fail when responsibility is not explicitly assigned. The following personas represent the real people inside Meridian and in the extended ecosystem who must be engaged, informed, and accountable at specific stages of the migration. The CFO cannot own what the field supervisor must own. The IT Director cannot decide what the Payroll Manager must decide.</p>
+
+  <div class="persona-grid">
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--blue)">
+        <div class="persona-avatar" style="background:var(--bluel);color:var(--blue)">CFO</div>
+        <div class="persona-role">Chief Financial Officer</div>
+        <div class="persona-dept">Executive · Decision authority</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Go/no-go decision at each phase gate</div>
+          <div class="persona-own-item">Budget approval for PS engagement and integrations</div>
+          <div class="persona-own-item">Multi-entity structure design decision in IES</div>
+          <div class="persona-own-item">Board-level reporting requirements sign-off</div>
+          <div class="persona-own-item">Co-signs QBDT decommission alongside Controller</div>
+        </div></div>
+        <div class="persona-pain">Does not need to understand IES configuration — needs to understand that the 10-state consolidated P&L they currently build in Excel must be rebuilt as a native IES report before QBDT is decommissioned.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--violet)">
+        <div class="persona-avatar" style="background:var(--violetl);color:var(--violet)">CON</div>
+        <div class="persona-role">Corporate Controller</div>
+        <div class="persona-dept">Finance · CoA and compliance owner</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Chart of Accounts consolidation across all 10 QBDT files</div>
+          <div class="persona-own-item">Opening balance sign-off for all 10 entities</div>
+          <div class="persona-own-item">Intercompany transaction mapping to IES</div>
+          <div class="persona-own-item">Period close process redesign in IES</div>
+          <div class="persona-own-item">WIP and retainage accounting policy confirmation</div>
+          <div class="persona-own-item">External auditor coordination pre/post go-live</div>
+        </div></div>
+        <div class="persona-pain">The Controller is the most time-constrained persona. Consolidating 10 CoAs into a single IES structure while running month-end close on 10 QBDT files simultaneously is the single most likely cause of project delay.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--teal)">
+        <div class="persona-avatar" style="background:var(--teall);color:var(--teal)">PAY</div>
+        <div class="persona-role">Payroll Manager (Corporate)</div>
+        <div class="persona-dept">Finance · Multi-state payroll owner</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Employee record remediation (Tier 2 across all states)</div>
+          <div class="persona-own-item">Pay item mapping — all 10 QBDT files (may have 80+ unique items)</div>
+          <div class="persona-own-item">Multi-state payroll tax registration verification in IES</div>
+          <div class="persona-own-item">Union fringe benefit and dues configuration per CBA</div>
+          <div class="persona-own-item">Prevailing wage pay item setup per jurisdiction</div>
+          <div class="persona-own-item">YTD validation sign-off — all employees, all states</div>
+          <div class="persona-own-item">First live payroll parallel run approval</div>
+        </div></div>
+        <div class="persona-pain">This person will work more overtime during migration than any other persona. If there is only one Corporate Payroll Manager for 210 employees across 10 states, the migration timeline must account for their capacity constraint.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--amber)">
+        <div class="persona-avatar" style="background:var(--amberl);color:var(--amber)">HR</div>
+        <div class="persona-role">HR Director</div>
+        <div class="persona-dept">Human Resources · Compliance and benefits</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Employee direct deposit re-collection strategy (210 employees)</div>
+          <div class="persona-own-item">Benefits plan configuration in IES — health, 401k, FSA/HSA</div>
+          <div class="persona-own-item">Multi-state leave policy configuration (CO FAMLI, WA PFML, CA SDI)</div>
+          <div class="persona-own-item">Employee communication plan — what changes, when, in what language</div>
+          <div class="persona-own-item">I-9 and new hire reporting configuration per state</div>
+          <div class="persona-own-item">Union CBAs — translating agreement terms into IES payroll rules</div>
+        </div></div>
+        <div class="persona-pain">Collecting direct deposit banking details from 210 employees across 10 states — including field workers with limited email access — is a 3-week logistics project on its own. This must start at Stage 3, not Stage 5.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--orange)">
+        <div class="persona-avatar" style="background:var(--orangel);color:var(--orange)">IT</div>
+        <div class="persona-role">IT Director</div>
+        <div class="persona-dept">Technology · Integration and security</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Custom SQL job cost sync rebuild (Lone Star Tech or equivalent vendor)</div>
+          <div class="persona-own-item">Procore and QB Time IES integration re-authentication across all branches</div>
+          <div class="persona-own-item">LCPtracker certified payroll integration assessment</div>
+          <div class="persona-own-item">SSO/identity management for 210 IES user accounts</div>
+          <div class="persona-own-item">Network access and bandwidth assessment for IES (cloud-based)</div>
+          <div class="persona-own-item">Data backup and archive plan for 10 QBDT files post-decommission</div>
+        </div></div>
+        <div class="persona-pain">The custom SQL reporting integration that the Controller and CFO depend on for the weekly consolidated job cost report cannot migrate. The IT Director must scope and deliver an IES API-based replacement before QBDT is decommissioned — or the CFO will have no consolidated reporting for weeks.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--green)">
+        <div class="persona-avatar" style="background:var(--greenl);color:var(--green)">VPO</div>
+        <div class="persona-role">VP Operations / Division Heads (×4)</div>
+        <div class="persona-dept">Operations · Project oversight by region</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Customer:Job → IES Projects architecture sign-off for their division</div>
+          <div class="persona-own-item">Job phase and cost code mapping decisions</div>
+          <div class="persona-own-item">Ensuring Project Managers are trained before go-live</div>
+          <div class="persona-own-item">AIA billing workflow validation in IES</div>
+          <div class="persona-own-item">Go-live timing decision for their region (staggered vs simultaneous)</div>
+        </div></div>
+        <div class="persona-pain">Division heads will push for delay if they do not see their job cost reporting replicated in IES before go-live. This is a legitimate concern — their project profitability visibility must not regress on Day 1.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--blue)">
+        <div class="persona-avatar" style="background:var(--bluel);color:var(--blue)">PM</div>
+        <div class="persona-role">Project Managers (×15–20)</div>
+        <div class="persona-dept">Operations · Job cost and billing</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">IES Project setup validation — their jobs are configured correctly</div>
+          <div class="persona-own-item">Progress billing (AIA G702/G703) workflow in IES</div>
+          <div class="persona-own-item">Subcontractor billing and retainage tracking per project</div>
+          <div class="persona-own-item">North-star test: run an AIA application in IES before go-live</div>
+        </div></div>
+        <div class="persona-pain">PMs are the highest-volume IES users after go-live. If the AIA billing workflow in IES is more cumbersome than their current Procore + QBDT process, they will work around IES using Excel — defeating the purpose of migration. AIA billing UX must be tested and accepted by at least 3 PMs before go-live clearance.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--teal)">
+        <div class="persona-avatar" style="background:var(--teall);color:var(--teal)">EST</div>
+        <div class="persona-role">Chief Estimator + Estimating team</div>
+        <div class="persona-dept">Pre-construction · Bid and job setup</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">IES job setup workflow from awarded bid</div>
+          <div class="persona-own-item">Budget template design — which cost categories map to which bid divisions</div>
+          <div class="persona-own-item">Prevailing wage classification list per project type</div>
+        </div></div>
+        <div class="persona-pain">Estimators currently use QBDT item lists as their cost code structure. The migration to IES Projects cost categories must not disrupt their bid-to-budget workflow. Estimating software integration (if any) needs to be re-scoped.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--red)">
+        <div class="persona-avatar" style="background:var(--redl);color:var(--red)">CPO</div>
+        <div class="persona-role">Certified Payroll / Compliance Officer</div>
+        <div class="persona-dept">Compliance · Federal contracts</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Certified payroll report continuity during and after migration</div>
+          <div class="persona-own-item">LCPtracker integration assessment and re-connection</div>
+          <div class="persona-own-item">Davis-Bacon wage determination setup per active federal project</div>
+          <div class="persona-own-item">Fringe benefit credit documentation in IES payroll</div>
+          <div class="persona-own-item">Debarment risk assessment — any payroll lapse on a federal job</div>
+        </div></div>
+        <div class="persona-pain">This persona holds a veto on go-live timing for any branch with active federal contracts. A lapse in certified payroll reporting can result in contract suspension and potential debarment. This is not a business inconvenience — it is an existential risk for those projects.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--violet)">
+        <div class="persona-avatar" style="background:var(--violetl);color:var(--violet)">BR</div>
+        <div class="persona-role">Branch/Regional Managers (×10)</div>
+        <div class="persona-dept">Operations · State-level P&L owners</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Local staff training coordination</div>
+          <div class="persona-own-item">Branch go-live readiness sign-off</div>
+          <div class="persona-own-item">Local bank account reconnection coordination</div>
+          <div class="persona-own-item">Change management within their branch</div>
+        </div></div>
+        <div class="persona-pain">Branch managers are often the least technically engaged persona but absorb the most disruption when migration issues surface locally. They need a simple, non-technical escalation path and a named point of contact at corporate for the first 30 days post go-live.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--amber)">
+        <div class="persona-avatar" style="background:var(--amberl);color:var(--amber)">FLD</div>
+        <div class="persona-role">Field Supervisors / Foremen (×20+)</div>
+        <div class="persona-dept">Field · Time entry and daily reports</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Their own direct deposit banking re-entry in IES self-service</div>
+          <div class="persona-own-item">QB Time or IES time entry adoption for their crew</div>
+          <div class="persona-own-item">Pay stub access orientation (many file stubs for housing or I-9 purposes)</div>
+        </div></div>
+        <div class="persona-pain">Field supervisors are the most likely to miss the direct deposit re-entry deadline. They are on-site, often without reliable email access, may speak Spanish as a first language, and do not prioritise administrative tasks. Plan for 20–30% paper check fallback on the first payroll run across field-heavy branches.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--green)">
+        <div class="persona-avatar" style="background:var(--greenl);color:var(--green)">CPA</div>
+        <div class="persona-role">External CPA / Accounting Firm</div>
+        <div class="persona-dept">External · Audit and tax compliance</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Opening balance sign-off — all 10 entities or consolidated</div>
+          <div class="persona-own-item">WIP and retainage accounting method consistency confirmation</div>
+          <div class="persona-own-item">Year-end W-2 accuracy verification across all states</div>
+          <div class="persona-own-item">Audit trail continuity — no periods should be inaccessible post-migration</div>
+        </div></div>
+        <div class="persona-pain">External CPAs are often engaged too late. If they are not involved in the CoA design and opening balance review before migration, they will find discrepancies during the next audit and trace them back to the migration event — creating a costly retroactive correction process.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--blue)">
+        <div class="persona-avatar" style="background:var(--bluel);color:var(--blue)">IPS</div>
+        <div class="persona-role">Intuit Professional Services</div>
+        <div class="persona-dept">External · IES configuration and migration</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">IES environment build from consolidated CoA and Dimensions design</div>
+          <div class="persona-own-item">Data migration execution — all 10 files</div>
+          <div class="persona-own-item">Construction industry template configuration</div>
+          <div class="persona-own-item">Gap remediation design (certified payroll, union fringe, WA L&I)</div>
+          <div class="persona-own-item">90-day post go-live hypercare support</div>
+        </div></div>
+        <div class="persona-pain">IPS capacity is the most common external bottleneck. A 10-state, multi-EIN, union payroll engagement is a tier-1 PS engagement — Meridian should not be assigned a junior PS resource. Escalate to PS leadership if the assigned team has not done a multi-state union payroll migration before.</div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="border-top:3px solid var(--teal)">
+        <div class="persona-avatar" style="background:var(--teall);color:var(--teal)">IMP</div>
+        <div class="persona-role">Implementation Partner / Consultant</div>
+        <div class="persona-dept">External · Programme management</div>
+      </div>
+      <div class="persona-body">
+        <div class="persona-owns"><div class="persona-owns-label">Owns</div><div class="persona-owns-items">
+          <div class="persona-own-item">Overall programme plan and dependency tracking</div>
+          <div class="persona-own-item">Staggered go-live sequencing across 10 branches</div>
+          <div class="persona-own-item">Stakeholder communication plan and cadence</div>
+          <div class="persona-own-item">Risk register and escalation protocol</div>
+          <div class="persona-own-item">Integration vendor coordination (Procore, QB Time, LCPtracker)</div>
+        </div></div>
+        <div class="persona-pain">Meridian needs a dedicated programme manager who sits between Intuit PS and Meridian's internal team. Without this role, the migration will be run ad-hoc by the Controller and Payroll Manager on top of their day jobs — and it will slip.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. MIGRATION PHASES ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">04 —</span>
+    <span class="sec-title">Migration phases — realistic 18-month programme</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--green);border-color:var(--greenb);background:var(--greenl)">Staggered by state</span>
+  </div>
+  <p class="prose">Meridian cannot go live in all 10 states on the same day. A staggered rollout — HQ first, then the least-complex states, then union/federal states last — reduces risk, allows lessons from early states to inform later ones, and ensures that if something goes wrong, it affects one branch rather than ten simultaneously.</p>
+
+  <div class="callout co-blue">
+    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>Recommended go-live sequence:</strong> Wave 1: TX (HQ), AZ, GA, NC — non-union, lower complexity. Wave 2: FL, CO, OH — moderate complexity. Wave 3: CA, NY, WA — union, prevailing wage, certified payroll, highest compliance risk. Each wave is ~8 weeks apart. Wave 3 begins only after Wave 1 has completed 30 days of stable operation.</div>
+  </div>
+
+  <div class="phase-flow">
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--blue);color:var(--blue)">P1</div><div class="phase-label" style="color:var(--blue)">Programme Setup</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">Programme setup, scoping & data inventory</div><div class="phase-card-weeks">Months 1–2 · All 14 personas engaged</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--blue)">Data collection</div><div class="pws-items">
+            <div class="pws-item">Export all 10 QBDT files and run AI diagnostic on each</div>
+            <div class="pws-item">Inventory all payroll items across 10 files — expect 120+ unique items</div>
+            <div class="pws-item">Catalogue all connected apps, custom integrations, bank feeds</div>
+            <div class="pws-item">Map all Customer:Job hierarchies — all 10 branches</div>
+            <div class="pws-item">Document all union CBAs and prevailing wage determinations</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--violet)">Design decisions</div><div class="pws-items">
+            <div class="pws-item">Multi-entity structure: single IES account vs separate per EIN</div>
+            <div class="pws-item">Consolidated vs entity-level CoA design</div>
+            <div class="pws-item">Dimensions architecture: Region + Division + Job Site</div>
+            <div class="pws-item">Projects hierarchy: one model for all 10 branches or branch-specific</div>
+            <div class="pws-item">Staggered go-live wave plan — signed off by CFO and all Division VPs</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="phase-connector"></div>
+
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--teal);color:var(--teal)">P2</div><div class="phase-label" style="color:var(--teal)">IES Build</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">IES environment build & pre-migration data preparation</div><div class="phase-card-weeks">Months 3–5 · Controller, Payroll Manager, IT Director, IPS team</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--teal)">Accounting build</div><div class="pws-items">
+            <div class="pws-item">Consolidated CoA built in IES — construction industry template + Meridian customisations</div>
+            <div class="pws-item">3 legal entities configured with intercompany elimination accounts</div>
+            <div class="pws-item">Dimensions: Region (10 values), Division (4), Job Site (60+)</div>
+            <div class="pws-item">Approval workflows: PO limit by region, invoice approval by entity</div>
+            <div class="pws-item">Bank feeds: 18 accounts across 10 states — reconnection plan per institution</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--amber)">Payroll build</div><div class="pws-items">
+            <div class="pws-item">All 210 employee records created — Tier 2 remediation completed</div>
+            <div class="pws-item">Pay items mapped: 31 standard + ~90 custom across 10 files</div>
+            <div class="pws-item">10 state payroll tax registrations verified or created in IES</div>
+            <div class="pws-item">Union CBAs translated into IES deduction and contribution rules (NY, CA, WA, OH, CO)</div>
+            <div class="pws-item">Prevailing wage pay items configured per jurisdiction and project type</div>
+            <div class="pws-item">LCPtracker integration re-scoped and tested</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="phase-connector"></div>
+
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--amber);color:var(--amber)">P3</div><div class="phase-label" style="color:var(--amber)">Wave 1 Go-Live</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">Wave 1 go-live: TX, AZ, GA, NC</div><div class="phase-card-weeks">Month 6–7 · ~100 employees · Non-union · No prevailing wage</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--amber)">Migration execution</div><div class="pws-items">
+            <div class="pws-item">HQ and 3 branch QBDT files migrated — financial data and paycheck history</div>
+            <div class="pws-item">First live IES payroll run: ~100 employees</div>
+            <div class="pws-item">Procore and QB Time re-authenticated for Wave 1 branches</div>
+            <div class="pws-item">5-night parallel run — decommission gate for TX/AZ/GA/NC after clean nights</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--green)">Lessons captured</div><div class="pws-items">
+            <div class="pws-item">Document every exception and resolution from Wave 1</div>
+            <div class="pws-item">Update pay item mapping profile based on Wave 1 custom item surprises</div>
+            <div class="pws-item">Identify field worker DD re-entry completion rate — adjust Wave 2/3 approach</div>
+            <div class="pws-item">Wave 1 retro with Branch Managers before Wave 2 begins</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="phase-connector"></div>
+
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--violet);color:var(--violet)">P4</div><div class="phase-label" style="color:var(--violet)">Wave 2 Go-Live</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">Wave 2 go-live: FL, CO, OH</div><div class="phase-card-weeks">Month 9–10 · ~60 employees · Some union (OH) · CO FAMLI</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--violet)">Added complexity vs Wave 1</div><div class="pws-items">
+            <div class="pws-item">Ohio: municipal income tax withholding — per city, per employee work location</div>
+            <div class="pws-item">Colorado: FAMLI (paid family leave) — separate EE/ER contribution lines</div>
+            <div class="pws-item">Ohio union trades: Cleveland Building Trades agreements</div>
+            <div class="pws-item">FL lien law — 45-day preliminary notice workflow in IES</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--green)">Validation additions</div><div class="pws-items">
+            <div class="pws-item">OH municipal tax: verify per-city withholding is calculating correctly for each employee's work location</div>
+            <div class="pws-item">CO FAMLI: verify EE deduction rate and ER contribution are both appearing on paychecks</div>
+            <div class="pws-item">Ohio union parallel run: compare union fringe benefit calculations against CBA schedule</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="phase-connector"></div>
+
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--red);color:var(--red)">P5</div><div class="phase-label" style="color:var(--red)">Wave 3 Go-Live</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">Wave 3 go-live: CA, NY, WA</div><div class="phase-card-weeks">Month 12–13 · ~50 employees · Union · Prevailing wage · Certified payroll</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--red)">Highest complexity elements</div><div class="pws-items">
+            <div class="pws-item">CA DIR certified payroll portal: LCPtracker integration must be fully tested before go-live</div>
+            <div class="pws-item">NY prevailing wage (NYPL §220): wage determination updates must auto-flow from IES</div>
+            <div class="pws-item">WA L&I workers' comp: manual premium calculation process confirmed and documented</div>
+            <div class="pws-item">CA SDI + ETT: dual contribution lines verified on every CA paycheck</div>
+            <div class="pws-item">Union fringe benefit allocations (health, pension, training, vacation funds) — all 5 union CBAs</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--amber)">Go-live gates (all must pass)</div><div class="pws-items">
+            <div class="pws-item">Certified Payroll Officer sign-off on LCPtracker test submission</div>
+            <div class="pws-item">Union steward review: fringe benefit calculations match CBA schedule</div>
+            <div class="pws-item">CA DIR test submission accepted (real certified payroll report)</div>
+            <div class="pws-item">WA L&I manual reconciliation process documented and tested with a sample quarter</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="phase-connector"></div>
+
+    <div class="phase-row">
+      <div class="phase-left"><div class="phase-circle" style="border-color:var(--green);color:var(--green)">P6</div><div class="phase-label" style="color:var(--green)">Transformation</div></div>
+      <div class="phase-card">
+        <div class="phase-card-head"><div class="phase-card-title">Post go-live: process uplift, IES feature adoption & staff education</div><div class="phase-card-weeks">Months 14–24 · All personas · AI Insights, Projects, Dimensions at full utilisation</div></div>
+        <div class="phase-card-body"><div class="phase-workstreams">
+          <div class="pws"><div class="pws-label" style="color:var(--green)">Process changes</div><div class="pws-items">
+            <div class="pws-item">Weekly consolidated P&L: Excel → IES multi-entity dashboard (CFO, Controller)</div>
+            <div class="pws-item">AIA billing: Procore → IES Progress Invoicing (PMs)</div>
+            <div class="pws-item">Job cost reporting: monthly manual → real-time IES Projects (all PMs)</div>
+            <div class="pws-item">Subcontractor payments: manual check → IES batch ACH with lien waiver tracking</div>
+            <div class="pws-item">Expense reports: email submissions → IES Expense mobile app (field)</div>
+          </div></div>
+          <div class="pws"><div class="pws-label" style="color:var(--teal)">Education programme</div><div class="pws-items">
+            <div class="pws-item">Project Manager IES Projects certification — 4-week programme, all 15–20 PMs</div>
+            <div class="pws-item">Field supervisor QB Time + IES self-service orientation — site visits, bilingual</div>
+            <div class="pws-item">Finance team IES reporting & Dimensions training — 2-day workshop per entity</div>
+            <div class="pws-item">Executive dashboard training — CFO, Division VPs (3 hours)</div>
+            <div class="pws-item">IES AI Insights orientation — cash flow forecasting, job cost variance alerts</div>
+          </div></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5. CHALLENGES ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">05 —</span>
+    <span class="sec-title">Critical migration challenges</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--red);border-color:var(--redb);background:var(--redl)">28 identified</span>
+  </div>
+
+  <table class="challenge-table">
+    <thead><tr><th style="width:22%">Challenge</th><th style="width:8%">Severity</th><th style="width:10%">Owner</th><th style="width:35%">Realistic description</th><th style="width:25%">Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>10 separate QBDT files with inconsistent CoA</strong></td><td><span class="severity sv-crit">Critical</span></td><td><span class="owner-tag">Controller</span></td><td>Acquired branches have different account names, numbering schemes, and accounting methods. Consolidating into a single IES CoA requires a 6-week design process — not a mapping exercise.</td><td>Engage Controller and CPA in a dedicated CoA design workshop before any migration work begins. This is a prerequisite, not a parallel activity.</td></tr>
+      <tr><td><strong>Multi-EIN structure in IES</strong></td><td><span class="severity sv-crit">Critical</span></td><td><span class="owner-tag">CFO + IPS</span></td><td>Meridian has 3 legal entities. IES multi-entity is more capable than QBDT but requires an explicit architecture decision: separate IES accounts per EIN with consolidated reporting, or a single IES account with entity tracking via Dimensions. Wrong choice is extremely expensive to undo.</td><td>IPS architecture review. Decision must be made at Programme Setup (Month 1) and cannot change after IES environment is built.</td></tr>
+      <tr><td><strong>Certified payroll continuity on federal jobs</strong></td><td><span class="severity sv-crit">Critical</span></td><td><span class="owner-tag">CPO + IT</span></td><td>LCPtracker submits certified payroll to federal contracting agencies on a weekly cycle. Any break in submission triggers contract non-compliance. IES does not generate the WH-347 form natively — LCPtracker integration must be tested and producing clean submissions before Wave 3 go-live.</td><td>Begin LCPtracker integration assessment in Month 2. Run a test WH-347 submission from IES payroll data at least 6 weeks before Wave 3 go-live. CPO holds the go-live veto.</td></tr>
+      <tr><td><strong>Washington state L&I workers' comp</strong></td><td><span class="severity sv-crit">Critical</span></td><td><span class="owner-tag">Payroll + IT</span></td><td>WA uses a state-administered L&I system. Premium rates vary by risk class and hours worked, change quarterly, and cannot be automated natively in IES. Miscalculating L&I premiums creates an L&I audit liability.</td><td>Document the manual L&I premium calculation process and assign a dedicated owner (WA branch Payroll Admin). Build a quarterly L&I reconciliation into the IES workflow as a manual step with a reminder trigger.</td></tr>
+      <tr><td><strong>Union CBA translation into IES payroll rules</strong></td><td><span class="severity sv-crit">Critical</span></td><td><span class="owner-tag">Payroll + HR</span></td><td>NY, CA, WA, OH, CO each have active union collective bargaining agreements. Fringe benefit contribution rates (health, pension, training, vacation fund, annuity) vary by trade, classification, and hours worked. IES custom pay types can model these — but each CBA must be translated individually, tested, and confirmed by the union steward before go-live.</td><td>Assign one week per CBA for payroll configuration + union steward review. With 5 CBAs, budget 6 weeks minimum for Wave 3 payroll configuration alone.</td></tr>
+      <tr><td><strong>Ohio municipal income tax by work location</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">Payroll</span></td><td>Ohio has 600+ municipal tax jurisdictions. Employees who work across multiple Ohio cities in a pay period have split withholding obligations. IES handles OH municipal tax but requires accurate work location tracking — which means QB Time entries must carry the correct job site location for every OH employee every day.</td><td>Ensure QB Time job site codes map to OH municipalities before Wave 2 go-live. Audit 3 OH employee paychecks against city-by-city work location for the first 3 pay periods.</td></tr>
+      <tr><td><strong>Payroll item proliferation across 10 files</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">Payroll Manager</span></td><td>Each of the 10 QBDT files may have 30–80 payroll items, with different names for the same concept (e.g. "Health Ins ER", "HealthER", "Hlth Ben Employer"). After deduplication, Meridian may still have 90+ unique pay items requiring individual mapping.</td><td>Run AI deduplication on all 10 payroll item lists before mapping. Standardise names in the IES master pay item library as part of IES build. Do not carry forward 10 different names for the same pay type.</td></tr>
+      <tr><td><strong>AIA G702/G703 billing workflow</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">PM + Controller</span></td><td>Meridian's PMs create AIA Applications for Payment through Procore today. IES Progress Invoicing can generate the G702/G703 — but the workflow is different. If Meridian continues using Procore for AIA billing and IES for accounting, a synchronisation process must be designed to prevent double-entry and billing discrepancies.</td><td>Make an explicit decision in Month 2: does AIA billing move to IES Progress Invoicing or stay in Procore with an IES sync? Both work — but the workflow must be designed, not discovered. PMs must be trained on whichever workflow is chosen.</td></tr>
+      <tr><td><strong>Retainage tracking ($4.2M across 23 projects)</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">Controller + PM</span></td><td>Retainage balances in QBDT are tracked at the invoice line level. IES tracks retainage at the Project level using a Retainage account in the CoA. The migration must carry $4.2M of retainage balances in a format that IES can correctly release when projects reach substantial completion.</td><td>Retainage balance migration requires a dedicated reconciliation step: each open project's retainage balance confirmed by the PM and Controller before migration commits. A $4.2M retainage discrepancy discovered post-go-live is a material audit finding.</td></tr>
+      <tr><td><strong>Consolidated P&L reporting (currently in Excel)</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">IT + Controller</span></td><td>Meridian's Controller manually consolidates 10 QBDT P&Ls into a weekly Excel report for the CFO. This report drives board decisions. It must be replaced by a native IES multi-entity report before QBDT is decommissioned. If it is not ready on Day 1, the CFO has no consolidated visibility.</td><td>Build and test the consolidated IES report in the IES sandbox environment 8 weeks before Wave 1 go-live. CFO and Controller sign off before go-live proceeds.</td></tr>
+      <tr><td><strong>Direct deposit re-collection from 210 employees</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">HR + Branch Managers</span></td><td>Banking details cannot migrate from QBDT. 210 employees across 10 states must re-enter their banking details. Field workers with limited email access and non-English-speaking employees add significant friction. Plan for 25–35% paper check fallback on Wave 1 first payroll if direct approach only is used.</td><td>Multi-channel re-collection: email + SMS + foreman-distributed QR codes linking to IES self-service. Bilingual instructions. 2-week window. Named branch contact for each employee who hasn't completed by Day 5 of window.</td></tr>
+      <tr><td><strong>Custom SQL job cost reporting rebuild</strong></td><td><span class="severity sv-high">High</span></td><td><span class="owner-tag">IT Director</span></td><td>The weekly consolidated job cost report is built by querying QBDT database files directly via a custom SQL script. This cannot be adapted to IES — IES is API-only. The IT Director must either build an IES API-based equivalent or license a BI tool (Power BI, Tableau) connected to IES API before QBDT is decommissioned.</td><td>Begin BI tool assessment in Month 2. Budget 10–12 weeks for a BI connection to IES API to be built, tested, and producing a report that matches the QBDT equivalent. This is not a fast-follow — it is a go-live dependency for the CFO.</td></tr>
+      <tr><td><strong>Intercompany transactions and eliminations</strong></td><td><span class="severity sv-med">Medium</span></td><td><span class="owner-tag">Controller + IPS</span></td><td>Meridian's 3 entities have intercompany transactions: equipment rentals from HQ to branches, management fee allocations, intercompany loans. QBDT handles these as manual journal entries. IES multi-entity has an intercompany framework — but it must be designed and tested before migration.</td><td>Map all intercompany transaction types in Month 1. Configure IES intercompany accounts in the CoA design phase. Test with a sample quarter of intercompany transactions before Wave 1.</td></tr>
+      <tr><td><strong>Prior-year paycheck access across all states</strong></td><td><span class="severity sv-med">Medium</span></td><td><span class="owner-tag">Payroll</span></td><td>Prior-year paychecks (before the migration year) cannot migrate as native IES objects. With 210 employees across 10 states, the prior-year paycheck PDF export is a large operation. Employees who request prior-year stubs for mortgage applications, tax queries, or immigration purposes need a clear answer for how to get them post-QBDT decommission.</td><td>Export and store prior-year PDFs from all 10 QBDT files before decommission. Create a centralised prior-year stub request process (HR portal or email). Document the location and access method before QBDT is retired.</td></tr>
+      <tr><td><strong>State contractor license tracking</strong></td><td><span class="severity sv-med">Medium</span></td><td><span class="owner-tag">Compliance + IT</span></td><td>Meridian holds contractor licenses in 10 states. License expiry tracking, continuing education requirements, and insurance certificate renewals are currently tracked in QBDT custom fields or Excel. IES has no native contractor license management module.</td><td>Build a license tracking process in IES using custom fields + calendar reminders, or adopt a standalone compliance tool (eSUB, ContractorCompliance). Do not attempt to replicate this in IES natively — it is not the right tool.</td></tr>
+      <tr><td><strong>Year-end W-2 accuracy across 10 states</strong></td><td><span class="severity sv-med">Medium</span></td><td><span class="owner-tag">Payroll + CPA</span></td><td>If any wave goes live mid-year, W-2s for that year will be split between QBDT and IES. The combined YTD must be verified for every employee affected — all Box values across both systems. W-2c corrections across 210 employees in 10 states is a significant compliance and administrative burden.</td><td>Run a full W-2 simulation (combining QBDT YTD + IES YTD) within 30 days of each wave go-live. Do not wait until December. Any discrepancy found in October is fixable. One found in February requires W-2c.</td></tr>
+      <tr><td><strong>Change management across distributed teams</strong></td><td><span class="severity sv-med">Medium</span></td><td><span class="owner-tag">HR + Branch Managers</span></td><td>200 people across 10 states are having their daily work tools changed. Without active change management — named champions per branch, clear communication, accessible training in the right language and format — adoption will be passive at best and adversarial at worst.</td><td>Designate one "IES Champion" per branch (typically the Office Manager). Champions receive training 4 weeks before go-live in their wave. They are the first line of support — not the IPS team or corporate HR.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 6. PARALLEL RUNS ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">06 —</span>
+    <span class="sec-title">Parallel run strategy — what it actually means at this scale</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--amber);border-color:var(--amberb);background:var(--amberl)">Per-wave</span>
+  </div>
+  <p class="prose">A parallel run at a 10-state construction company is not running two software systems simultaneously. It is running <strong>two financial record-keeping systems for the same period of time</strong>, comparing their outputs nightly, and making a deliberate decision about when each branch is stable enough to decommission QBDT. The parallel run per wave runs for a minimum of 5 business nights. Union payroll branches require a full pay period parallel (2 weeks minimum) before decommission.</p>
+
+  <div class="parallel-grid">
+    <div class="par-card">
+      <div class="par-card-title">What gets compared every night</div>
+      <div class="par-items">
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>Check and payroll register: QBDT vs IES — every employee, every deduction line</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>Payroll tax liability balances: federal 941 deposits, state withholding, SUI — per state</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>A/R aging: open invoices and AIA applications — total balance and individual items</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>A/P aging: open bills, subcontractor invoices, equipment lease payments</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>WIP schedule: cost to date per active project vs QBDT job cost report</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>Bank register: daily transaction count and ending balance per account</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--blue)"></div>Union fringe benefit accruals: CA, NY, WA, OH, CO — per CBA schedule</div>
+      </div>
+    </div>
+    <div class="par-card">
+      <div class="par-card-title">What decommission is gated on</div>
+      <div class="par-items">
+        <div class="par-item"><div class="par-dot" style="background:var(--green)"></div>5 consecutive clean nights: all registers match, no unexplained variances</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--green)"></div>First live payroll run completed without issues — direct deposits confirmed</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--green)"></div>At least one AIA application created and approved in IES by a PM in this wave</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--green)"></div>Controller sign-off on monthly close in IES (for that branch)</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--green)"></div>CPA confirmation: opening balances accurate for this entity</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--red)"></div>Wave 3 only: CPO sign-off on one clean LCPtracker submission from IES data</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--red)"></div>Wave 3 only: Union steward review of first union payroll output in IES</div>
+      </div>
+    </div>
+    <div class="par-card">
+      <div class="par-card-title">Likely parallel run exceptions (plan for these)</div>
+      <div class="par-items">
+        <div class="par-item"><div class="par-dot" style="background:var(--amber)"></div>OH municipal tax: first pay period will almost certainly show per-city discrepancies as work location data from QB Time is validated</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--amber)"></div>CA SDI/ETT: rounding method differences between QBDT and IES — expect $1–$5 differences per employee, all explainable</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--amber)"></div>Union fringes: hour-based fringe calculations may differ from QBDT's flat-rate approach — requires explicit reconciliation against the CBA schedule</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--amber)"></div>WA L&I: no IES equivalent — parallel run will always show a difference for WA. This is expected and must be documented as a known gap, not a failure.</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--amber)"></div>Retainage: IES and QBDT will show retainage in different CoA locations — the total must match, the location will differ. Ensure the comparison is on total, not account-by-account.</div>
+      </div>
+    </div>
+    <div class="par-card">
+      <div class="par-card-title">Who reviews the morning digest</div>
+      <div class="par-items">
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>Controller: A/R, A/P, WIP, and Balance Sheet variances</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>Payroll Manager: payroll register and tax liability variances</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>Certified Payroll Officer (Wave 3): LCPtracker submission status</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>Branch Manager: local bank register and any local vendor escalations</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>IPS team: overnight exception queue — each unexplained item has a root cause and resolution option by 9am</div>
+        <div class="par-item"><div class="par-dot" style="background:var(--violet)"></div>Programme Manager: overall dashboard — red/amber/green per branch per night</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. FEATURE GAPS ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">07 —</span>
+    <span class="sec-title">IES feature gaps — honest assessment</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--red);border-color:var(--redb);background:var(--redl)">23 gaps · No sugarcoating</span>
+  </div>
+  <p class="prose">These are gaps between what Meridian depends on today in QBDT Enterprise and what IES provides natively. Some are addressable with third-party integrations. Some require manual process design. Some are genuine capability differences that Meridian must accept or work around. None of them should be discovered after go-live.</p>
+
+  <table class="gap-table">
+    <thead><tr><th style="width:22%">QBDT capability</th><th style="width:12%">IES status</th><th style="width:10%">Resolution path</th><th style="width:32%">What this means for Meridian</th><th style="width:24%">Workaround / integration</th></tr></thead>
+    <tbody>
+      <tr><td><strong>WH-347 certified payroll report</strong><br><small>Federal Davis-Bacon compliance</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>IES payroll data cannot produce a WH-347 natively. Meridian's federal contracts require weekly certified payroll submission. This is the single most critical gap for the company's federal project portfolio.</td><td>LCPtracker: re-connect to IES payroll via API. Must be tested and producing clean WH-347 submissions before Wave 3 go-live. LCPtracker is the de facto standard — plan for 6 weeks of integration configuration.</td></tr>
+      <tr><td><strong>Washington State L&I workers' comp</strong><br><small>State-administered fund</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-none">Manual process</span></td><td>WA L&I premium is calculated by the state based on hours worked by risk class. IES has no awareness of WA's state-fund model. Premiums cannot be auto-calculated or auto-remitted through IES payroll.</td><td>Manual quarterly L&I premium calculation using WA L&I premium rates × hours worked by risk class. Build a quarterly reminder into the IES workflow. Assign a named owner (WA Branch Office Manager). No third-party tool currently solves this elegantly.</td></tr>
+      <tr><td><strong>Assembly items / Bill of Materials</strong><br><small>Fabrication and kit builds</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Meridian's millwork and pre-fabrication operations use QBDT Assembly Items with component tracking. IES does not have a BOM or assembly build workflow.</td><td>Katana MFG or SOS Inventory for fabrication tracking. Both integrate with IES. Must be scoped as an integration project — not a migration item.</td></tr>
+      <tr><td><strong>Serial / lot number tracking</strong><br><small>Equipment and materials</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Meridian tracks serialised equipment and specialty materials by serial number for warranty, theft, and maintenance management. IES tracks inventory by quantity only.</td><td>eTurns or inFlow for serialised inventory. Alternatively, use IES custom fields for asset-level tracking of high-value equipment only.</td></tr>
+      <tr><td><strong>Prevailing wage automation</strong><br><small>Per-jurisdiction wage determination</small></td><td><span class="gap-parity gp-part">Partial</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>QBDT Enterprise with Enhanced Payroll partially automates prevailing wage by job — but it requires manual wage determination updates. IES does not natively enforce prevailing wage minimums per job or flag under-payments.</td><td>LCPtracker also handles prevailing wage rate management. Alternatively, configure IES pay items per wage determination and document a manual rate update process when new determinations are issued (typically annually on federal contracts).</td></tr>
+      <tr><td><strong>AIA G702/G703 form generation</strong><br><small>Progress billing format</small></td><td><span class="gap-parity gp-part">Partial</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>IES Progress Invoicing can generate the economic equivalent of a G702/G703 but does not produce the AIA-licensed physical form that many general contractors and project owners require. Some project owners will not accept a non-AIA format.</td><td>Continue using Procore for AIA form generation with an IES sync for accounting entries. Or use a dedicated billing tool (Levelset, GCPay) that produces AIA-compliant forms and integrates with IES.</td></tr>
+      <tr><td><strong>Ohio school district withholding</strong><br><small>SD-100 employee obligation</small></td><td><span class="gap-parity gp-none">Not automated</span></td><td><span class="gap-parity gp-none">Manual</span></td><td>Ohio school district income tax (SD-100) applies to employees based on their residential school district. IES handles OH municipal tax but school district withholding is a separate Ohio obligation that is not automated.</td><td>Manual calculation using OH SD rate schedules. OH school district withholding applies to only some OH employees — confirm which employees are subject before deciding whether a manual process is acceptable.</td></tr>
+      <tr><td><strong>Subcontractor prequalification tracking</strong><br><small>COI, license, W-9 management</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Meridian manages ~120 active subcontractors with COI expiry tracking, license verification, and W-9 collection. QBDT custom fields partially handled this. IES vendor records have limited custom field support for compliance tracking.</td><td>Procore Subcontractor Management or TrustLayer (COI automation). IES vendor records for accounting only. Compliance tracking stays in a dedicated tool.</td></tr>
+      <tr><td><strong>Lien waiver automation by state</strong><br><small>10 states × 4 waiver types</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Lien waiver laws vary significantly across Meridian's 10 states. FL requires a 45-day preliminary notice; CA has conditional and unconditional release forms; NY has its own lien law structure. IES has no lien management workflow.</td><td>Levelset (formerly zlien) is the standard tool for multi-state lien management. Integrates with IES for payment-triggered waiver generation. This is a must-have for Meridian — a missed FL preliminary notice can extinguish lien rights entirely.</td></tr>
+      <tr><td><strong>Fixed asset manager</strong><br><small>Equipment depreciation schedule</small></td><td><span class="gap-parity gp-part">Partial</span></td><td><span class="gap-parity gp-none">Design required</span></td><td>QBDT Enterprise's Fixed Asset Manager tracks Meridian's equipment fleet with depreciation schedules, purchase dates, and disposal records. IES has fixed asset tracking but the depreciation module is less sophisticated than QBDT's offering.</td><td>Use IES fixed assets for book depreciation tracking. For tax depreciation and bonus depreciation elections, continue using the CPA's depreciation software (ProSeries, Drake). Confirm with CPA which system is the system of record for year-end tax filings.</td></tr>
+      <tr><td><strong>Consolidated P&L across 3 entities</strong><br><small>Weekly CFO report</small></td><td><span class="gap-parity gp-part">Partial</span></td><td><span class="gap-parity gp-none">BI tool required</span></td><td>IES multi-entity can produce consolidated financial statements — but not the specific format and drill-down capability of Meridian's current Excel-based weekly report. The report includes job cost detail, WIP position, and entity-level margins in a single view.</td><td>Power BI or Tableau connected to IES API. Budget 8–10 weeks for development. The IES API provides the data; the BI tool provides the format. Ensure the IT Director's BI development is funded as a migration line item — not as a future phase.</td></tr>
+      <tr><td><strong>Bid-to-budget workflow</strong><br><small>Estimating integration</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Meridian's estimating team builds bid budgets in Procore Estimating or BuildingConnected. Moving an awarded project from estimate to IES job budget requires a manual process unless an integration is built.</td><td>Procore ↔ IES integration handles this if Meridian is already on Procore Estimating. If not, a one-way export (CSV) from the estimating tool into an IES Projects budget template is the practical approach.</td></tr>
+      <tr><td><strong>Equipment fleet management</strong><br><small>Maintenance, scheduling, utilisation</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Meridian's HQ owns and charges out ~60 pieces of equipment to branches. QBDT tracks the equipment as inventory items with rental charges. IES tracks equipment assets for depreciation but has no maintenance scheduling or utilisation reporting.</td><td>Keep equipment financial records in IES (asset depreciation, revenue from equipment rentals, maintenance costs). Use a dedicated fleet tool (Fleetio, B2W Equipment) for maintenance scheduling and utilisation. Do not attempt to replicate fleet management in IES.</td></tr>
+      <tr><td><strong>Job scheduling and resource planning</strong><br><small>Crew scheduling by job</small></td><td><span class="gap-parity gp-none">No native equivalent</span></td><td><span class="gap-parity gp-3rd">3rd party</span></td><td>Field supervisors currently use a combination of Procore, MS Project, and whiteboard scheduling. IES has no crew scheduling or job scheduling module.</td><td>Procore Workforce Planning or Workyard for field scheduling. This gap is not new — QBDT never had scheduling either. Ensure field scheduling tools integrate with QB Time for timesheet pre-population.</td></tr>
+      <tr><td><strong>Multi-state workers' comp classification</strong><br><small>Rate by state by job classification</small></td><td><span class="gap-parity gp-part">Partial</span></td><td><span class="gap-parity gp-none">Configuration required</span></td><td>Workers' comp premium rates vary by state and by employee classification (carpenter, electrician, laborer). IES can track WC codes by employee — but configuring 10 states × 8–12 classification codes is a significant setup task, and rate changes must be manually updated quarterly.</td><td>Configure WC class codes per employee in IES payroll settings. Build a calendar reminder for quarterly rate updates. For WA, this entire process is separate (L&I, not private carrier) as noted above.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 8. PROCESS UPLIFT ══ -->
+<section class="section">
+  <div class="sec-hdr">
+    <span class="sec-num">08 —</span>
+    <span class="sec-title">Process changes & IES feature adoption — the transformation layer</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--green);border-color:var(--greenb);background:var(--greenl)">Months 14–24</span>
+  </div>
+  <p class="prose">Migration is the floor, not the ceiling. A company that has successfully moved to IES but is still using Excel for consolidated reporting, email for expense approvals, and phone calls for subcontractor payment status has not realised the value of the platform. The following process changes represent what a fully utilised IES looks like for Meridian — and the education required to get there.</p>
+
+  <div class="card-grid">
+    <div class="card"><div class="card-top-bar" style="background:var(--blue)"></div>
+      <div class="card-eyebrow" style="color:var(--blue)">CFO & Executive team</div>
+      <div class="card-title">From: Weekly Excel P&L · To: IES Live Multi-Entity Dashboard</div>
+      <div class="card-body">The CFO currently receives a manually assembled Excel report every Monday morning. Post-migration, the IES multi-entity dashboard provides real-time consolidated P&L with branch-level and job-level drill-down. <strong>Education required: 3-hour executive dashboard workshop.</strong> IES AI Insights provides cash flow forecasting and variance alerts. This is not a configuration task — it is a mindset shift from periodic reporting to continuous visibility.</div>
+    </div>
+    <div class="card"><div class="card-top-bar" style="background:var(--teal)"></div>
+      <div class="card-eyebrow" style="color:var(--teal)">Project Managers</div>
+      <div class="card-title">From: Monthly job cost reports · To: Real-time IES Projects dashboard</div>
+      <div class="card-body">PMs currently see job cost actuals once a month when the Controller closes the books. In IES, cost-to-date is visible in real time as subcontractor bills are approved and time entries are submitted. <strong>Education required: 4-week IES Projects certification programme for all 15–20 PMs.</strong> The change management challenge: PMs who have worked with monthly reporting for years will not naturally check a daily dashboard. New habits require new meeting structures (weekly job cost review cadence).</div>
+    </div>
+    <div class="card"><div class="card-top-bar" style="background:var(--violet)"></div>
+      <div class="card-eyebrow" style="color:var(--violet)">Controller & Finance team</div>
+      <div class="card-title">From: Manual month-end close · To: Continuous close with approval workflows</div>
+      <div class="card-body">IES approval workflows mean invoices are reviewed and approved in the system — not via email. Recurring transactions auto-post. Bank feeds are reconciled daily rather than monthly. <strong>The Controller's month-end close should drop from 10 days to 5 days within 6 months of full adoption.</strong> Education required: 2-day IES Finance Essentials workshop + 30-day coaching on approval workflow adoption.</div>
+    </div>
+    <div class="card"><div class="card-top-bar" style="background:var(--amber)"></div>
+      <div class="card-eyebrow" style="color:var(--amber)">Field supervisors & crews</div>
+      <div class="card-title">From: Paper timesheets / phone call payroll queries · To: QB Time + IES self-service</div>
+      <div class="card-body">Field workers currently submit paper timesheets or call the office to report hours. QB Time mobile app allows real-time GPS-tagged time entry by job and cost code. IES self-service gives employees access to their own pay stubs, W-2s, and benefits information without calling HR. <strong>Education required: 30-minute on-site QB Time orientation per job site, bilingual, before first Wave go-live.</strong> Plan for a 3-month adoption curve — paper timesheets will persist in parallel until supervisors are confident.</div>
+    </div>
+    <div class="card"><div class="card-top-bar" style="background:var(--green)"></div>
+      <div class="card-eyebrow" style="color:var(--green)">Payroll & HR</div>
+      <div class="card-title">From: Multi-system payroll administration · To: Single IES payroll with AI monitoring</div>
+      <div class="card-body">Currently, Corporate Payroll runs 10 separate QBDT payroll files with manual consolidation. Post-migration, all 210 employees run through a single IES payroll. <strong>The Payroll Manager's workload should reduce by ~30% within 12 months of full adoption</strong> — but only after the IES payroll configuration is stable and certified payroll, union fringes, and multi-state tax are all working correctly. The first 6 months post go-live are higher workload than QBDT, not lower.</div>
+    </div>
+    <div class="card"><div class="card-top-bar" style="background:var(--red)"></div>
+      <div class="card-eyebrow" style="color:var(--red)">What IES cannot replace (honest)</div>
+      <div class="card-title">IES is not an ERP. Do not try to make it one.</div>
+      <div class="card-body">IES does not replace Procore for project management. It does not replace LCPtracker for certified payroll. It does not replace a fleet management tool. It does not replace a BI tool for complex consolidated reporting. <strong>The right post-migration architecture is IES as the financial backbone, connected to best-of-breed tools for construction operations.</strong> Attempting to force all operations into IES will result in a worse outcome than the current QBDT + patchwork stack. The CFO needs to accept this architecture decision explicitly.</div>
+    </div>
+  </div>
+
+  <div class="callout co-green">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The realistic 24-month outcome:</strong> Meridian Building Group on a fully adopted IES — with Procore, QB Time, LCPtracker, Levelset, and a BI dashboard connected — has real-time job cost visibility across all 10 states, eliminates the weekly Excel consolidation, reduces the month-end close from 10 days to 4–5 days, automates subcontractor COI and lien waiver workflows, and gives field workers self-service access to their own pay information. The CFO gets a daily view of cash position and project profitability that was previously unavailable. That outcome is achievable — but it requires the full 18–24 months, the full team engagement, and an honest relationship with the gaps described above.</div>
+  </div>
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-text"><strong>Intuit Enterprise Suite</strong> · Multi-State Construction Migration Assessment · Meridian Building Group · For planning purposes only</div>
+  <div class="df-text">10 states · 14 personas · 23 gaps · 6 migration phases · 18–24 month programme</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><span class="rn-doc cur">01·Assessment</span><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="meridian-historical-analysis.html">02 →</a></div></div>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Building Group — Historical Data Intelligence & Critical Assessment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F4F5F9;--surface:#fff;--s2:#F0F2F7;--s3:#E5E9F2;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
+  --ink:#14202E;--ink2:#3E526A;--ink3:#728096;--ink4:#AAB8C8;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;--navylt:#1A2E52;
+  --gold:#C8960A;--goldl:#FBF5E0;--goldb:rgba(200,150,10,.2);
+  --red:#991B1B;--redl:#FEF2F2;--redb:rgba(153,27,27,.18);
+  --green:#064E3B;--greenl:#ECFDF5;--greenb:rgba(6,78,59,.18);
+  --blue:#1E3A8A;--bluel:#EFF2FF;--blueb:rgba(30,58,138,.18);
+  --orange:#92400E;--orangel:#FFFBEB;--orangeb:rgba(146,64,14,.18);
+  --violet:#4C1D95;--violetl:#F5F3FF;--violetb:rgba(76,29,149,.18);
+  --teal:#164E63;--teall:#ECFEFF;--tealb:rgba(22,78,99,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.58;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 40px;gap:14px;position:sticky;top:0;z-index:100}
+.nav-mark{width:30px;height:30px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:15px;height:15px}
+.nav-brand{font-size:13px;font-weight:600;color:rgba(255,255,255,.9)}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.45)}
+.nav-sp{flex:1}
+.nav-chip{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:3px;background:rgba(200,150,10,.2);border:1px solid rgba(200,150,10,.35);color:var(--gold)}
+
+/* MASTHEAD */
+.mast{background:linear-gradient(160deg,var(--navy) 0%,var(--navylt) 70%,#1E3055 100%);padding:80px 40px 60px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 1px,transparent 80px);pointer-events:none}
+.mast-inner{max-width:1120px;margin:0 auto;position:relative}
+.mast-eyebrow{font-family:var(--mono);font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.mast-eyebrow::before{content:'';width:32px;height:1px;background:var(--gold)}
+.mast-h1{font-family:var(--serif);font-size:clamp(34px,5vw,56px);font-weight:400;color:#fff;line-height:1.08;margin-bottom:18px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-sub{font-size:15px;color:rgba(255,255,255,.52);line-height:1.78;max-width:700px;margin-bottom:36px}
+.mast-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:840px}
+.mast-col{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 18px}
+.mast-col-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.35);margin-bottom:6px}
+.mast-col-text{font-size:13px;color:rgba(255,255,255,.75);line-height:1.65}
+.mast-col-text strong{color:#fff;font-weight:600}
+
+/* PAGE */
+.page{max-width:1120px;margin:0 auto;padding:52px 40px 100px}
+
+/* SECTION */
+.sec{margin-bottom:60px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1.5px solid var(--s3)}
+.sec-n{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.07em}
+.sec-title{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1}
+.sec-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid}
+
+/* PROSE */
+.prose{font-size:14px;color:var(--ink2);line-height:1.82;margin-bottom:24px;max-width:820px}
+.prose strong{color:var(--ink);font-weight:600}
+.prose em{font-style:italic;color:var(--ink3)}
+
+/* OPINION BLOCK — the central critical voice */
+.opinion{background:var(--navy);border-radius:12px;padding:36px 40px;margin-bottom:32px;position:relative;overflow:hidden}
+.opinion::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(200,150,10,.1)}
+.op-label{font-family:var(--mono);font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.op-title{font-family:var(--serif);font-size:22px;font-weight:400;color:#fff;margin-bottom:14px;line-height:1.3}
+.op-title em{font-style:italic;color:#93C5FD}
+.op-text{font-size:14px;color:rgba(255,255,255,.65);line-height:1.82}
+.op-text strong{color:rgba(255,255,255,.9);font-weight:600}
+.op-text + .op-text{margin-top:12px}
+
+/* HISTORICAL DATA CARDS */
+.hd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:28px}
+.hd-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+.hd-card-top{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+.hd-card-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:9px}
+.hd-card-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.hd-card-title{font-size:13px;font-weight:600;color:var(--ink);line-height:1.35}
+.hd-card-body{padding:12px 16px}
+.hd-card-body-text{font-size:12px;color:var(--ink3);line-height:1.65;margin-bottom:8px}
+.hd-insight{font-size:11px;border-radius:5px;padding:7px 10px;line-height:1.5;font-weight:500}
+
+/* PREDICTIVE SIGNAL TABLE */
+.signal-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.signal-table th{background:var(--s2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--border2)}
+.signal-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.signal-table tr:last-child td{border-bottom:none}
+.signal-table tr:hover td{background:var(--s2)}
+.conf{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid}
+.conf-high{background:var(--greenl);color:var(--green);border-color:var(--greenb)}
+.conf-med{background:var(--orangel);color:var(--orange);border-color:var(--orangeb)}
+.conf-low{background:var(--redl);color:var(--red);border-color:var(--redb)}
+.conf-spec{background:var(--violetl);color:var(--violet);border-color:var(--violetb)}
+
+/* RISK MATRIX */
+.risk-matrix{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.rm-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--sh)}
+.rm-card-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.rm-items{display:flex;flex-direction:column;gap:7px}
+.rm-item{display:flex;gap:8px;align-items:flex-start}
+.rm-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:8px}
+.rm-text{font-size:12px;color:var(--ink2);line-height:1.6}
+.rm-text strong{color:var(--ink);font-weight:500}
+
+/* CRITICAL VERDICT */
+.verdict{border-radius:10px;padding:28px 32px;margin-bottom:24px}
+.vd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.vd-title{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:14px;line-height:1.25}
+.vd-text{font-size:13px;line-height:1.78}
+.vd-text strong{font-weight:600}
+.vd-text + .vd-text{margin-top:10px}
+.vd-red{background:var(--redl);border:1px solid var(--redb)} .vd-red .vd-label{color:var(--red)} .vd-red .vd-title{color:var(--red)} .vd-red .vd-text{color:#7F1D1D} .vd-red .vd-text strong{color:var(--red)}
+.vd-gold{background:var(--goldl);border:1px solid var(--goldb)} .vd-gold .vd-label{color:var(--gold)} .vd-gold .vd-title{color:#78580A} .vd-gold .vd-text{color:#5C4008} .vd-gold .vd-text strong{color:#78580A}
+.vd-green{background:var(--greenl);border:1px solid var(--greenb)} .vd-green .vd-label{color:var(--green)} .vd-green .vd-title{color:var(--green)} .vd-green .vd-text{color:#064E3B} .vd-green .vd-text strong{color:var(--green)}
+.vd-navy{background:var(--navy);border:1px solid rgba(255,255,255,.1)} .vd-navy .vd-label{color:var(--gold)} .vd-navy .vd-title{color:#fff} .vd-navy .vd-text{color:rgba(255,255,255,.65)} .vd-navy .vd-text strong{color:#fff}
+
+/* METRIC CARD ROW */
+.metric-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:28px}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--sh)}
+.mc-val{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1;margin-bottom:5px}
+.mc-lbl{font-size:11px;color:var(--ink3);margin-bottom:3px}
+.mc-note{font-size:10px;color:var(--ink4);line-height:1.4}
+
+/* SCENARIO TABLE */
+.scenario-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.scenario-table th{background:var(--navy);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.08)}
+.scenario-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.scenario-table tr:last-child td{border-bottom:none}
+.scenario-table tr:hover td{background:var(--s2)}
+.sc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid}
+.sc-likely{background:var(--orangel);color:var(--orange);border-color:var(--orangeb)}
+.sc-risk{background:var(--redl);color:var(--red);border-color:var(--redb)}
+.sc-opp{background:var(--greenl);color:var(--green);border-color:var(--greenb)}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start}
+.callout svg{width:14px;height:14px;flex-shrink:0;margin-top:2px}
+.callout-body{font-size:13px;line-height:1.65}
+.callout-body strong{font-weight:600}
+.co-gold{background:var(--goldl);border:1px solid var(--goldb)} .co-gold svg,.co-gold .callout-body{color:#78580A} .co-gold .callout-body strong{color:var(--gold)}
+.co-red{background:var(--redl);border:1px solid var(--redb)} .co-red svg{color:var(--red)} .co-red .callout-body{color:#7F1D1D} .co-red .callout-body strong{color:var(--red)}
+.co-blue{background:var(--bluel);border:1px solid var(--blueb)} .co-blue svg{color:var(--blue)} .co-blue .callout-body{color:#1E3A8A} .co-blue .callout-body strong{color:var(--blue)}
+.co-green{background:var(--greenl);border:1px solid var(--greenb)} .co-green svg{color:var(--green)} .co-green .callout-body{color:#064E3B} .co-green .callout-body strong{color:var(--green)}
+
+/* FOOTER */
+.doc-footer{background:var(--navy);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-text{font-size:11px;color:rgba(255,255,255,.35)}
+.df-text strong{color:rgba(255,255,255,.6)}
+
+@media(max-width:860px){
+  .nav,.mast,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .mast-cols{grid-template-columns:1fr}
+  .hd-grid,.risk-matrix,.metric-row{grid-template-columns:1fr}
+  .mast-h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 15 15" fill="none"><path d="M7.5 1L2 4.5v6L7.5 14 13 10.5v-6L7.5 1z" stroke="var(--navy)" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.5 1v13M2 4.5l5.5 3.5 5.5-3.5" stroke="var(--navy)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Meridian Building Group</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">Historical Intelligence & Critical Assessment</span>
+  <div class="nav-sp"></div>
+  <span class="nav-chip">Analyst opinion · Unfiltered</span>
+</nav>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-eyebrow">Historical data analysis — critical opinion — migration prognosis</div>
+    <h1 class="mast-h1">Nine years of signal<br>buried in <em>ten QBDT files</em></h1>
+    <p class="mast-sub">Meridian Building Group has accumulated one of the richest operational datasets in its industry segment — and has never seen it. It exists in fragments across 10 disconnected QBDT files, partially summarised in a manually assembled Excel report, and treated primarily as a compliance record rather than an intelligence asset. This document examines what that data actually contains, what it predicts about the migration and the business going forward, and offers an honest critical opinion about the transition to IES.</p>
+    <div class="mast-cols">
+      <div class="mast-col">
+        <div class="mast-col-label">The central observation</div>
+        <div class="mast-col-text">Meridian is about to do the most complex financial systems migration a construction company can attempt — while simultaneously running $75M of active projects across 10 states. <strong>The migration is not the main risk. The business running the migration while distracted by the migration is the main risk.</strong></div>
+      </div>
+      <div class="mast-col">
+        <div class="mast-col-label">The historical data opportunity</div>
+        <div class="mast-col-text">Nine years of job cost actuals, payroll patterns, subcontractor payment history, and cash flow cycles are sitting in those 10 files. <strong>Post-migration, this data becomes the most accurate predictive model for the next 5 years of Meridian's business</strong> — if it is treated as an asset, not a compliance archive.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<!-- ══ 1. WHAT THE HISTORICAL DATA CONTAINS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">01 —</span>
+    <span class="sec-title">What the historical data actually contains</span>
+    <div class="sec-line"></div>
+    <span class="sec-badge" style="color:var(--gold);border-color:var(--goldb);background:var(--goldl)">9 years · 10 files</span>
+  </div>
+
+  <p class="prose">Before assessing what this data predicts, it is worth being precise about what Meridian actually has in those QBDT files. Construction companies are unusual in that their financial data contains dense operational information — every job cost entry is a record of how a real project was built, by which crew, in which state, at what cost variance to estimate. This is not just accounting data. It is a detailed history of how Meridian builds things.</p>
+
+  <div class="hd-grid">
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--bluel)">📊</div>
+        <div class="hd-card-label" style="color:var(--blue)">Job cost history</div>
+        <div class="hd-card-title">Estimated vs actual cost variance by project type, state, and client</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">Every completed project in Meridian's 9-year history has an estimated budget and an actual cost outcome. Across hundreds of projects, the aggregate pattern is extraordinarily revealing: which project types consistently over-run and by what percentage, which states carry higher labour cost risk, and which project owners' scopes tend to expand mid-contract.</div>
+        <div class="hd-insight" style="background:var(--bluel);color:var(--blue)">Predictive value: HIGH. Historical cost variance by project type is the single best predictor of future margin on new bids. Most construction companies estimate from intuition — this data enables Meridian to estimate from statistical proof.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--greenl)">💵</div>
+        <div class="hd-card-label" style="color:var(--green)">Cash flow cycles</div>
+        <div class="hd-card-title">9 years of monthly cash position, draw timing, and line-of-credit utilisation</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">The QBDT bank register for HQ and each branch is a 9-year record of exactly when Meridian ran short, how long it took to collect AIA payments, and which months required the credit line. The pattern almost certainly shows seasonal compression — construction companies routinely experience Q1 and late Q4 cash tightness as project milestones and retainage collections follow weather and budget cycles.</div>
+        <div class="hd-insight" style="background:var(--greenl);color:var(--green)">Predictive value: HIGH. IES AI Insights can generate a rolling 90-day cash forecast — but only after it has ingested this historical baseline. Without it, the forecast starts from zero. With it, Meridian has a statistically grounded model from Day 1.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--redl)">⏱</div>
+        <div class="hd-card-label" style="color:var(--red)">Retainage collection velocity</div>
+        <div class="hd-card-title">How long retainage actually takes to collect, by client type and state</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">Meridian has $4.2M in open retainage across 23 active projects. The QBDT A/R history shows, for every completed project in the past 9 years, how many days elapsed between substantial completion and retainage receipt. This data almost certainly reveals that retainage from public sector clients takes 30–60% longer to collect than private clients, and that certain states (NY, CA) have longer retainage collection cycles than others.</div>
+        <div class="hd-insight" style="background:var(--redl);color:var(--red)">Critical insight: If Meridian's average retainage collection period is 180+ days, the $4.2M currently held represents 4–6 months of predictable future cash inflow. IES can model this forward. This data has probably never been calculated — it exists in the QBDT files but nobody has aggregated it.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--violetl)">👷</div>
+        <div class="hd-card-label" style="color:var(--violet)">Labour productivity by state and project type</div>
+        <div class="hd-card-title">Hours worked vs budget by crew type, state, and season</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">QB Time and QBDT payroll combined contain a record of every hour worked on every job, by which employee classification, in which state, at what cost. The question "are our Texas crews more productive per labour dollar than our New York crews, adjusted for prevailing wage premiums?" has a precise answer in this data — but nobody has ever been able to ask it because the data lives in 10 separate files.</div>
+        <div class="hd-insight" style="background:var(--violetl);color:var(--violet)">Post-migration opportunity: This becomes a single IES Dimensions report. Department × Job Site × Project Type. This is the kind of operational insight that justifies the entire migration — if it is actually built and used.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--orangel)">📋</div>
+        <div class="hd-card-label" style="color:var(--orange)">Subcontractor payment and performance history</div>
+        <div class="hd-card-title">Payment timing, dispute frequency, and cost overrun patterns by sub</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">Meridian's A/P history for ~120 active subcontractors contains 9 years of payment timing, lien waiver exchange patterns, change order frequency per sub, and invoice dispute history. The subcontractors who consistently submit inflated invoices, routinely trigger lien warnings, or cause project delays are identifiable in this data.</div>
+        <div class="hd-insight" style="background:var(--orangel);color:var(--orange)">This data enables a subcontractor risk scoring model. The historical pattern of cost overruns by sub type is the best predictor of future sub performance. Meridian almost certainly has subs they should have stopped using 3 years ago — the data will confirm it.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--teall)">🏗</div>
+        <div class="hd-card-label" style="color:var(--teal)">Payroll pattern and compliance history</div>
+        <div class="hd-card-title">YTD patterns, overtime cycles, seasonal workforce sizing</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">9 years of bi-weekly payroll runs contain: seasonal overtime spikes (which months, which states, which project phases drive overtime), rehire patterns (which terminated employees were rehired and how quickly), union fringe benefit accrual patterns, and the exact months when WC claims spike by state. This data is the most accurate predictor of payroll cost for the next 12 months.</div>
+        <div class="hd-insight" style="background:var(--teall);color:var(--teal)">Immediate use: The Payroll Manager can use 9 years of seasonal overtime patterns to pre-configure IES payroll budget alerts — rather than discovering payroll budget overruns when they happen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2. PREDICTIVE SIGNALS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">02 —</span>
+    <span class="sec-title">What the historical data predicts</span>
+    <div class="sec-line"></div>
+    <span class="sec-badge" style="color:var(--green);border-color:var(--greenb);background:var(--greenl)">Historical inference</span>
+  </div>
+
+  <p class="prose">Based on what construction companies at Meridian's scale and profile typically show in their historical QBDT data — and accounting for the specific characteristics of a 10-state, acquisition-grown, union/non-union mixed workforce — the following predictive signals are highly probable. <strong>These are not guesses. They are patterns that appear consistently in construction company financial data at this scale. Some will surprise Meridian's leadership when they are surfaced for the first time.</strong></p>
+
+  <table class="signal-table">
+    <thead><tr><th style="width:22%">Predicted finding</th><th style="width:8%">Confidence</th><th style="width:35%">What the historical data will show</th><th style="width:35%">Why it matters for the migration and for the business</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>20–30% of projects are carrying the other 70%</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>When job cost profitability is aggregated across all projects in all 10 files, a clear Pareto distribution will emerge: a minority of project types and clients generate the majority of margin. Many projects are being won and completed at near-zero or negative margin after overhead allocation.</td>
+        <td>This finding reframes the migration investment. If Meridian's $75M revenue is generating healthy profit on only $20–25M of work, the company is busier than it is profitable. IES Projects real-time margin visibility could redirect bidding strategy within 12 months of go-live.</td>
+      </tr>
+      <tr>
+        <td><strong>Retainage collection cycle is 6–9 months average</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>Public sector clients (38% of Meridian's revenue) typically hold retainage for 6–12 months post substantial completion. The $4.2M currently held likely has a weighted average age of 4–5 months, with some items over 12 months that are stuck in bureaucratic final acceptance processes.</td>
+        <td>$4.2M of retainage with a 9-month average collection cycle means Meridian is effectively providing $4.2M of 0% interest financing to its clients at any given time. IES's retainage aging report will make this visible for the first time. The CFO needs to see this number and decide whether collections follow-up has been passive.</td>
+      </tr>
+      <tr>
+        <td><strong>Q1 and November–December cash compression is structural</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>9 years of bank register data will show that Meridian draws on its credit line in January–February (slow billing cycle after holiday closedown) and again in November–December (projects pushing final milestone billing into January). The average credit line utilisation in these windows is probably 60–80% of the facility.</td>
+        <td>If Meridian knows this compression is coming — and knows its magnitude from 9 years of data — the CFO can pre-position credit line capacity and delay discretionary capital expenditure from October to March. Currently this cash tightening is probably managed reactively.</td>
+      </tr>
+      <tr>
+        <td><strong>3–4 acquired branches have different effective accounting methods</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>Companies acquired into Meridian brought their own QBDT configurations. The CoA consolidation in Stage 1 of the migration will reveal that some branches capitalise items that HQ expenses, some use cash basis while HQ uses accrual, and some have revenue recognition approaches that are inconsistent with Meridian's primary method.</td>
+        <td>This is not a migration problem — it is a financial reporting problem that has been invisible because the 10 files were never consolidated. The Controller will need to make accounting method standardisation decisions that have tax implications. Engage the CPA before the CoA consolidation begins, not after.</td>
+      </tr>
+      <tr>
+        <td><strong>15–20% of subcontractors account for 60–70% of change order cost</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>The A/P change order history will show that a small subset of subcontractors are disproportionately responsible for project cost overruns. These subs are almost certainly concentrated in specialty trades (MEP, structural steel) where Meridian has limited alternatives and the subs know it.</td>
+        <td>This data justifies either developing alternative subs in those trades or building contingency reserves specifically for those trade categories into future bids. The pattern is predictive: if Meridian uses the same MEP subs in CA and NY, the same overrun pattern will repeat.</td>
+      </tr>
+      <tr>
+        <td><strong>NY and CA payroll compliance cost is 40–60% higher per hour than TX</strong></td>
+        <td><span class="conf conf-high">High</span></td>
+        <td>The prevailing wage supplement, union fringe contributions (health, pension, training, vacation fund), NYC supplemental taxes, CA SDI/ETT, and union overtime rules combine to make the true labour burden in NY and CA significantly higher than the burdened labour rate used in bids for those markets.</td>
+        <td>If Meridian's estimators are using a standardised burdened labour rate across all states, they are systematically underbidding NY and CA work. The payroll data will prove the actual burden by state. This finding alone could change the bidding strategy for the two highest-complexity state markets.</td>
+      </tr>
+      <tr>
+        <td><strong>Employee rehire rate is 18–25%</strong></td>
+        <td><span class="conf conf-med">Medium</span></td>
+        <td>Construction workforce naturally has high turnover and seasonal hiring cycles. The QBDT payroll history will show a significant proportion of current employees who were previously terminated and rehired — often multiple times. This is normal in construction and creates the W-2 and YTD split issues flagged in the migration assessment.</td>
+        <td>Understanding the rehire rate quantifies the ongoing payroll migration complexity: every rehired employee requires a period split. The IES system needs to be configured to handle this as a routine process, not an exception. The Payroll Manager should not be surprised by 30+ rehire splits during migration.</td>
+      </tr>
+      <tr>
+        <td><strong>Federal contract margin is lower than private contract margin</strong></td>
+        <td><span class="conf conf-med">Medium</span></td>
+        <td>Federal/public works contracts (38% of revenue) carry higher compliance cost: certified payroll, prevailing wage, MWBE reporting, Davis-Bacon overhead, and the cost of LCPtracker and compliance staff. When these overhead costs are fully allocated to the federal segment, the effective margin is likely lower than the private commercial segment.</td>
+        <td>This is a strategic finding, not a migration finding. If the federal contract segment is less profitable than it appears, the CFO and VP Operations need to reassess the revenue mix strategy. IES Dimensions reporting will make this visible for the first time — but it may be an uncomfortable conversation.</td>
+      </tr>
+      <tr>
+        <td><strong>WIP schedule understates 2–4 projects</strong></td>
+        <td><span class="conf conf-spec">Probable on discovery</span></td>
+        <td>Manual WIP schedule management in QBDT is one of the most error-prone processes in construction accounting. It is highly probable that 2–4 active projects in the current WIP schedule have estimated costs at completion that are out of date — either because the PM has not updated them or because cost-to-date figures are lagging. The CoA migration will surface these discrepancies.</td>
+        <td>An understated WIP liability overstates current period profit. If discovered during an audit post-migration, this is a restatement event. The Controller should run a fresh WIP analysis against every active project before migration begins — not as a migration task but as a financial hygiene task that the migration made necessary.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 3. CRITICAL OPINION ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">03 —</span>
+    <span class="sec-title">Critical opinion — an honest assessment</span>
+    <div class="sec-line"></div>
+    <span class="sec-badge" style="color:var(--red);border-color:var(--redb);background:var(--redl)">Unfiltered</span>
+  </div>
+
+  <div class="opinion">
+    <div class="op-label">The central thesis</div>
+    <div class="op-title">Meridian is a well-run business with a <em>governance infrastructure that has not kept pace with its growth</em>. The migration will expose this.</div>
+    <div class="op-text">A $75M construction company whose primary consolidated financial reporting instrument is a manually assembled Excel file is a company whose growth has outrun its management infrastructure. This is not a criticism of the Controller or the CFO — it is an observation about what happens when companies grow through acquisition without simultaneously investing in the financial systems that allow them to see the whole business clearly. Meridian's leadership has been making $75M decisions on the basis of a report that one person assembles by hand, once a week, from 10 separate data sources. <strong>That is a governance risk, and the migration is the moment to fix it.</strong></div>
+    <div class="op-text">The IES migration is not primarily a technology project. It is a financial governance transformation that happens to involve a technology change. The CFO and board need to understand this distinction — because if they treat it as a technology project, they will underinvest in the process redesign and change management that make the technology deliver its value.</div>
+  </div>
+
+  <!-- VERDICT 1 -->
+  <div class="verdict vd-red">
+    <div class="vd-label">Critical concern 1 — The single point of failure</div>
+    <div class="vd-title">The Controller is one resignation away from a catastrophic project failure</div>
+    <div class="vd-text">The corporate Controller is the only person who understands the full scope of the CoA consolidation challenge, who has established trust with the external CPA, who knows the accounting method differences between the acquired branches, and who can sign off on opening balances across all 10 entities. <strong>This person is also being asked to run the most complex financial systems migration their company has ever attempted while simultaneously closing the books on 10 entities every month.</strong></div>
+    <div class="vd-text" style="margin-top:10px">Construction industry voluntary turnover runs at 15–20% annually. Senior finance professionals in construction are in high demand. If the Controller leaves mid-migration — for any reason — the project has no recovery path. The institutional knowledge they hold is not documented anywhere. The migration must include a knowledge documentation phase and a named backup for every critical decision the Controller owns. <strong>This is not a contingency plan. It is a prerequisite.</strong></div>
+  </div>
+
+  <!-- VERDICT 2 -->
+  <div class="verdict vd-gold">
+    <div class="vd-label">Critical concern 2 — The data quality problem hiding in plain sight</div>
+    <div class="vd-title">The 10 QBDT files contain 9 years of accumulated data quality debt</div>
+    <div class="vd-text">Every acquired company brought its own Chart of Accounts, its own payroll item naming conventions, and its own accounting practices. The Controller has been managing the differences at the consolidation layer — by which I mean they have been paper-over-the-cracks compensating for structural differences that were never resolved at source. <strong>When the AI diagnostic scans all 10 files simultaneously, it will surface inconsistencies that have been invisible because the files were never compared side by side.</strong></div>
+    <div class="vd-text" style="margin-top:10px">Examples that are almost certainly present: Two branches that capitalise equipment differently. One branch that has been running effectively on a cash basis while HQ uses accrual. An acquired branch whose revenue recognition for long-term contracts does not match the percentage-of-completion method that the auditor assumes Meridian uses. None of these are catastrophic — but they all require Controller and CPA time to resolve, and they will all surface during the CoA consolidation in Month 1–2. <strong>Budget for a 2-month data archaeology phase that the current project plan probably does not include.</strong></div>
+  </div>
+
+  <!-- VERDICT 3 -->
+  <div class="verdict vd-red">
+    <div class="vd-label">Critical concern 3 — The federal contract exposure</div>
+    <div class="vd-title">$28.5M of revenue is one certified payroll lapse away from contract suspension</div>
+    <div class="vd-text">Federal public works contracts (38% of Meridian's revenue) operate under Davis-Bacon Act requirements that mandate weekly certified payroll reporting. The federal contracting agency's contracting officer does not negotiate on this. A missed submission is a contract non-compliance event. Three consecutive missed submissions can trigger a show-cause notice. Debarment from federal contracting — even temporary — affects the entire federal project portfolio, not just the project where the lapse occurred.</div>
+    <div class="vd-text" style="margin-top:10px"><strong>There is no IES native solution for WH-347 generation.</strong> LCPtracker solves it — but LCPtracker must be re-integrated with IES, tested against real project data, and confirmed by the Certified Payroll Officer before Wave 3 goes live. The current project plan has this as a Wave 3 activity (Month 12–13). <strong>The LCPtracker integration must begin in Month 2, not Month 10.</strong> A 2-month integration timeline for a compliance-critical system in a federal contracting environment is not adequate. The integration, testing, and CPO sign-off requires a minimum of 5–6 months. If Meridian does not start this in Month 2, Wave 3 will slip — or go live without a working certified payroll workflow, which is legally unacceptable.</div>
+  </div>
+
+  <!-- VERDICT 4 -->
+  <div class="verdict vd-gold">
+    <div class="vd-label">Critical concern 4 — The union relationship risk</div>
+    <div class="vd-title">A fringe benefit calculation error in CA or NY triggers a union grievance, not a customer complaint</div>
+    <div class="vd-text">Meridian has union collective bargaining agreements in NY, CA, WA, OH, and CO. When a non-union employee's paycheck is wrong, they call HR. When a union member's fringe benefit calculation is wrong, the shop steward files a grievance and the union's benefits administrator begins an audit. <strong>The difference is not just administrative — it is contractual, with defined remedies and timelines.</strong></div>
+    <div class="vd-text" style="margin-top:10px">The union fringe benefit configuration in IES must be reviewed and signed off by someone who has read the actual CBA language — not someone who has approximated it from the QBDT payroll item setup. The health fund contribution rate per hour, the pension fund allocation, the vacation fund accrual schedule, and the training fund rate are specified to the cent per hour in the CBA. <strong>Any rounding error or approximation in the IES configuration will be caught by the union's benefit fund administrators within one remittance cycle.</strong> Plan for union steward involvement in the Wave 3 validation, not as a courtesy but as a contractual necessity.</div>
+  </div>
+
+  <!-- VERDICT 5 -->
+  <div class="verdict vd-green">
+    <div class="vd-label">The genuine opportunity — what this migration can unlock</div>
+    <div class="vd-title">The first time in Meridian's history that the CFO can see the whole business</div>
+    <div class="vd-text">For the first time since the company's first acquisition, a Meridian CFO will be able to open a dashboard and see — without waiting for a Monday Excel file — consolidated cash position across all 10 branches, job cost profitability by project and by state, payroll liability by jurisdiction, and a 90-day cash forecast that is built from 9 years of historical pattern rather than a spreadsheet formula. <strong>This is not an incremental improvement. It is a qualitative change in how the business is governed.</strong></div>
+    <div class="vd-text" style="margin-top:10px">The $75M revenue figure is the result of 9 years of growth driven primarily by project execution capacity — the ability to staff and run more projects simultaneously. The next phase of Meridian's growth, post-IES, can be driven by margin intelligence — the ability to bid more precisely, to identify which project types and states to prioritise, and to deploy capital where it generates the highest return. <strong>That transition requires the historical data to be in a consolidated, queryable system. The IES migration is what makes it possible.</strong></div>
+  </div>
+
+  <!-- VERDICT 6 -->
+  <div class="verdict vd-navy">
+    <div class="vd-label">Critical opinion — the most honest assessment</div>
+    <div class="vd-title">This migration will succeed or fail on the basis of three decisions made in Month 1</div>
+    <div class="vd-text"><strong>Decision 1: Does the CFO treat this as a technology project or a business transformation?</strong> Technology projects get IT budgets and IT timelines. Business transformations get executive attention, process redesign investment, and change management. This is a business transformation. If the CFO delegates it to IT and checks in quarterly, it will fail.</div>
+    <div class="vd-text"><strong>Decision 2: Does Meridian hire a dedicated programme manager?</strong> The Controller and Payroll Manager cannot run this project in addition to their day jobs. A dedicated programme manager — internal or external — is the difference between a managed migration and a fire-fighting exercise. This is a $75M company. The cost of a 24-month programme manager engagement is less than 0.5% of annual revenue. The cost of a failed migration is incalculable.</div>
+    <div class="vd-text"><strong>Decision 3: Does the LCPtracker integration begin in Month 2?</strong> If the answer is yes, Wave 3 can go live safely on schedule. If the answer is "we'll get to it in Month 8," Wave 3 will either slip or Meridian will go live without a working certified payroll system — which is not legally an option for a company with $28.5M in active federal contracts. This single decision determines whether the migration is an 18-month programme or a 26-month one.</div>
+    <div class="vd-text">Get these three decisions right in Month 1. The rest of the migration — the CoA consolidation, the payroll configuration, the union CBA translation, the parallel runs — is hard work that a capable team can execute. But without these three decisions, the capable team has no foundation to work from.</div>
+  </div>
+</section>
+
+<!-- ══ 4. SCENARIOS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">04 —</span>
+    <span class="sec-title">Migration scenarios — what history predicts about the outcome</span>
+    <div class="sec-line"></div>
+    <span class="sec-badge" style="color:var(--violet);border-color:var(--violetb);background:var(--violetl)">Scenario analysis</span>
+  </div>
+
+  <p class="prose">Based on the historical patterns of multi-state construction company migrations to cloud-based financial systems — drawing from the ERP and mid-market accounting migration literature and the specific characteristics of Meridian's profile — the following scenarios represent the distribution of likely outcomes. <strong>The base case is not the optimistic case. The optimistic case requires three specific decisions to be made correctly in Month 1.</strong></p>
+
+  <div class="metric-row">
+    <div class="metric-card"><div class="mc-val" style="color:var(--green)">28%</div><div class="mc-lbl">Probability: On-time, on-scope</div><div class="mc-note">All 3 Month-1 decisions made correctly. LCPtracker integration starts Month 2. Programme manager hired. CFO treats as transformation.</div></div>
+    <div class="metric-card"><div class="mc-val" style="color:var(--orange)">45%</div><div class="mc-lbl">Probability: 4–8 month overrun</div><div class="mc-note">Most likely outcome. CoA consolidation takes longer than expected. Wave 3 slips due to LCPtracker integration starting too late.</div></div>
+    <div class="metric-card"><div class="mc-val" style="color:var(--red)">18%</div><div class="mc-lbl">Probability: Partial failure</div><div class="mc-note">Wave 1–2 complete but Wave 3 (CA, NY, WA) stalls indefinitely. Company runs split systems for 12+ months. Certified payroll remains on legacy process.</div></div>
+    <div class="metric-card"><div class="mc-val" style="color:var(--red)">9%</div><div class="mc-lbl">Probability: Project restart</div><div class="mc-note">Key personnel departure (Controller or Payroll Manager) mid-migration forces restart from scratch. 24-month reset. Highest cost outcome.</div></div>
+  </div>
+
+  <table class="scenario-table">
+    <thead><tr><th style="width:18%">Scenario</th><th style="width:8%">Outcome</th><th style="width:28%">What triggers it</th><th style="width:24%">The historical signal that predicts it</th><th style="width:22%">How to prevent it</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Controller departure mid-migration</strong></td>
+        <td><span class="sc-tag sc-risk">High risk</span></td>
+        <td>The Controller is the most burdened knowledge-holder in the migration. At month 8–10, when the CoA consolidation is complete but Wave 2 is still being configured, the combination of migration workload and normal month-end pressure creates the highest burnout risk. Senior construction finance professionals have significant market mobility.</td>
+        <td>The payroll for a Corporate Controller at a $75M construction company is below market in roughly 40% of cases. Historically, large-scope projects that add 30–40% to someone's workload without a corresponding compensation adjustment create a 6–12 month resignation window. Meridian's HR and CFO should know whether the Controller is at market rate before Month 2.</td>
+        <td>Retention bonus tied to migration completion milestones. Documented knowledge transfer plan from Month 1. Named backup who shadows every major CoA decision. The backup does not need to be able to do the Controller's job — they need to be able to pick up the documentation and not lose the project.</td>
+      </tr>
+      <tr>
+        <td><strong>Wave 3 federal contract lapse</strong></td>
+        <td><span class="sc-tag sc-risk">Critical risk</span></td>
+        <td>LCPtracker integration starts in Month 8–9 instead of Month 2. Testing reveals unexpected data mapping issues between IES payroll fields and LCPtracker's certified payroll template. Wave 3 go-live is pushed to accommodate a 3-month fix. But during that push, one federal project's certified payroll officer submits directly from IES-formatted data that isn't LCPtracker-validated. The submission is rejected. Non-compliance notice issued.</td>
+        <td>Every multi-state construction company migration with active federal contracts that defers the certified payroll integration past Month 4 encounters this scenario. The integration looks simple from the outside — it is not. IES payroll field names do not map natively to WH-347 fields. LCPtracker requires a dedicated data transformation layer. This takes 3 months minimum when done correctly.</td>
+        <td>Non-negotiable: LCPtracker integration begins Month 2. Assign a dedicated IT resource to this integration only. CPO reviews every test submission. Do not go live in Wave 3 until the CPO has submitted and received acceptance of one complete certified payroll report through IES → LCPtracker → contracting agency.</td>
+      </tr>
+      <tr>
+        <td><strong>Union grievance on fringe benefit calculation</strong></td>
+        <td><span class="sc-tag sc-likely">Likely in Wave 3</span></td>
+        <td>The NY or CA union fringe benefit configuration in IES has a rounding error or a rate that does not precisely match the current CBA. The first remittance cycle (typically monthly) produces a contribution that is $0.02–$0.10 per hour different from what the union benefit fund expects. The benefit fund's contribution tracking system flags the discrepancy. A grievance is filed.</td>
+        <td>This happens in the majority of union payroll migrations. The reason is always the same: the IES configuration was built from the QBDT pay item setup, and the QBDT pay item was configured years ago from memory rather than from the current CBA. CBAs are renegotiated every 3 years. If the CBA was renewed after the QBDT item was created, the QBDT item may already be wrong — and the migration simply carries the error forward into IES.</td>
+        <td>Pull the current signed CBA for each union local before configuring IES pay items. Do not configure from QBDT items — configure from the CBA document. Have the union benefits administrator confirm the contribution rates in writing before the first IES payroll run in Wave 3 states.</td>
+      </tr>
+      <tr>
+        <td><strong>CoA consolidation reveals restatement risk</strong></td>
+        <td><span class="sc-tag sc-likely">Likely in Month 2–3</span></td>
+        <td>The AI diagnostic scans all 10 QBDT files and identifies that 2 acquired branches have been using cash-basis accounting while HQ uses accrual. This means the consolidated P&L that the CFO has been reviewing for 3 years has been mixing accounting methods. The CPA is alerted. A restatement assessment is required before migration proceeds.</td>
+        <td>Acquisition-driven growth without post-acquisition accounting standardisation almost universally results in inconsistent accounting methods across entities. The companies being acquired were typically smaller, less sophisticated operations. Cash basis is common in small construction companies. The larger the acquirer, the more entities it absorbs without auditing their accounting methods.</td>
+        <td>Conduct an accounting method audit of all 10 entities in Month 1 — before the CoA consolidation begins. Engage the CPA as a consultant during this phase, not just for sign-off at the end. If restatements are required, they are far less expensive to complete before migration than after.</td>
+      </tr>
+      <tr>
+        <td><strong>Field worker adoption failure</strong></td>
+        <td><span class="sc-tag sc-likely">Likely in Wave 1</span></td>
+        <td>Field supervisors and foremen on active job sites across TX, AZ, GA, and NC are too busy and too disconnected from office communication channels to complete the IES self-service onboarding and direct deposit re-entry by the deadline. 35–45% of field employees across Wave 1 branches receive paper checks on the first payroll. Several complain to their foremen. Two senior foremen call the branch manager asking why "the new system doesn't work."</td>
+        <td>This is the most consistently underestimated adoption risk in every field-intensive construction migration. The office-based assumption — that employees will check their email and complete an online form on request — fails systematically for field workers. Spanish-speaking employees who receive an English-only email are particularly at risk. The foreman who dismisses the onboarding email as "more corporate paperwork" carries significant influence over their crew.</td>
+        <td>Designate one office-based Champion per job site (not per branch). Run bilingual on-site orientation sessions the week before Wave 1 go-live. Bring printed QR codes to job site trailers. Have the Branch Manager physically present at the largest sites on orientation day. Expect 25% paper check fallback and plan for it rather than trying to eliminate it.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 5. THE LONG VIEW ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">05 —</span>
+    <span class="sec-title">The long view — what a fully realised IES tells Meridian about itself</span>
+    <div class="sec-line"></div>
+    <span class="sec-badge" style="color:var(--blue);border-color:var(--blueb);background:var(--bluel)">Strategic horizon</span>
+  </div>
+
+  <p class="prose">At 24 months post go-live, assuming the migration succeeds on the terms described above, Meridian Building Group has access to a view of its own business that it has never had before. The question is whether the organisation is structured to use it — or whether the insights surface, get noted, and then get buried under the next project deadline.</p>
+
+  <div class="hd-grid">
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--goldl)">💡</div>
+        <div class="hd-card-label" style="color:var(--gold)">The insight that will change bidding strategy</div>
+        <div class="hd-card-title">Which states and project types are actually profitable, adjusted for compliance cost</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">When labour cost by state (including union fringes, prevailing wage supplements, state-specific taxes, and WC premiums) is compared against gross margin by state, the picture is almost certainly different from what the Division VPs believe it is. NY and CA almost certainly look worse. AZ and TX probably look better. The Estimating team can use this data to re-calibrate burdened labour rates per state per trade class — the most impactful single change to bid accuracy available to Meridian.</div>
+        <div class="hd-insight" style="background:var(--goldl);color:#78580A">This is a 10-year strategy decision hidden in a compliance dataset. It is available on Day 90 post-migration if IES is configured to surface it.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--bluel)">📈</div>
+        <div class="hd-card-label" style="color:var(--blue)">The insight that will change cash management</div>
+        <div class="hd-card-title">A statistically grounded cash flow model replacing gut-feel treasury management</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">Nine years of monthly cash position data, combined with the forward-looking retainage collection schedule and AIA billing pipeline in IES, produces a 90-day cash forecast that is genuinely predictive rather than aspirational. The CFO can model: "if we draw $8M on credit in January (as we historically do), and our AIA collections typically run 35 days after submission, our liquidity trough is February 18th." This is portfolio treasury management — currently unavailable because the data is siloed.</div>
+        <div class="hd-insight" style="background:var(--bluel);color:var(--blue)">Available from IES AI Insights on Day 60 post-migration — but only if the historical bank data was migrated completely, including prior-year periods.</div>
+      </div>
+    </div>
+
+    <div class="hd-card">
+      <div class="hd-card-top">
+        <div class="hd-card-icon" style="background:var(--violetl)">🏆</div>
+        <div class="hd-card-label" style="color:var(--violet)">The insight that will change workforce strategy</div>
+        <div class="hd-card-title">Labour productivity by classification, state, and project phase</div>
+      </div>
+      <div class="hd-card-body">
+        <div class="hd-card-body-text">When QB Time hours by classification and job phase are compared against project cost outcomes at scale, patterns emerge that experienced superintendents know intuitively but have never been able to prove quantitatively. Which phases of a commercial renovation project historically have the highest labour overrun? Which crew classifications consistently deliver at or under budget? Is the union premium in NY justified by higher productivity, or is it purely a cost burden? This data exists. It has just never been organised to answer this question.</div>
+        <div class="hd-insight" style="background:var(--violetl);color:var(--violet)">This is a workforce intelligence asset. It takes 12 months of post-migration IES Projects data to generate statistically meaningful results — but the historical QBDT data provides the baseline.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="opinion">
+    <div class="op-label">Final assessment</div>
+    <div class="op-title">Meridian's migration is worth doing. <em>But it must be done with its eyes open.</em></div>
+    <div class="op-text">The migration to IES is the right strategic move for a company at Meridian's scale and trajectory. The fragmented 10-file QBDT architecture is a genuine constraint on the CFO's ability to govern the business, the Controller's ability to close the books efficiently, and the project managers' ability to make real-time margin decisions. IES, when fully configured and adopted, removes all three constraints simultaneously.</div>
+    <div class="op-text">But the migration carries real risks that are proportional to its complexity. The three decisions in Month 1 — executive ownership, programme management, and LCPtracker integration start date — are not administrative details. They are the structural choices that determine whether this migration belongs in the 28% success category or the 45% overrun category. <strong>A company that has run $75M of complex projects across 10 states has the organisational capability to execute this migration successfully. The question is whether it will bring that same project management discipline to the migration itself, or whether it will treat the migration as a lower-priority IT task and discover in Month 14 that the gaps are larger than anticipated.</strong></div>
+    <div class="op-text">Meridian builds things for a living. It knows how to plan a complex project, manage dependencies, engage the right subcontractors at the right time, and deliver to a deadline. The migration is a complex project. Apply the same rigour to it that you would apply to a $20M courthouse renovation — and the outcome is very likely to be successful.</div>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-text"><strong>Meridian Building Group</strong> · Historical Data Intelligence & Critical Migration Assessment · Analyst opinion for internal planning</div>
+  <div class="df-text">Not for distribution · Prepared for CFO and Board review</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><span class="rn-doc cur">02·Historical</span><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><a class="rn-doc" href="meridian-progress-strategy.html">04·Progress</a><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="meridian-migration-assessment.html">← 01</a><a class="rn-arr" href="meridian-flow-strategy.html">03 →</a></div></div>
+</body>
+</html>

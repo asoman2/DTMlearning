@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian · Progress Tracking & Acceptability Strategy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F4F5F9;--s:#FFF;--s2:#F0F2F7;--s3:#E6E9F2;
+  --b:rgba(0,0,0,.07);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.17);
+  --ink:#14202E;--ink2:#3A5068;--ink3:#6B80A0;--ink4:#A4B4C8;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --navy:#0F1E3A;
+  /* The two axes */
+  --comp:#1E40AF;--compl:#EFF2FF;--compb:rgba(30,64,175,.18);
+  --accp:#065F46;--accpl:#ECFDF5;--accpb:rgba(6,95,70,.18);
+  /* Divergence (gap) */
+  --gap:#991B1B;--gapl:#FEF2F2;--gapb:rgba(153,27,27,.15);
+  /* Supporting */
+  --amber:#78350F;--amberl:#FFFBEB;--amberb:rgba(120,53,15,.18);
+  --violet:#4C1D95;--violetl:#F5F3FF;--violetb:rgba(76,29,149,.18);
+  --gold:#92680A;--goldl:#FEFCE8;--goldb:rgba(146,104,10,.18);
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 36px;gap:14px;position:sticky;top:0;z-index:100}
+.nav-mark{width:28px;height:28px;background:var(--comp);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:14px;height:14px}
+.nav-brand{font-size:13px;font-weight:600;color:#fff}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
+.nav-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.nav-sp{flex:1}
+.nav-chips{display:flex;gap:6px}
+.nav-chip{font-size:10px;font-weight:600;padding:3px 9px;border-radius:3px;border:1px solid;white-space:nowrap}
+.nc-comp{background:rgba(30,64,175,.2);border-color:rgba(30,64,175,.35);color:#93C5FD}
+.nc-accp{background:rgba(6,95,70,.2);border-color:rgba(6,95,70,.35);color:#6EE7B7}
+
+/* MASTHEAD */
+.mast{background:linear-gradient(160deg,var(--navy) 0%,#1A2E52 65%,#1E3660 100%);padding:72px 36px 56px;position:relative;overflow:hidden}
+.mast::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 1px,transparent 70px);pointer-events:none}
+.mast-inner{max-width:1120px;margin:0 auto;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:20px}
+.mast-h1{font-family:var(--serif);font-size:clamp(32px,4.5vw,52px);font-weight:400;color:#fff;line-height:1.08;margin-bottom:16px;letter-spacing:-.02em}
+.mast-h1 em{font-style:italic;color:#93C5FD}
+.mast-lead{font-size:15px;color:rgba(255,255,255,.5);line-height:1.78;max-width:680px;margin-bottom:32px}
+
+/* THE CORE INSIGHT BOX */
+.insight-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:22px 26px;max-width:780px;margin-bottom:32px}
+.ib-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:10px}
+.ib-axes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ib-axis{border-radius:8px;padding:14px 16px;border:1px solid}
+.ib-comp{background:rgba(30,64,175,.15);border-color:rgba(30,64,175,.3)}
+.ib-accp{background:rgba(6,95,70,.15);border-color:rgba(6,95,70,.3)}
+.ib-axis-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+.ib-comp .ib-axis-label{color:#93C5FD} .ib-accp .ib-axis-label{color:#6EE7B7}
+.ib-axis-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:4px;line-height:1.3}
+.ib-axis-def{font-size:11px;color:rgba(255,255,255,.45);line-height:1.55}
+.ib-gap-note{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:rgba(255,255,255,.55);line-height:1.6}
+.ib-gap-note strong{color:#FCA5A5}
+
+.mast-stats{display:flex;gap:28px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:22px}
+.ms-val{font-family:var(--serif);font-size:24px;font-weight:400;color:#fff;line-height:1;margin-bottom:3px}
+.ms-lbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em}
+
+/* PAGE */
+.page{max-width:1120px;margin:0 auto;padding:52px 36px 100px}
+
+/* SECTION */
+.sec{margin-bottom:60px}
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:12px;border-bottom:1.5px solid var(--s3)}
+.sec-n{font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.07em}
+.sec-title{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--ink)}
+.sec-line{flex:1}
+.sec-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:3px;border:1px solid}
+
+/* PROSE */
+.prose{font-size:14px;color:var(--ink2);line-height:1.82;margin-bottom:22px;max-width:820px}
+.prose strong{color:var(--ink);font-weight:600}
+
+/* THE 2×2 DIVERGENCE MATRIX */
+.matrix-2x2{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--b2);border:1px solid var(--b2);border-radius:12px;overflow:hidden;box-shadow:var(--sh2);margin-bottom:28px}
+.m2-cell{background:var(--s);padding:20px 22px;border-right:1px solid var(--b2);border-bottom:1px solid var(--b2)}
+.m2-cell:nth-child(2),.m2-cell:nth-child(4){border-right:none}
+.m2-cell:nth-child(3),.m2-cell:nth-child(4){border-bottom:none}
+.m2-axis-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.m2-title{font-size:14px;font-weight:600;margin-bottom:6px;line-height:1.3}
+.m2-desc{font-size:12px;color:var(--ink3);line-height:1.65;margin-bottom:8px}
+.m2-action{font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;border:1px solid;display:inline-block}
+/* Good state */
+.m2-cell.m2-good{background:var(--accpl)}
+.m2-cell.m2-good .m2-title{color:var(--accp)}
+.m2-cell.m2-good .m2-action{background:var(--accpl);color:var(--accp);border-color:var(--accpb)}
+/* Critical gap */
+.m2-cell.m2-critical{background:var(--gapl)}
+.m2-cell.m2-critical .m2-title{color:var(--gap)}
+.m2-cell.m2-critical .m2-action{background:var(--gapl);color:var(--gap);border-color:var(--gapb)}
+/* Ahead of itself */
+.m2-cell.m2-ahead{background:var(--amberl)}
+.m2-cell.m2-ahead .m2-title{color:var(--amber)}
+.m2-cell.m2-ahead .m2-action{background:var(--amberl);color:var(--amber);border-color:var(--amberb)}
+/* Early stage */
+.m2-cell.m2-early{background:var(--s2)}
+.m2-cell.m2-early .m2-title{color:var(--ink2)}
+.m2-cell.m2-early .m2-action{background:var(--s2);color:var(--ink3);border-color:var(--b2)}
+.m2-axis-row{display:flex;align-items:center;justify-content:space-between;padding:8px 22px;background:var(--s2);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4)}
+.m2-corner{background:var(--s2);padding:20px 22px;display:flex;align-items:center;justify-content:center}
+.m2-corner-text{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4)}
+
+/* PERSONA ACCEPTABILITY CARDS */
+.pa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:28px}
+.pa-card{background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .15s}
+.pa-card:hover{box-shadow:var(--sh2)}
+.pa-head{padding:14px 16px 10px;border-bottom:1px solid var(--b)}
+.pa-avatar-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.pa-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--serif)}
+.pa-role{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2}
+.pa-dept{font-size:10px;color:var(--ink3)}
+.pa-acc-def{background:var(--goldl);border:1px solid var(--goldb);border-radius:5px;padding:7px 10px;margin-bottom:0}
+.pa-acc-def-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--gold);margin-bottom:3px}
+.pa-acc-def-text{font-size:12px;color:#78450A;line-height:1.5;font-style:italic;font-weight:500}
+.pa-body{padding:12px 16px}
+.pa-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:6px}
+.pa-signals{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.pa-signal{font-size:11px;color:var(--ink2);display:flex;gap:7px;align-items:flex-start;line-height:1.45}
+.pa-signal::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.pa-signal.sig-behav::before{background:var(--accp)}
+.pa-signal.sig-data::before{background:var(--comp)}
+.pa-signal.sig-voice::before{background:var(--violet)}
+.pa-northstar{background:var(--accpl);border:1px solid var(--accpb);border-radius:5px;padding:7px 10px}
+.pa-northstar-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--accp);margin-bottom:3px}
+.pa-northstar-text{font-size:11px;color:var(--accp);line-height:1.5}
+
+/* SIGNAL TAXONOMY */
+.signal-types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+.sig-type-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.sig-type-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:10px}
+.sig-type-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.sig-type-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.sig-type-desc{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:8px}
+.sig-examples{display:flex;flex-direction:column;gap:3px}
+.sig-ex{font-size:11px;color:var(--ink2);display:flex;gap:5px;align-items:flex-start;line-height:1.4}
+.sig-ex::before{content:'→';font-size:10px;color:var(--ink4);flex-shrink:0;margin-top:1px}
+
+/* ACCEPTABILITY GATE TABLE */
+.acc-gate-table{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.acc-gate-table th{background:var(--navy);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.08)}
+.acc-gate-table td{padding:9px 14px;border-bottom:1px solid var(--b);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.acc-gate-table tr:last-child td{border-bottom:none}
+.acc-gate-table tr:hover td{background:var(--s2)}
+.ag-wave{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+.agw-1{background:var(--accpl);color:var(--accp);border-color:var(--accpb)}
+.agw-2{background:var(--amberl);color:var(--amber);border-color:var(--amberb)}
+.agw-3{background:var(--gapl);color:var(--gap);border-color:var(--gapb)}
+.ag-threshold{font-family:var(--mono);font-size:11px;color:var(--comp);font-weight:500}
+
+/* DASHBOARD WIREFRAME */
+.dashboard-sketch{background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:24px;box-shadow:var(--sh2);margin-bottom:28px;overflow:hidden}
+.ds-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.ds-title::before{content:'';width:3px;height:14px;background:var(--comp);border-radius:2px;flex-shrink:0}
+.ds-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.ds-metric{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:12px 14px}
+.ds-metric-val{font-family:var(--mono);font-size:22px;font-weight:400;line-height:1;margin-bottom:4px}
+.ds-metric-lbl{font-size:11px;color:var(--ink3);margin-bottom:2px}
+.ds-metric-sub{font-size:10px;color:var(--ink4)}
+.ds-comp-val{color:var(--comp)} .ds-accp-val{color:var(--accp)} .ds-gap-val{color:var(--gap)}
+.ds-gap-bar-section{margin-bottom:16px}
+.ds-gap-bar-label{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:8px}
+.ds-gap-row{display:grid;grid-template-columns:120px 1fr 80px;gap:8px;align-items:center;margin-bottom:6px}
+.ds-gap-persona{font-size:12px;color:var(--ink2);font-weight:500}
+.ds-dual-track{height:10px;background:var(--s3);border-radius:5px;overflow:hidden;position:relative}
+.ds-track-comp{height:100%;border-radius:5px;position:absolute;top:0;left:0;opacity:.4}
+.ds-track-acc{height:6px;position:absolute;top:2px;left:0;border-radius:3px}
+.ds-gap-pct{font-family:var(--mono);font-size:10px;text-align:right}
+.ds-gap-positive{color:var(--accp)} .ds-gap-warning{color:var(--amber)} .ds-gap-critical{color:var(--gap)}
+.ds-northstars{background:var(--navy);border-radius:8px;padding:14px 16px}
+.ds-ns-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:10px}
+.ds-ns-items{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ds-ns-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:10px 12px}
+.ds-ns-item-persona{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px}
+.ds-ns-item-scenario{font-size:11px;color:rgba(255,255,255,.7);line-height:1.45;margin-bottom:6px}
+.ds-ns-status{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;display:inline-block}
+.dns-pass{background:rgba(6,95,70,.25);color:#6EE7B7}
+.dns-fail{background:rgba(153,27,27,.25);color:#FCA5A5}
+.dns-pend{background:rgba(30,64,175,.2);color:#93C5FD}
+
+/* DIVERGENCE ESCALATION */
+.escalation-flow{display:flex;flex-direction:column;gap:0;margin-bottom:28px}
+.esc-row{display:grid;grid-template-columns:100px 1fr;gap:0}
+.esc-conn{width:1px;height:16px;background:var(--b2);margin-left:49px}
+.esc-left{display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.esc-circle{width:32px;height:32px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);background:var(--s)}
+.esc-card{background:var(--s);border:1px solid var(--b);border-radius:9px;margin:8px 0 8px 14px;padding:14px 18px;box-shadow:var(--sh)}
+.esc-threshold{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+.esc-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.esc-desc{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:8px}
+.esc-actions{display:flex;gap:6px;flex-wrap:wrap}
+.esc-action{font-size:10px;font-weight:500;padding:3px 8px;border-radius:3px;background:var(--s2);border:1px solid var(--b);color:var(--ink3)}
+
+/* VOICE OF PARTICIPANT */
+.vop-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.vop-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.vop-moment{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+.vop-q{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:8px;line-height:1.4;font-style:italic}
+.vop-q::before{content:'"';font-family:var(--serif);font-size:20px;color:var(--ink4);line-height:0;vertical-align:-6px;margin-right:2px}
+.vop-q::after{content:'"';font-family:var(--serif);font-size:20px;color:var(--ink4);line-height:0;vertical-align:-6px;margin-left:2px}
+.vop-format{font-size:12px;color:var(--ink3);margin-bottom:6px}
+.vop-scoring{font-size:11px;color:var(--ink2);background:var(--s2);border-radius:5px;padding:7px 10px;line-height:1.55}
+.vop-who{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.vop-persona{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--s2);color:var(--ink3);border:1px solid var(--b)}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:13px 17px;margin-bottom:18px;display:flex;gap:11px;align-items:flex-start}
+.callout svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;line-height:1.65}
+.callout-text strong{font-weight:600}
+.co-comp{background:var(--compl);border:1px solid var(--compb)} .co-comp svg,.co-comp .callout-text{color:#1E3A8A} .co-comp .callout-text strong{color:var(--comp)}
+.co-accp{background:var(--accpl);border:1px solid var(--accpb)} .co-accp svg{color:var(--accp)} .co-accp .callout-text{color:#064E3B} .co-accp .callout-text strong{color:var(--accp)}
+.co-gap{background:var(--gapl);border:1px solid var(--gapb)} .co-gap svg{color:var(--gap)} .co-gap .callout-text{color:#7F1D1D} .co-gap .callout-text strong{color:var(--gap)}
+.co-gold{background:var(--goldl);border:1px solid var(--goldb)} .co-gold svg{color:var(--gold)} .co-gold .callout-text{color:#78450A} .co-gold .callout-text strong{color:var(--gold)}
+
+/* TABLE */
+.plain-table{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-bottom:28px;font-size:12px}
+.plain-table th{background:var(--s2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1px solid var(--b2)}
+.plain-table td{padding:9px 14px;border-bottom:1px solid var(--b);vertical-align:top;line-height:1.55;color:var(--ink2)}
+.plain-table tr:last-child td{border-bottom:none}
+.plain-table tr:hover td{background:var(--s2)}
+
+/* FOOTER */
+.doc-footer{background:var(--navy);padding:24px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.df-t{font-size:11px;color:rgba(255,255,255,.3)}
+.df-t strong{color:rgba(255,255,255,.55)}
+
+@media(max-width:860px){
+  .nav,.mast,.page,.doc-footer{padding-left:20px;padding-right:20px}
+  .ib-axes,.m2-grid,.signal-types,.ds-grid,.ds-ns-items,.vop-grid{grid-template-columns:1fr}
+  .pa-grid{grid-template-columns:1fr}
+  .mast-h1{font-size:30px}
+  .ds-gap-row{grid-template-columns:100px 1fr 60px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L2 4v6l5 3 5-3V4L7 1z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 1v12M2 4l5 3 5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <span class="nav-brand">Meridian Building Group</span>
+  <div class="nav-sep"></div>
+  <span class="nav-sub">Progress Tracking & Acceptability Strategy</span>
+  <div class="nav-sp"></div>
+  <div class="nav-chips">
+    <span class="nav-chip nc-comp">Technical completion</span>
+    <span class="nav-chip nc-accp">Participant acceptability</span>
+  </div>
+</nav>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-kicker">Progress strategy · Dual-axis model · Acceptability-first</div>
+    <h1 class="mast-h1">Progress is not completion.<br><em>Acceptability</em> is progress.</h1>
+    <p class="mast-lead">A migration that is 80% technically complete but only 30% accepted by its participants has not migrated at all — it has created a parallel system that nobody trusts. This strategy defines how progress is measured on two independent axes simultaneously, and how divergence between them triggers escalation before it becomes failure.</p>
+
+    <div class="insight-box">
+      <div class="ib-label">The two independent axes — both must be tracked, neither can substitute for the other</div>
+      <div class="ib-axes">
+        <div class="ib-axis ib-comp">
+          <div class="ib-axis-label">Axis 1</div>
+          <div class="ib-axis-title">Technical completion</div>
+          <div class="ib-axis-def">Have the steps been executed? Data migrated, configurations applied, APIs verified, parallel runs passed. Measurable, objective, binary per step. Easy to track. Easy to over-report.</div>
+        </div>
+        <div class="ib-axis ib-accp">
+          <div class="ib-axis-label">Axis 2</div>
+          <div class="ib-axis-title">Participant acceptability</div>
+          <div class="ib-axis-def">Do the people who depend on this migration believe it is working correctly for them? Behavioural signals, north-star scenario tests, voice of participant, adoption patterns. Harder to measure. Impossible to fake.</div>
+        </div>
+      </div>
+      <div class="ib-gap-note"><strong>The gap between these two axes is the real risk metric.</strong> When technical completion races ahead of participant acceptability, the migration is building a system people will work around, not with. The gap is the early warning signal. Catching it at 15% divergence is a conversation. Catching it at 50% divergence is a programme restart.</div>
+    </div>
+
+    <div class="mast-stats">
+      <div><div class="ms-val">2</div><div class="ms-lbl">Progress axes tracked</div></div>
+      <div><div class="ms-val">14</div><div class="ms-lbl">Acceptability definitions</div></div>
+      <div><div class="ms-val">3</div><div class="ms-lbl">Signal types per persona</div></div>
+      <div><div class="ms-val">4</div><div class="ms-lbl">Divergence thresholds</div></div>
+      <div><div class="ms-val">12</div><div class="ms-lbl">North-star scenarios</div></div>
+      <div><div class="ms-val">8</div><div class="ms-lbl">Voice of participant moments</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<!-- ══ 1. THE DIVERGENCE MATRIX ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">01 —</span>
+    <span class="sec-title">The divergence matrix — four states a migration can be in</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--comp);border-color:var(--compb);background:var(--compl)">Core model</span>
+  </div>
+
+  <p class="prose">At any given point in the programme, each wave — and each persona within that wave — sits in one of four states defined by the relationship between technical completion and participant acceptability. The migration dashboard should always show where each wave and each persona sits in this matrix. The worst state is not "low completion, low acceptance" — that is expected early in the programme. The worst state is "high completion, low acceptance" — the migration has happened, but the participants haven't accepted it.</p>
+
+  <div class="matrix-2x2">
+    <!-- Axis labels -->
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr">
+      <div class="m2-axis-row">↑ High technical completion</div>
+      <div class="m2-axis-row">↑ High technical completion</div>
+    </div>
+    <!-- Row 1 -->
+    <div class="m2-cell m2-ahead">
+      <div class="m2-axis-label"><span style="font-size:11px">←</span> Low acceptability · High completion</div>
+      <div class="m2-title">Running ahead of trust</div>
+      <div class="m2-desc">The technical migration has executed but participants don't yet believe it's working for them. Common at 2–4 weeks post go-live. The most dangerous state if left unaddressed — this is where workarounds are built and parallel QBDT usage begins.</div>
+      <div class="m2-action">Acceptability intervention required immediately</div>
+    </div>
+    <div class="m2-cell m2-good">
+      <div class="m2-axis-label"><span style="font-size:11px">→</span> High acceptability · High completion</div>
+      <div class="m2-title">Migration success</div>
+      <div class="m2-desc">Technical migration is complete and participants have accepted it as their system of record. This is the only state in which QBDT decommission should proceed. Participants are using IES daily, north-star scenarios pass, voice of participant is positive.</div>
+      <div class="m2-action">Proceed to next stage or wave</div>
+    </div>
+    <!-- Row 2 -->
+    <div class="m2-cell m2-critical">
+      <div class="m2-axis-label"><span style="font-size:11px">←</span> Low acceptability · Low completion</div>
+      <div class="m2-title">Early resistance</div>
+      <div class="m2-desc">Migration has barely started and participants are already resistant. This is the signal that the pre-migration benefit communication failed — people don't yet understand why IES is better for them. Requires going back to motivation, not forward to configuration.</div>
+      <div class="m2-action">Return to benefit communication — benefit before instruction</div>
+    </div>
+    <div class="m2-cell m2-early">
+      <div class="m2-axis-label"><span style="font-size:11px">→</span> High acceptability · Low completion</div>
+      <div class="m2-title">Good foundation</div>
+      <div class="m2-desc">Participants are open and willing but the technical work isn't done yet. The healthiest early state — the benefit communication worked, Champions are effective, people are curious about IES. Continue at pace without rushing.</div>
+      <div class="m2-action">Continue — do not rush completion at cost of quality</div>
+    </div>
+    <!-- Axis bottom label -->
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr">
+      <div class="m2-axis-row">← Low acceptability</div>
+      <div class="m2-axis-row">High acceptability →</div>
+    </div>
+  </div>
+
+  <div class="callout co-gap">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1 12h11L6.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.5 5v3.5M6.5 10v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>The "running ahead of trust" state is the hidden failure mode in every complex migration.</strong> A Programme Manager who only tracks technical completion will see 90% progress and call the migration successful. The Controller who doesn't trust the consolidated P&L, the field supervisors who are still calling HR for pay stubs, the union payroll administrator submitting from a spreadsheet because they don't trust IES — these are invisible in a completion-only tracking system. The dual-axis model makes them visible before they become permanent.</div>
+  </div>
+</section>
+
+<!-- ══ 2. PERSONA ACCEPTABILITY DEFINITIONS ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">02 —</span>
+    <span class="sec-title">Acceptability defined — per persona, before migration begins</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--accp);border-color:var(--accpb);background:var(--accpl)">Pre-agreed definitions</span>
+  </div>
+
+  <p class="prose">Acceptability cannot be measured retrospectively. Each persona's definition of "this migration is working for me" must be agreed, written down, and baselined <strong>before the migration begins</strong> — ideally in Month 1 of the programme, as part of the Wave 0 setup. These definitions become the north-star scenarios that prove acceptability at each gate. They are not subjective: each definition produces a testable scenario with a pass/fail outcome.</p>
+
+  <div class="pa-grid">
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--comp)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--compl);color:var(--comp)">CFO</div><div><div class="pa-role">CFO — Tom Vasquez</div><div class="pa-dept">Executive</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"I open IES on a Monday morning and see the consolidated P&L across all 10 states — current as of Friday close — without waiting for a spreadsheet."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals (3 types)</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-behav">Has not requested the Excel P&L from the Controller in 14+ days</div>
+          <div class="pa-signal sig-data">IES multi-entity dashboard accessed ≥3× per week in usage logs</div>
+          <div class="pa-signal sig-voice">In 30-day check-in: "I can see what I need without asking anyone"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">CFO opens IES on a Monday, navigates to multi-entity dashboard, finds current week P&L by state and division, drills into one job that is flagging over budget — under 5 minutes.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--violet)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--violetl);color:var(--violet)">CON</div><div><div class="pa-role">Corporate Controller</div><div class="pa-dept">Finance</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"I closed the books for every entity in 6 days or fewer — and the Balance Sheet tied to the opening balance Karen Alvarez approved."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-behav">First monthly close in IES completed ≤6 days</div>
+          <div class="pa-signal sig-data">IES Balance Sheet matches opening balance sign-off within $0 variance</div>
+          <div class="pa-signal sig-voice">"The WIP schedule ties and I haven't had to go back into QBDT to check anything"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">Controller runs the first monthly close in IES: Balance Sheet, P&L, A/R Aging, A/P Aging, WIP Schedule. All tie to the QBDT baseline. Close completed by Day 6.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--accp)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--accpl);color:var(--accp)">PAY</div><div><div class="pa-role">Payroll Manager</div><div class="pa-dept">Finance · Multi-state</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"Every employee across all 10 states was paid correctly on the first live IES payroll. No employee called about a paycheck error."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-behav">Zero payroll error escalations in first 3 live payroll runs</div>
+          <div class="pa-signal sig-data">IES YTD matches QBDT baseline for all 210 employees ±$0</div>
+          <div class="pa-signal sig-voice">"I ran the second payroll without the co-pilot and it was fine"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">Payroll Manager runs the Wave 1 first live payroll (100 employees, 4 states) independently — no co-pilot — on the second run. All employees paid correctly. No payroll tax errors. Direct deposits confirmed.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--accp)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--accpl);color:var(--accp)">CPO</div><div><div class="pa-role">Certified Payroll Officer</div><div class="pa-dept">Compliance · Federal contracts</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"I submitted a certified payroll report through LCPtracker using IES data and the contracting agency accepted it without a reject notice."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-data">LCPtracker receives IES payroll data without field mapping errors</div>
+          <div class="pa-signal sig-data">WH-347 submission accepted by contracting agency — no rejection</div>
+          <div class="pa-signal sig-voice">"I don't have to manually correct any fields before submitting"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario · Wave 3 gate</div><div class="pa-northstar-text">CPO submits one complete certified payroll report for an active CA or NY federal project. IES → LCPtracker → contracting agency. Report accepted. CPO signs Wave 3 go-live gate.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--amber)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--amberl);color:var(--amber)">PM</div><div><div class="pa-role">Project Managers (×15–20)</div><div class="pa-dept">Operations · Job cost</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"I can see my job's cost-to-date against budget right now — not at month-end. I caught something I wouldn't have caught in QBDT."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-behav">PM opens IES Projects dashboard ≥3× per week in first 30 days</div>
+          <div class="pa-signal sig-behav">PM creates at least 1 progress invoice in IES (not via Procore workaround)</div>
+          <div class="pa-signal sig-voice">"I found a cost overrun before month-end because of IES"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">PM navigates to their active job in IES Projects, views cost-to-date vs budget by phase, identifies one line over budget, creates a progress billing application — all without help or reference material.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--gold)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--goldl);color:var(--gold)">CPA</div><div><div class="pa-role">Karen Alvarez, CPA</div><div class="pa-dept">External · Mitchell & Park LLP</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"The IES opening balances I confirmed match the QBDT final Trial Balance. I can produce a clean audit trail from the migration date forward."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-data">IES Opening Balance = QBDT Final Trial Balance ±$0</div>
+          <div class="pa-signal sig-data">Audit trail continuous from migration date — no gaps</div>
+          <div class="pa-signal sig-voice">Signed opening balance confirmation — not verbal, written</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario · Gate</div><div class="pa-northstar-text">Karen Alvarez runs Balance Sheet, P&L, and Trial Balance in IES as of migration date. All balances match the QBDT final reports she exported pre-migration. She signs the opening balance confirmation document.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--accp)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--accpl);color:var(--accp)">FLD</div><div><div class="pa-role">Field Supervisors / Foremen</div><div class="pa-dept">On-site · 20+ crew leads</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"My paycheck arrived on time and I can see my pay stub on my phone without calling anyone."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-data">Pay History accessed on mobile within 7 days of first live IES payroll</div>
+          <div class="pa-signal sig-behav">Zero calls to HR asking for pay stubs in weeks 2–4</div>
+          <div class="pa-signal sig-voice">"I found my stub. It was easy." (spoken to foreman)</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">Field supervisor opens the IES self-service link on their phone, finds their most recent pay stub, can identify their gross pay, deductions, and net pay. Under 3 minutes, no help needed.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--gap)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--gapl);color:var(--gap)">UNI</div><div><div class="pa-role">Union Stewards (×5 locals)</div><div class="pa-dept">Wave 3 · CA, NY, WA, OH, CO</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"The first IES remittance to our benefit fund matched the contribution rates in our current CBA to the cent. No discrepancy notice."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-data">First benefit fund remittance matches CBA schedule ±$0.00 per hour</div>
+          <div class="pa-signal sig-data">No grievance filed within 60 days of Wave 3 go-live</div>
+          <div class="pa-signal sig-voice">Union steward confirms remittance in writing</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario · Wave 3 gate</div><div class="pa-northstar-text">Payroll Manager runs first union payroll in IES. Fringe benefit contribution amounts (health, pension, training, vacation) are calculated per the CBA schedule. Union steward reviews and confirms. No discrepancy.</div></div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-head" style="border-top:3px solid var(--comp)">
+        <div class="pa-avatar-row"><div class="pa-avatar" style="background:var(--compl);color:var(--comp)">BRM</div><div><div class="pa-role">Branch Managers (×10)</div><div class="pa-dept">Regional · State-level P&L owners</div></div></div>
+        <div class="pa-acc-def"><div class="pa-acc-def-label">Acceptability means</div><div class="pa-acc-def-text">"My branch payroll ran correctly and my team didn't come to me with questions I couldn't answer."</div></div>
+      </div>
+      <div class="pa-body">
+        <div class="pa-section-label">Acceptability signals</div>
+        <div class="pa-signals">
+          <div class="pa-signal sig-behav">Zero branch-level payroll escalations in first two live runs</div>
+          <div class="pa-signal sig-behav">Champion is answering questions without involving Branch Manager</div>
+          <div class="pa-signal sig-voice">"The transition was quieter than I expected"</div>
+        </div>
+        <div class="pa-northstar"><div class="pa-northstar-label">North-star scenario</div><div class="pa-northstar-text">Branch Manager's team completes the first week in IES without escalating any issue to corporate. Champion resolves all questions locally. Branch Manager's Monday morning check-in with the team produces no IES complaints.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 3. SIGNAL TAXONOMY ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">03 —</span>
+    <span class="sec-title">Signal taxonomy — three types of acceptability evidence</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--accp);border-color:var(--accpb);background:var(--accpl)">How we measure</span>
+  </div>
+
+  <p class="prose">Acceptability cannot be self-reported alone — people say they have accepted something before they have, especially in professional settings where admitting difficulty feels like failing. The strategy uses three independent signal types that triangulate acceptability from different angles. Only when all three point in the same direction is the acceptability score reliable.</p>
+
+  <div class="signal-types">
+    <div class="sig-type-card">
+      <div class="sig-type-icon" style="background:var(--accpl)">👁</div>
+      <div class="sig-type-label" style="color:var(--accp)">Type 1 · Behavioural</div>
+      <div class="sig-type-title">What people do — not what they say</div>
+      <div class="sig-type-desc">Usage patterns that reveal whether participants have genuinely adopted IES as their working system, or are using it only because they have to while maintaining QBDT as their reference. Behavioural signals are the hardest to fake and the most predictive of long-term adoption.</div>
+      <div class="sig-examples">
+        <div class="sig-ex">CFO has not requested the Excel P&L consolidation in 14 days</div>
+        <div class="sig-ex">PM accesses IES Projects 3+ times per week (usage logs)</div>
+        <div class="sig-ex">Field supervisor has not called HR for a pay stub in 7 days</div>
+        <div class="sig-ex">Payroll Manager ran the second payroll without the co-pilot</div>
+        <div class="sig-ex">Controller ran monthly close without opening QBDT to check figures</div>
+      </div>
+    </div>
+
+    <div class="sig-type-card">
+      <div class="sig-type-icon" style="background:var(--compl)">📊</div>
+      <div class="sig-type-label" style="color:var(--comp)">Type 2 · Data comparison</div>
+      <div class="sig-type-title">IES output vs QBDT baseline — objective verification</div>
+      <div class="sig-type-desc">Systematic comparison of IES outputs against pre-migration QBDT baselines. These are objective, binary, and non-negotiable. A YTD that doesn't match is not an opinion — it's a fact. Data comparison signals are the foundation of financial and payroll acceptability.</div>
+      <div class="sig-examples">
+        <div class="sig-ex">IES Balance Sheet = QBDT baseline ± $0 (per entity)</div>
+        <div class="sig-ex">IES YTD per employee = QBDT Payroll Summary ± $0</div>
+        <div class="sig-ex">IES A/R Aging = QBDT A/R Aging (total + individual invoices)</div>
+        <div class="sig-ex">Fringe benefit remittance = CBA schedule ± $0.00 per hour</div>
+        <div class="sig-ex">LCPtracker WH-347 accepted by contracting agency (no reject)</div>
+      </div>
+    </div>
+
+    <div class="sig-type-card">
+      <div class="sig-type-icon" style="background:var(--violetl)">💬</div>
+      <div class="sig-type-label" style="color:var(--violet)">Type 3 · Voice of participant</div>
+      <div class="sig-type-title">Structured sentiment at defined moments — not surveys</div>
+      <div class="sig-type-desc">Not a satisfaction survey. Structured questions asked at specific defined moments by the Champion or PS team. Each question has a qualitative answer that maps to an acceptability signal. The questions are designed to surface the "running ahead of trust" state before it becomes visible in behavioural or data signals.</div>
+      <div class="sig-examples">
+        <div class="sig-ex">7-day check-in: "What have you needed to look up in QBDT since go-live?"</div>
+        <div class="sig-ex">14-day check-in: "Is there anything you're doing outside of IES that you expected to do inside it?"</div>
+        <div class="sig-ex">30-day check-in: "If IES went offline for a day, which of your tasks would stop?"</div>
+        <div class="sig-ex">60-day check-in: "Name one thing IES shows you that QBDT didn't."</div>
+        <div class="sig-ex">90-day check-in: "What would need to be true for you to call this migration successful?"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout co-gold">
+    <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 5.5v3.5M6.5 4v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div class="callout-text"><strong>The 30-day voice of participant question is the most diagnostic.</strong> "If IES went offline for a day, which of your tasks would stop?" A participant who has genuinely accepted IES names several critical tasks. A participant who hasn't says "I'd switch back to QBDT" or "I'm not sure." This question reveals the degree of dependency — and dependency is the operational definition of acceptance. The Programme Manager should read every answer to this question personally, not receive a summary.</div>
+  </div>
+</section>
+
+<!-- ══ 4. THE PROGRESS DASHBOARD ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">04 —</span>
+    <span class="sec-title">The progress dashboard — visualising both axes simultaneously</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--comp);border-color:var(--compb);background:var(--compl)">Programme Manager view</span>
+  </div>
+
+  <p class="prose">The Programme Manager's dashboard is the operational expression of the dual-axis model. It shows both completion and acceptability for every persona and every wave at a glance. The key visual treatment: two overlapping bars per row — a wider lighter bar for technical completion, a narrower stronger bar for acceptability. When they are the same width, the migration is in alignment. When the completion bar significantly exceeds the acceptability bar, the gap is the problem.</p>
+
+  <div class="dashboard-sketch">
+    <div class="ds-title">Programme progress dashboard — dual-axis per persona</div>
+
+    <div class="ds-grid">
+      <div class="ds-metric"><div class="ds-metric-val ds-comp-val">73%</div><div class="ds-metric-lbl">Technical completion</div><div class="ds-metric-sub">Wave 1 average across all stages</div></div>
+      <div class="ds-metric"><div class="ds-metric-val ds-accp-val">61%</div><div class="ds-metric-lbl">Participant acceptability</div><div class="ds-metric-sub">Weighted average — 9 personas, Wave 1</div></div>
+      <div class="ds-metric"><div class="ds-metric-val ds-gap-val">+12%</div><div class="ds-metric-lbl">Divergence gap</div><div class="ds-metric-sub">Completion running ahead of acceptance · Monitor closely</div></div>
+    </div>
+
+    <div class="ds-gap-bar-section">
+      <div class="ds-gap-bar-label">Completion (light) vs Acceptability (strong) — per persona · Wave 1</div>
+
+      <!-- CFO -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">CFO</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:90%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:85%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-positive">90% / 85%</div>
+      </div>
+      <!-- Controller -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">Controller</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:80%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:52%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-critical">80% / 52% ⚠</div>
+      </div>
+      <!-- Payroll Mgr -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">Payroll Manager</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:75%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:68%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-positive">75% / 68%</div>
+      </div>
+      <!-- Project Managers -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">Project Managers</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:65%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:38%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-critical">65% / 38% ⚠</div>
+      </div>
+      <!-- Field -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">Field supervisors</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:70%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:64%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-warning">70% / 64%</div>
+      </div>
+      <!-- Branch Mgrs -->
+      <div class="ds-gap-row">
+        <div class="ds-gap-persona">Branch Managers</div>
+        <div class="ds-dual-track">
+          <div class="ds-track-comp" style="width:72%;background:var(--comp)"></div>
+          <div class="ds-track-acc" style="width:70%;background:var(--accp)"></div>
+        </div>
+        <div class="ds-gap-pct ds-gap-positive">72% / 70%</div>
+      </div>
+    </div>
+
+    <div class="ds-northstars">
+      <div class="ds-ns-label">North-star scenario status — Wave 1</div>
+      <div class="ds-ns-items">
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">CFO</div><div class="ds-ns-item-scenario">Open IES, find consolidated P&L by state — under 5 min</div><div class="ds-ns-status dns-pass">Passed</div></div>
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">Controller</div><div class="ds-ns-item-scenario">First monthly close in IES — ≤6 days, all reports tie</div><div class="ds-ns-status dns-fail">Not yet run</div></div>
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">Payroll Manager</div><div class="ds-ns-item-scenario">Second live payroll — independent, zero errors</div><div class="ds-ns-status dns-pass">Passed</div></div>
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">Project Managers</div><div class="ds-ns-item-scenario">Navigate to job, check cost, create invoice — no help</div><div class="ds-ns-status dns-fail">2 of 8 passed</div></div>
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">Field supervisors</div><div class="ds-ns-item-scenario">Find pay stub on phone — under 3 min</div><div class="ds-ns-status dns-pass">18 of 22 passed</div></div>
+        <div class="ds-ns-item"><div class="ds-ns-item-persona">Branch Managers</div><div class="ds-ns-item-scenario">Zero escalations in first week</div><div class="ds-ns-status dns-pend">In progress</div></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="prose">The dashboard reveals the two critical divergence cases in this example: the Controller (80% complete / 52% accepted — monthly close hasn't run yet, WIP concerns) and Project Managers (65% / 38% — only 2 of 8 have passed the north-star scenario). These are not surprises at this stage; they are expected transitions. The value of the dashboard is surfacing them at Day 14 rather than Day 60.</p>
+</section>
+
+<!-- ══ 5. ACCEPTABILITY GATES ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">05 —</span>
+    <span class="sec-title">Acceptability gates — what must be true before each wave advances</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--gap);border-color:var(--gapb);background:var(--gapl)">Non-negotiable thresholds</span>
+  </div>
+
+  <p class="prose">Technical completion gates (pre-flight passed, YTD validated, CoA signed off) already exist in the migration flow. Acceptability gates are the complement: explicit thresholds that participant acceptability must meet before each major programme advance. These are not optional reviews — they are hard stops that the Programme Manager cannot override without CFO-level escalation.</p>
+
+  <table class="acc-gate-table">
+    <thead><tr><th style="width:12%">Gate</th><th style="width:12%">Wave</th><th style="width:22%">Technical threshold (already in flow)</th><th style="width:22%">Acceptability threshold (new)</th><th style="width:18%">Measured by</th><th style="width:14%">Override authority</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Wave 0 → Wave 1 unlock</strong></td>
+        <td><span class="ag-wave agw-1">Wave 0</span></td>
+        <td>Multi-entity architecture decided. 10-file AI scans complete. CoA design agreed. LCPtracker integration started.</td>
+        <td>CFO has seen the Programme Dashboard and confirmed understanding of the dual-axis model. Programme Manager appointed. All 14 persona acceptability definitions documented and agreed.</td>
+        <td>Written confirmation from CFO. Signed acceptability definition document.</td>
+        <td>Board only</td>
+      </tr>
+      <tr>
+        <td><strong>Wave 1 go-live</strong></td>
+        <td><span class="ag-wave agw-1">Wave 1</span></td>
+        <td>CoA CPA sign-off. YTD validation complete. Parallel dry run passed. 5 clean parallel nights.</td>
+        <td><span class="ag-threshold">≥80%</span> acceptability score for Payroll Manager (3 signal types). CFO north-star scenario passed. ≥70% of field supervisors have accessed Pay History. Zero "running back to QBDT" behaviours in 14-day observation window.</td>
+        <td>Programme Manager + PS Customer Success Manager</td>
+        <td>CFO + CPA</td>
+      </tr>
+      <tr>
+        <td><strong>QBDT decommission · Wave 1 entities</strong></td>
+        <td><span class="ag-wave agw-1">Wave 1</span></td>
+        <td>5 consecutive clean parallel nights. First monthly close in IES complete.</td>
+        <td><span class="ag-threshold">≥90%</span> acceptability for Controller (first close ≤6 days, all reports tie). CFO has not requested Excel P&L in 14+ days. Branch Managers all confirm "quiet first week" in voice of participant check-in.</td>
+        <td>Programme Manager reviews dual-axis dashboard. Named sign-off from Controller and CFO.</td>
+        <td>CFO only</td>
+      </tr>
+      <tr>
+        <td><strong>Wave 2 go-live</strong></td>
+        <td><span class="ag-wave agw-2">Wave 2</span></td>
+        <td>CO FAMLI pay items validated. OH municipal tax per-city confirmed. FL preliminary notice workflow tested.</td>
+        <td>Wave 1 acceptability must be stable (no regression in 30-day observation window). OH Branch Manager has completed the north-star scenario. Payroll Manager has run OH union payroll at least once independently.</td>
+        <td>Programme Manager. Ohio union steward expert consultation completed.</td>
+        <td>CFO + Controller</td>
+      </tr>
+      <tr>
+        <td><strong>Wave 3 go-live</strong></td>
+        <td><span class="ag-wave agw-3">Wave 3</span></td>
+        <td>LCPtracker integration complete and tested. All 5 union CBAs configured. WA L&I manual process documented. CA DIR test submission accepted.</td>
+        <td><span class="ag-threshold">100%</span> CPO acceptability — one complete WH-347 accepted by contracting agency. All 5 union stewards have confirmed fringe benefit rates in writing. WA L&I manual process has a named owner who has completed one mock quarterly calculation.</td>
+        <td>CPO holds individual veto. Each union steward holds individual veto for their CBA. Programme Manager cannot override.</td>
+        <td>CFO. CPO and union steward vetoes cannot be overridden.</td>
+      </tr>
+      <tr>
+        <td><strong>Full programme closure</strong></td>
+        <td><span class="ag-wave agw-3">All waves</span></td>
+        <td>All 3 waves decommissioned. QBDT files archived. Migration sign-off document generated.</td>
+        <td>All 14 acceptability definitions must show ≥80% score. CFO confirms consolidated reporting replaces Excel permanently. All north-star scenarios passed for all waves. 90-day post-go-live monitoring complete.</td>
+        <td>Programme Manager + PS Customer Success Manager. Review with CFO.</td>
+        <td>CFO + Board</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 6. DIVERGENCE ESCALATION ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">06 —</span>
+    <span class="sec-title">Divergence escalation — what happens when completion outpaces acceptance</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--gap);border-color:var(--gapb);background:var(--gapl)">Escalation model</span>
+  </div>
+
+  <p class="prose">The divergence between technical completion and participant acceptability is measured as a percentage gap. Four thresholds trigger progressively more serious responses. The key design principle: earlier thresholds are responses, not alarms. The programme should not feel like it is in crisis every time a gap appears — gaps are expected, especially in the first 2 weeks of each wave. The escalation model distinguishes between expected divergence (which is managed) and persistent divergence (which is a programme risk).</p>
+
+  <div class="escalation-flow">
+    <div class="esc-row">
+      <div class="esc-left"><div class="esc-circle" style="border-color:var(--accp);color:var(--accp)">≤10</div></div>
+      <div class="esc-card" style="border-left:3px solid var(--accp)">
+        <div class="esc-threshold" style="color:var(--accp)">Divergence ≤10% — expected state</div>
+        <div class="esc-title">Normal transition — monitor, no action required</div>
+        <div class="esc-desc">Technical completion will always lead acceptability slightly, especially in the first 1–2 weeks of each wave. A gap of 10% or less is healthy: the migration is proceeding at the right pace. The Champion is managing the transition. No escalation. Note in daily digest.</div>
+        <div class="esc-actions">
+          <span class="esc-action">Daily digest note</span>
+          <span class="esc-action">Champion monitors</span>
+          <span class="esc-action">No programme-level action</span>
+        </div>
+      </div>
+    </div>
+    <div class="esc-conn"></div>
+
+    <div class="esc-row">
+      <div class="esc-left"><div class="esc-circle" style="border-color:var(--amber);color:var(--amber)">10–20</div></div>
+      <div class="esc-card" style="border-left:3px solid var(--amber)">
+        <div class="esc-threshold" style="color:var(--amber)">Divergence 10–20% — managed response</div>
+        <div class="esc-title">Acceptability lagging — Champion intervention within 48 hours</div>
+        <div class="esc-desc">Completion is noticeably ahead of acceptance. This is the "running ahead of trust" zone. The Champion for the affected persona group makes personal outreach within 48 hours — not an email, a conversation. The voice of participant question for this window is asked: "What have you needed to look up in QBDT since go-live?" The answer diagnoses the specific gap. Response is targeted to the diagnosed gap.</div>
+        <div class="esc-actions">
+          <span class="esc-action">Champion personal outreach ≤48h</span>
+          <span class="esc-action">Voice of participant question asked</span>
+          <span class="esc-action">Gap diagnosis → targeted response</span>
+          <span class="esc-action">Programme Manager notified</span>
+        </div>
+      </div>
+    </div>
+    <div class="esc-conn"></div>
+
+    <div class="esc-row">
+      <div class="esc-left"><div class="esc-circle" style="border-color:var(--gap);color:var(--gap)">20–35</div></div>
+      <div class="esc-card" style="border-left:3px solid var(--gap)">
+        <div class="esc-threshold" style="color:var(--gap)">Divergence 20–35% — PS team intervention</div>
+        <div class="esc-title">Significant gap — PS specialist assigned to the specific persona within 24 hours</div>
+        <div class="esc-desc">A 20%+ gap means the Champion is not sufficient to close the acceptability deficit. A PS specialist with domain expertise relevant to that persona is assigned — not a general helpdesk resource. The north-star scenario for this persona is scheduled and run within 5 business days. Until it passes, the wave cannot advance to its next stage. The gap is surfaced to the Division VP for that persona group.</div>
+        <div class="esc-actions">
+          <span class="esc-action">PS specialist assigned ≤24h</span>
+          <span class="esc-action">North-star scenario scheduled ≤5 days</span>
+          <span class="esc-action">Wave stage advance blocked</span>
+          <span class="esc-action">Division VP notified</span>
+          <span class="esc-action">Daily monitoring until resolved</span>
+        </div>
+      </div>
+    </div>
+    <div class="esc-conn"></div>
+
+    <div class="esc-row">
+      <div class="esc-left"><div class="esc-circle" style="border-color:var(--gap);color:var(--gap);font-size:9px">35+</div></div>
+      <div class="esc-card" style="border-left:3px solid var(--gap);background:var(--gapl)">
+        <div class="esc-threshold" style="color:var(--gap)">Divergence &gt;35% — programme-level escalation</div>
+        <div class="esc-title">Programme risk — CFO briefed, wave advancement blocked, root cause review within 48 hours</div>
+        <div class="esc-desc">A gap above 35% is a programme risk signal, not just a persona-level adoption issue. It means a fundamental assumption about the migration — whether about readiness, about the IES configuration, or about change management — was wrong. The Programme Manager briefs the CFO within 24 hours. A root cause review (not a post-mortem — this is still in flight) is completed within 48 hours. The review produces three options: pause and remediate, descope the affected persona from this wave, or accept the gap with a written plan to close it within 30 days.</div>
+        <div class="esc-actions">
+          <span class="esc-action">CFO briefed ≤24h</span>
+          <span class="esc-action">Wave advancement blocked until resolved</span>
+          <span class="esc-action">Root cause review ≤48h</span>
+          <span class="esc-action">3 options presented: remediate / descope / accept with plan</span>
+          <span class="esc-action">Written resolution plan required</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. VOICE OF PARTICIPANT ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">07 —</span>
+    <span class="sec-title">Voice of participant — structured questions at 8 defined moments</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--violet);border-color:var(--violetb);background:var(--violetl)">Qualitative intelligence</span>
+  </div>
+
+  <p class="prose">Not surveys. Specific questions, asked at specific moments, by a specific person (the Champion or PS Customer Success Manager), to specific personas. The questions are designed to surface workarounds, hidden QBDT dependency, and confidence gaps before they appear in behavioural data. Each question maps to an acceptability signal in the scoring model. The answers are read by the Programme Manager — not summarised, not aggregated, read.</p>
+
+  <div class="vop-grid">
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--comp)">Moment 1 · Day 3 post go-live</div>
+      <div class="vop-q">What was the first thing you did in IES today?</div>
+      <div class="vop-format">Asked by: Champion · Method: In person or phone · Duration: 5 minutes</div>
+      <div class="vop-scoring">Healthy answer: A task relevant to their role. Concerning answer: "I logged in to check something, then went back to QBDT to confirm it." Action: If QBDT reference behaviour appears, note it and ask again at Day 7.</div>
+      <div class="vop-who"><span class="vop-persona">All personas — Wave 1 go-live</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--comp)">Moment 2 · Day 7</div>
+      <div class="vop-q">What have you needed to look up in QBDT since go-live?</div>
+      <div class="vop-format">Asked by: Champion · Method: In person · Duration: 10 minutes</div>
+      <div class="vop-scoring">Healthy answer: "Nothing, actually" or "One thing — a historical invoice from 2021." Concerning answer: Any current-period reference to QBDT for data that should now be in IES. Action: Map each QBDT reference to a specific IES screen or report that would have answered it. Schedule a 20-minute targeted session.</div>
+      <div class="vop-who"><span class="vop-persona">Controller</span><span class="vop-persona">Payroll Manager</span><span class="vop-persona">Project Managers</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--accp)">Moment 3 · Day 14</div>
+      <div class="vop-q">Is there anything you're doing outside of IES that you expected to do inside it?</div>
+      <div class="vop-format">Asked by: PS Customer Success Manager · Method: Video call · Duration: 20 minutes</div>
+      <div class="vop-scoring">This question surfaces workarounds — Excel spreadsheets, manual calculations, informal processes built around IES gaps. Each workaround is documented. If 3+ workarounds exist for one persona, the PM escalation threshold is triggered. Workarounds built at Day 14 are permanent by Day 30 if not addressed.</div>
+      <div class="vop-who"><span class="vop-persona">Controller</span><span class="vop-persona">Payroll Manager</span><span class="vop-persona">Project Managers</span><span class="vop-persona">HR Director</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--accp)">Moment 4 · Day 30</div>
+      <div class="vop-q">If IES went offline for a day, which of your tasks would stop?</div>
+      <div class="vop-format">Asked by: Programme Manager · Method: In person if possible · Duration: 30 minutes</div>
+      <div class="vop-scoring">This is the dependency test. A fully accepted participant says "most of my critical tasks — billing, payroll, job cost reporting." A partially accepted participant names only peripheral tasks. The answer maps directly to the acceptability score. Anything the participant would route to QBDT during an IES outage is a gap still to close.</div>
+      <div class="vop-who"><span class="vop-persona">CFO</span><span class="vop-persona">Controller</span><span class="vop-persona">Payroll Manager</span><span class="vop-persona">All VPs</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--accp)">Moment 5 · Day 60</div>
+      <div class="vop-q">Name one thing IES shows you that QBDT didn't.</div>
+      <div class="vop-format">Asked by: Champion · Method: Team meeting or 1:1 · Duration: 10 minutes</div>
+      <div class="vop-scoring">This question tests whether participants have moved beyond parity to capability uplift. "I can see my job cost in real time" is the answer the PM wants to hear. "Nothing, really" is the signal that this persona is using IES as a browser-based QBDT — and the capability sprint programme for this persona needs to begin immediately.</div>
+      <div class="vop-who"><span class="vop-persona">Project Managers</span><span class="vop-persona">Controller</span><span class="vop-persona">CFO</span><span class="vop-persona">Branch Managers</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--violet)">Moment 6 · Day 90</div>
+      <div class="vop-q">What would need to be true for you to call this migration successful?</div>
+      <div class="vop-format">Asked by: Programme Manager · Method: Structured 1:1 · Duration: 45 minutes</div>
+      <div class="vop-scoring">Asked to every deep-domain-view persona. The answer is compared against the acceptability definition agreed in Month 1. If the Day 90 answer matches the original definition, acceptability has been achieved. If the definition has shifted — "I need one more thing that wasn't in the original scope" — the gap is documented and scoped, not ignored. The goalposts cannot move silently.</div>
+      <div class="vop-who"><span class="vop-persona">All deep domain personas</span><span class="vop-persona">Branch Managers (selected)</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--gap)">Moment 7 · Wave 3 · First union payroll</div>
+      <div class="vop-q">Did the fringe benefit calculations match what you expected from the CBA?</div>
+      <div class="vop-format">Asked by: Payroll Manager directly to Union Steward · Method: In person or phone · Required within 48h of first union payroll run</div>
+      <div class="vop-scoring">Binary. Yes = acceptability threshold met. No = immediate escalation. No ambiguity, no middle ground. Any "almost" or "close but" answer triggers the same escalation as a "no." Union fringe benefit accuracy is a contractual obligation — not a quality-of-life issue.</div>
+      <div class="vop-who"><span class="vop-persona">Union Stewards — all 5 locals</span><span class="vop-persona">Payroll Manager coordinates</span></div>
+    </div>
+
+    <div class="vop-card">
+      <div class="vop-moment" style="color:var(--gold)">Moment 8 · Wave 3 · 30 days post go-live</div>
+      <div class="vop-q">Has certified payroll submission changed the way you manage your compliance workload?</div>
+      <div class="vop-format">Asked by: PS Customer Success Manager · Method: Video call · Duration: 30 minutes</div>
+      <div class="vop-scoring">The CPO is the hardest-to-satisfy persona in the programme. This question is not about whether it "works" — that was confirmed at go-live. This question asks whether it has improved their professional life. A CPO who says "it's the same amount of work, just in a different system" has not achieved acceptability at the capability level — only at the survival level.</div>
+      <div class="vop-who"><span class="vop-persona">Certified Payroll Officer</span><span class="vop-persona">PS Customer Success Manager</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. ACCEPTABILITY SCORING ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">08 —</span>
+    <span class="sec-title">Acceptability scoring model — how the number is calculated</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--gold);border-color:var(--goldb);background:var(--goldl)">Measurement model</span>
+  </div>
+
+  <p class="prose">The acceptability score for each persona is calculated from a weighted combination of the three signal types. The weights are intentional: behavioural signals carry the most weight because they are the hardest to game and the most predictive of long-term adoption. Data comparison signals are binary and non-negotiable — a financial baseline that doesn't tie cannot be "mostly acceptable." Voice of participant is weighted last because self-reporting is the least reliable predictor of actual adoption.</p>
+
+  <table class="plain-table">
+    <thead><tr><th style="width:18%">Signal type</th><th style="width:10%">Weight</th><th style="width:30%">How scored per signal</th><th style="width:22%">Example signals</th><th style="width:20%">What a 0 means</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Behavioural</strong><br><small>What people do</small></td>
+        <td style="font-family:var(--mono);font-size:13px;color:var(--accp)">50%</td>
+        <td>Each defined behavioural signal scores 0 or 1 (binary). No partial credit — either the behaviour is present or it isn't. Score = (signals present ÷ total signals defined) × 100.</td>
+        <td>CFO has not requested Excel P&L in 14 days. PM opens Projects 3× per week. Payroll ran independently on 2nd run.</td>
+        <td>The participant is maintaining QBDT dependency behaviours. Workarounds are being built. Champion or PS intervention required immediately.</td>
+      </tr>
+      <tr>
+        <td><strong>Data comparison</strong><br><small>IES vs QBDT baseline</small></td>
+        <td style="font-family:var(--mono);font-size:13px;color:var(--comp)">35%</td>
+        <td>Each data comparison checkpoint scores 0, 0.5, or 1. 0 = mismatch (unresolved). 0.5 = mismatch explained and documented (e.g., rounding difference — within tolerance). 1 = exact match or documented acceptable variance.</td>
+        <td>Balance Sheet ties ±$0. YTD per employee matches. A/R Aging total matches. Fringe benefit remittance matches CBA.</td>
+        <td>A critical financial or payroll figure in IES does not match the QBDT baseline. This is a hard blocker — cannot advance to next stage regardless of other scores.</td>
+      </tr>
+      <tr>
+        <td><strong>Voice of participant</strong><br><small>Structured qualitative</small></td>
+        <td style="font-family:var(--mono);font-size:13px;color:var(--violet)">15%</td>
+        <td>Each voice of participant question scores 1 (healthy), 0.5 (neutral or uncertain), or 0 (concerning/QBDT reference). Score is the average across all questions asked at this point in the programme.</td>
+        <td>30-day question: "If IES went offline, which tasks would stop?" — named critical tasks = 1, named peripheral tasks = 0.5, "I'd use QBDT" = 0.</td>
+        <td>Participant is actively expressing QBDT preference or workaround behaviour in a structured setting. Most serious voice signal — triggers immediate Champion review.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout co-accp">
+    <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 7l3 3 5.5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="callout-text"><strong>The data comparison weight is intentionally asymmetric in one case:</strong> For the Payroll Manager, Certified Payroll Officer, and Union Stewards, any data comparison score of 0 (unresolved mismatch) sets the overall acceptability score to 0 regardless of behavioural and voice signals. A payroll administrator who loves using IES but has an unresolved YTD discrepancy is not acceptable — the discrepancy is a compliance risk. Financial and payroll accuracy is the non-negotiable floor. Everything else is measured above that floor.</div>
+  </div>
+</section>
+
+<!-- ══ 9. INTEGRATION WITH THE MIGRATION FLOW ══ -->
+<section class="sec">
+  <div class="sec-hdr">
+    <span class="sec-n">09 —</span>
+    <span class="sec-title">Integration with the migration flow</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" style="color:var(--comp);border-color:var(--compb);background:var(--compl)">Flow design requirements</span>
+  </div>
+
+  <p class="prose">The progress tracking and acceptability strategy is not a separate dashboard bolted onto the migration flow — it is embedded in the flow itself. Every step card in the flow contributes to the dual-axis model. Every gate convergence card shows acceptability thresholds alongside technical completion thresholds. The Programme Manager's Layer 1 view is the dual-axis dashboard.</p>
+
+  <table class="plain-table">
+    <thead><tr><th style="width:22%">Flow element</th><th style="width:35%">Technical completion contribution</th><th style="width:43%">Acceptability contribution (new)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Step completed</strong></td><td>Increments technical completion % for that persona and wave</td><td>Does not increment acceptability. Completion and acceptance are independent.</td></tr>
+      <tr><td><strong>North-star scenario run</strong></td><td>No technical completion contribution</td><td>Pass = high-weight behavioural signal for that persona. Fail = triggers 20–35% divergence escalation response.</td></tr>
+      <tr><td><strong>Gate convergence card — persona signs off</strong></td><td>Contributes to wave gate completion</td><td>Sign-off is itself a voice of participant signal (positive). If signatory blocks with a flag, it surfaces the specific concern in the voice of participant log.</td></tr>
+      <tr><td><strong>Voice of participant check-in completed</strong></td><td>No technical completion contribution</td><td>Updates the VoP component of the acceptability score for that persona. Answer is logged in the Programme Dashboard.</td></tr>
+      <tr><td><strong>Behaviour signal detected (usage log)</strong></td><td>No technical completion contribution</td><td>Automatic update to behavioural component of acceptability score. No user input required — IES usage data feeds directly.</td></tr>
+      <tr><td><strong>Data comparison step passed</strong></td><td>Contributes to technical completion (validation step)</td><td>Also updates data comparison component of acceptability score. A passed data comparison is the only step that simultaneously updates both axes.</td></tr>
+      <tr><td><strong>Divergence threshold crossed</strong></td><td>No effect on technical completion</td><td>Triggers escalation model. The relevant escalation response card becomes visible in the Programme Manager's Layer 1 view. Wave advancement is blocked at ≥20% divergence.</td></tr>
+      <tr><td><strong>QBDT decommission gate</strong></td><td>Technical: 5 clean nights + first close complete</td><td>Acceptability: ≥90% acceptability for Controller, CFO north-star passed, zero "QBDT reference" behaviours in 14-day window. Both must be true. Cannot decommission on technical completion alone.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="df-t"><strong>Meridian Building Group</strong> · Progress Tracking & Acceptability Strategy · For Programme Manager and UX team</div>
+  <div class="df-t">2 axes · 14 persona definitions · 3 signal types · 4 divergence thresholds · 8 voice of participant moments</div>
+</footer>
+
+<style>
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:#0F1E3A;border-top:1px solid rgba(255,255,255,.08);padding:7px 20px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:"DM Sans",system-ui,sans-serif;flex-wrap:nowrap}
+.rn-hub{font-size:11px;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.rn-hub:hover{color:rgba(255,255,255,.8)}
+.rn-sep{width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0}
+.rn-docs{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;min-width:0}
+.rn-doc{font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;text-decoration:none;white-space:nowrap;transition:background .15s;border:1px solid transparent;line-height:1.4}
+.rn-doc:hover{background:rgba(255,255,255,.08)}
+.rn-doc.cur{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.rn-doc:not(.cur){color:rgba(255,255,255,.45)}
+.rn-arrows{display:flex;gap:4px;flex-shrink:0}
+.rn-arr{font-size:11px;font-weight:600;padding:4px 11px;border-radius:4px;text-decoration:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.rn-arr:hover{background:rgba(255,255,255,.1);color:#fff}
+</style>
+<div class="res-nav"><a class="rn-hub" href="index.html"><svg viewBox="0 0 11 11" fill="none" width="11" height="11"><path d="M5.5 1L1 4v6h3V7h3v3h3V4L5.5 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Hub</a><div class="rn-sep"></div><div class="rn-docs"><a class="rn-doc" href="meridian-migration-assessment.html">01·Assessment</a><a class="rn-doc" href="meridian-historical-analysis.html">02·Historical</a><a class="rn-doc" href="meridian-flow-strategy.html">03·Flow Strategy</a><span class="rn-doc cur">04·Progress</span><a class="rn-doc" href="ies-education-strategy.html">05·Education</a><a class="rn-doc" href="concept-translation-education.html">06·Concepts</a><a class="rn-doc" href="ies-education-rollout.html">07·Rollout</a></div><div class="rn-sep"></div><div class="rn-arrows"><a class="rn-arr" href="meridian-flow-strategy.html">← 03</a><a class="rn-arr" href="ies-education-strategy.html">05 →</a></div></div>
+</body>
+</html>
