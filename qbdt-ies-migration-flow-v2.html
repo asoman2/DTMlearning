@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Construction · IES Migration Journey</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F5F6F8;--card:#fff;--card2:#F9FAFB;--card3:#F2F4F7;
+  --b:#E3E8EF;--b2:#CDD5DF;--b3:#B0BCC9;
+  --t1:#111827;--t2:#374151;--t3:#6B7280;--t4:#9CA3AF;
+  --s1:#1E40AF;--s1l:#EFF6FF;--s1b:#BFDBFE;
+  --s2:#065F46;--s2l:#ECFDF5;--s2b:#A7F3D0;
+  --s3:#4C1D95;--s3l:#F5F3FF;--s3b:#DDD6FE;
+  --s4:#78350F;--s4l:#FFFBEB;--s4b:#FDE68A;
+  --s5:#14532D;--s5l:#F0FDF4;--s5b:#BBF7D0;
+  --ok:#15803D;--okl:#F0FDF4;--okb:#86EFAC;
+  --warn:#B45309;--warnl:#FFFBEB;--warnb:#FDE68A;
+  --err:#B91C1C;--errl:#FEF2F2;--errb:#FECACA;
+  --ai:#1D4ED8;--ail:#EFF6FF;--aib:#BFDBFE;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);font-size:14px;color:var(--t1);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+#loader{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s}
+#loader.gone{opacity:0;pointer-events:none}
+.ld-mark{width:40px;height:40px;border:1px solid var(--b2);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.ld-mark svg{width:20px;height:20px;color:var(--s1)}
+.ld-text{font-size:12px;color:var(--t3);letter-spacing:.04em}
+.ld-bar{width:140px;height:2px;background:var(--b);border-radius:1px;overflow:hidden}
+.ld-fill{height:100%;background:var(--s1);animation:ldp 1.5s ease-out forwards}
+@keyframes ldp{from{width:0}to{width:100%}}
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--b);height:52px;display:flex;align-items:center;padding:0 24px;gap:14px}
+.nav-mark{width:26px;height:26px;background:var(--s1);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-mark svg{width:13px;height:13px}
+.nav-brand{font-size:13px;font-weight:600;color:var(--t1)}
+.nav-sep{width:1px;height:16px;background:var(--b2)}
+.nav-co{font-size:11px;color:var(--t3)}
+.nav-sp{flex:1}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-prog-label{font-size:11px;color:var(--t3)}
+.nav-pips{display:flex;gap:4px}
+.npip{height:4px;width:22px;border-radius:2px;background:var(--b);cursor:pointer;transition:background .2s,width .2s}
+.npip.act{width:34px}
+.npip.s1.act,.npip.s1.dn{background:var(--s1)}
+.npip.s2.act,.npip.s2.dn{background:var(--s2)}
+.npip.s3.act,.npip.s3.dn{background:var(--s3)}
+.npip.s4.act,.npip.s4.dn{background:var(--s4)}
+.npip.s5.act,.npip.s5.dn{background:var(--s5)}
+.nav-pct{font-family:var(--mono);font-size:11px;color:var(--t3);min-width:26px;text-align:right}
+.shell{display:grid;grid-template-columns:224px 1fr;min-height:calc(100vh - 52px)}
+.sidebar{border-right:1px solid var(--b);background:var(--card);padding:16px 0 40px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.sb-top{padding:0 14px 14px;border-bottom:1px solid var(--b);margin-bottom:10px}
+.sb-ov{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:6px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;transition:background .1s,color .1s;border:none;background:none;width:100%;text-align:left;font-family:var(--sans)}
+.sb-ov:hover{background:var(--bg);color:var(--t2)}
+.sb-ov.act{background:var(--ail);color:var(--s1)}
+.sb-ov svg{width:13px;height:13px}
+.sb-stage{margin-bottom:1px}
+.sb-sh{display:flex;align-items:flex-start;gap:9px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:background .1s}
+.sb-sh:hover{background:var(--bg)}
+.sb-sh.act{background:var(--bg);border-left-color:var(--stcol,var(--s1))}
+.sb-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--b3);flex-shrink:0;margin-top:3px;transition:all .15s}
+.sb-sh.act .sb-dot{background:var(--stcol);border-color:var(--stcol)}
+.sb-sh.dn .sb-dot{background:var(--ok);border-color:var(--ok)}
+.sb-stlbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t4);margin-bottom:2px}
+.sb-sh.act .sb-stlbl{color:var(--stcol)}
+.sb-stname{font-size:12px;font-weight:500;color:var(--t2);line-height:1.3}
+.sb-sh.act .sb-stname{color:var(--t1)}
+.sb-steps{padding:2px 14px 6px 32px}
+.sb-step{font-size:11px;color:var(--t4);padding:3px 6px;border-radius:4px;cursor:pointer;display:flex;align-items:flex-start;gap:5px;transition:color .1s,background .1s;line-height:1.4}
+.sb-step:hover{color:var(--t2)}
+.sb-step.act{color:var(--t1);background:var(--card3)}
+.sb-step.dn{color:var(--ok)}
+.sb-step-pip{width:3px;height:3px;border-radius:50%;background:currentColor;flex-shrink:0;margin-top:5px}
+.main{padding:28px 40px 80px;max-width:880px}
+/* Overview */
+.ov-bar{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--card);border:1px solid var(--b);border-radius:12px;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ov-logo{width:36px;height:36px;border-radius:8px;background:var(--s1l);border:1px solid var(--s1b);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:600;color:var(--s1);flex-shrink:0}
+.ov-coname{font-size:14px;font-weight:600;color:var(--t1)}
+.ov-cosub{font-size:11px;color:var(--t4)}
+.ov-stats{margin-left:auto;display:flex;gap:22px}
+.ov-stat-v{font-size:16px;font-weight:600;color:var(--t1);font-family:var(--mono);line-height:1}
+.ov-stat-l{font-size:10px;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.ov-h1{font-family:var(--serif);font-size:32px;font-weight:400;line-height:1.12;margin-bottom:9px;letter-spacing:-.01em}
+.ov-h1 em{font-style:italic;color:var(--s1)}
+.ov-sub{font-size:14px;color:var(--t2);line-height:1.78;max-width:580px;margin-bottom:26px}
+.ov-prins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.ov-prin{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px 15px}
+.ov-pi{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.ov-pi svg{width:14px;height:14px}
+.ov-ptitle{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--t1)}
+.ov-ptext{font-size:11px;color:var(--t3);line-height:1.65}
+.ov-stagelist{display:flex;flex-direction:column;margin-bottom:24px}
+.ov-stcon{width:1px;height:16px;background:var(--b);margin-left:20px}
+.ov-stage{display:grid;grid-template-columns:40px 1fr;cursor:pointer}
+.ov-stage-left{display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.ov-snum{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--b2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:var(--mono);color:var(--t3);transition:all .15s}
+.ov-stage:hover .ov-snum{border-color:var(--stcol);color:var(--stcol)}
+.ov-scard{background:var(--card);border:1px solid var(--b);border-radius:10px;margin:6px 0 6px 10px;padding:13px 16px;transition:border-color .15s,box-shadow .15s}
+.ov-stage:hover .ov-scard{border-color:var(--b2);box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.ov-sbadge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px}
+.ov-stitle{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:4px}
+.ov-ssub{font-size:11px;color:var(--t3);line-height:1.55;margin-bottom:9px}
+.ov-smeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ov-spill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px;background:var(--card3);color:var(--t3);border:1px solid var(--b)}
+.ov-cx{display:flex;align-items:center;gap:5px}
+.ov-cx-lbl{font-size:10px;color:var(--t3)}
+.ov-cxp{width:5px;height:5px;border-radius:50%;background:var(--b2)}
+.ov-cxp.on{background:var(--stcol)}
+.ov-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s1);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:background .12s;letter-spacing:.01em}
+.ov-btn:hover{background:#1E3A8A}
+.ov-btn svg{width:13px;height:13px}
+/* Stage */
+.st-hdr{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--b)}
+.st-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.st-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:3px 9px;border-radius:99px;border:1px solid}
+.st-cx{display:flex;align-items:center;gap:6px}
+.st-cx-lbl{font-size:10px;color:var(--t3)}
+.st-cxp{width:6px;height:6px;border-radius:50%;background:var(--b2)}
+.st-cxp.on{background:var(--stcol)}
+.ai-driven-tag{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--ail);border:1px solid var(--aib);color:var(--ai)}
+.ai-driven-tag svg{width:10px;height:10px}
+.st-h2{font-family:var(--serif);font-size:24px;font-weight:400;line-height:1.2;margin-bottom:8px;color:var(--t1)}
+.st-h2 em{font-style:italic;color:var(--stcol)}
+.st-sub{font-size:13px;color:var(--t2);line-height:1.75;max-width:640px}
+.ai-ctx{background:var(--ail);border:1px solid var(--aib);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start}
+.ai-ctx-ic{width:26px;height:26px;background:rgba(30,64,175,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-ctx-ic svg{width:13px;height:13px;color:var(--ai)}
+.ai-ctx-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ai);margin-bottom:3px}
+.ai-ctx-t{font-size:12px;color:var(--t2);line-height:1.65}
+.ai-ctx-t strong{color:var(--t1);font-weight:500}
+/* Step cards */
+.step-list{display:flex;flex-direction:column;gap:9px}
+.scard{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.scard:hover:not(.dn):not(.open){border-color:var(--b2)}
+.scard.open{border-color:var(--stcol)}
+.scard.dn{background:var(--card2);border-color:var(--b)}
+.scard.locked{opacity:.4;pointer-events:none}
+.sc-head{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;cursor:pointer}
+.sc-head:hover{background:var(--card3)}
+.scard.open .sc-head,.scard.dn .sc-head{background:transparent}
+.scard.open .sc-head{background:var(--card3)}
+.sc-n{width:26px;height:26px;border-radius:50%;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--t3);flex-shrink:0;margin-top:2px;background:var(--card);transition:all .15s}
+.scard.open .sc-n{border-color:var(--stcol);color:var(--stcol)}
+.scard.dn .sc-n{border-color:var(--okb);color:var(--ok);background:transparent;font-size:9px;letter-spacing:0}
+.sc-meta{flex:1;min-width:0}
+.sc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;border:1px solid;white-space:nowrap}
+.tag-ai{background:var(--ail);color:var(--ai);border-color:var(--aib)}
+.tag-acct{background:#F5F3FF;color:#5B21B6;border-color:#DDD6FE}
+.tag-pay{background:#F0FDF4;color:#15803D;border-color:#BBF7D0}
+.tag-hr{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.tag-int{background:#FFFBEB;color:#92400E;border-color:#FDE68A}
+.tag-gate{background:#FEF2F2;color:#991B1B;border-color:#FECACA}
+.tag-learn{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+.sc-title{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35}
+.scard.dn .sc-title{color:var(--t3)}
+.sc-sub{font-size:12px;color:var(--t3);line-height:1.5}
+.sc-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.sc-chev{width:15px;height:15px;color:var(--t4);transition:transform .18s}
+.scard.open .sc-chev{transform:rotate(180deg)}
+.sc-aitag{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--ail);color:var(--ai);border:1px solid var(--aib);white-space:nowrap}
+.confirmed-pill{font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;background:var(--okl);color:var(--ok);border:1px solid var(--okb)}
+/* Body */
+.sc-body{display:none;border-top:1px solid var(--b)}
+.scard.open .sc-body{display:block}
+.sc-body-in{padding:18px}
+/* Gate */
+.gate-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:9px 13px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start}
+.gate-box svg{width:12px;height:12px;color:var(--err);flex-shrink:0;margin-top:2px}
+.gate-t{font-size:11px;color:#7F1D1D;line-height:1.6}
+.gate-t strong{color:var(--err)}
+/* AI section */
+.ai-doing{background:var(--ail);border:1px solid var(--aib);border-radius:10px;padding:14px 15px;margin-bottom:15px}
+.aid-h{display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.aid-h svg{width:13px;height:13px;color:var(--ai)}
+.aid-h-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ai)}
+.aid-tasks{display:flex;flex-direction:column;gap:5px}
+.aid-t{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;background:#fff;border:1px solid var(--b);border-radius:7px}
+.aid-t.running{border-color:var(--aib)}
+.aic{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.aic-done{background:var(--okl);border:1px solid var(--okb)}
+.aic-done svg{width:8px;height:8px;color:var(--ok)}
+.aic-run{background:var(--ail);border:1px solid var(--aib);animation:pring 2s ease-in-out infinite}
+.aic-run svg{width:8px;height:8px;color:var(--ai);animation:spin 1.6s linear infinite}
+.aic-wait{background:var(--card3);border:1px solid var(--b2)}
+.aic-wait svg{width:8px;height:8px;color:var(--t4)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pring{0%,100%{box-shadow:0 0 0 0 rgba(30,64,175,.2)}50%{box-shadow:0 0 0 3px rgba(30,64,175,.07)}}
+.aid-main{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:2px}
+.aid-sub{font-size:11px;color:var(--t3);line-height:1.45}
+.aid-result{margin-top:9px;padding:8px 11px;background:var(--okl);border:1px solid var(--okb);border-radius:6px;font-size:11px;color:var(--ok);display:none;line-height:1.55}
+.aid-result svg{width:10px;height:10px;display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:5px}
+.aid-result.show{display:flex;align-items:flex-start;gap:6px}
+/* Concept bridge */
+.cb{border:1px solid #E9D5FF;border-radius:10px;overflow:hidden;margin-bottom:15px}
+.cb-hdr{background:#F5F3FF;padding:9px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #E9D5FF}
+.cb-hdr svg{width:12px;height:12px;color:#6D28D9}
+.cb-hdr-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#6D28D9}
+.cb-hdr-sub{font-size:11px;color:#8B5CF6;margin-left:auto}
+.cb-body{padding:13px;background:#fff}
+.cb-map{display:grid;grid-template-columns:1fr auto 1fr;gap:9px;align-items:center;margin-bottom:11px}
+.cb-side{padding:9px 12px;border-radius:7px}
+.cb-from{background:var(--card3);border:1px solid var(--b)}
+.cb-to{background:var(--s2l);border:1px solid var(--s2b)}
+.cb-sl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.cb-from .cb-sl{color:var(--t4)}
+.cb-to .cb-sl{color:var(--s2)}
+.cb-sv{font-size:11px;font-weight:500;color:var(--t1);font-family:var(--mono);margin-bottom:3px}
+.cb-sd{font-size:11px;color:var(--t3);line-height:1.5}
+.cb-arr{display:flex;flex-direction:column;align-items:center;gap:3px}
+.cb-arr svg{width:18px;height:18px;color:#8B5CF6}
+.cb-arr-lbl{font-size:9px;color:var(--t3)}
+.cb-why{background:var(--card3);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:9px}
+.cb-why strong{color:var(--t1);font-weight:500}
+.cb-par{display:flex;gap:5px;flex-wrap:wrap}
+.pc{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;border:1px solid}
+.pc-full{background:var(--okl);color:var(--ok);border-color:var(--okb)}
+.pc-part{background:var(--warnl);color:var(--warn);border-color:var(--warnb)}
+.pc-gap{background:var(--errl);color:var(--err);border-color:var(--errb)}
+/* Data sample */
+.ds{background:var(--card2);border:1px solid var(--b);border-radius:9px;overflow:hidden;margin-bottom:15px}
+.ds-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--card3);border-bottom:1px solid var(--b)}
+.ds-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.ds-count{font-size:10px;color:var(--t4)}
+table.dst{width:100%;border-collapse:collapse;font-size:11px}
+table.dst th{background:var(--card3);padding:6px 10px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);border-bottom:1px solid var(--b)}
+table.dst td{padding:7px 10px;border-bottom:1px solid var(--b);color:var(--t2);vertical-align:middle;line-height:1.4}
+table.dst tr:last-child td{border-bottom:none}
+table.dst tr:hover td{background:var(--card)}
+.ds-mono{font-family:var(--mono);color:var(--t1)}
+.dpill{display:inline-block;font-size:9px;font-weight:600;padding:1px 7px;border-radius:99px;border:1px solid;white-space:nowrap}
+.dpill-ok{background:var(--okl);color:var(--ok);border-color:var(--okb)}
+.dpill-warn{background:var(--warnl);color:var(--warn);border-color:var(--warnb)}
+.dpill-err{background:var(--errl);color:var(--err);border-color:var(--errb)}
+.dpill-info{background:var(--ail);color:var(--ai);border-color:var(--aib)}
+.dpill-neu{background:var(--card3);color:var(--t3);border-color:var(--b2)}
+/* Map rows */
+.mapwrap{margin-bottom:15px}
+.mapwrap-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.maprows{display:flex;flex-direction:column;gap:3px}
+.maprow{display:grid;grid-template-columns:1fr 20px 1fr 68px;gap:7px;align-items:center;padding:6px 9px;background:var(--card2);border:1px solid var(--b);border-radius:6px;transition:border-color .1s}
+.maprow:hover{border-color:var(--b2)}
+.maprow.ok{background:var(--okl);border-color:var(--okb)}
+.mf{font-size:11px;font-family:var(--mono);color:var(--t1)}
+.ma svg{width:12px;height:12px;color:var(--t4)}
+.mt{font-size:11px;font-family:var(--mono);color:var(--s2)}
+.ms2{font-size:9px;font-weight:600;padding:1px 6px;border-radius:99px;text-align:center;border:1px solid;white-space:nowrap}
+.ms-auto{background:var(--okl);color:var(--ok);border-color:var(--okb)}
+.ms-rev{background:var(--warnl);color:var(--warn);border-color:var(--warnb)}
+.ms-man{background:var(--errl);color:var(--err);border-color:var(--errb)}
+.mapsummary{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--t3)}
+.msi{display:flex;align-items:center;gap:4px}
+.msdot{width:4px;height:4px;border-radius:50%}
+/* Two column */
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:15px}
+.bglbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid var(--b)}
+.bglbl-ai{color:var(--ai)}
+.bglbl-you{color:var(--s2)}
+.bgpts{display:flex;flex-direction:column;gap:5px}
+.bgpt{display:flex;gap:7px;align-items:flex-start}
+.bgdot{width:3px;height:3px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.bgd-ai{background:var(--ai)}
+.bgd-you{background:var(--s2)}
+.bgt{font-size:12px;color:var(--t2);line-height:1.65}
+.bgt strong{color:var(--t1);font-weight:500}
+/* Decision */
+.dec{background:var(--s3l);border:1px solid var(--s3b);border-radius:10px;padding:13px 15px;margin-bottom:15px}
+.dec-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--s3);margin-bottom:7px}
+.dec-q{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:11px;line-height:1.4}
+.dec-opts{display:flex;flex-direction:column;gap:5px}
+.dec-opt{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border:1px solid var(--b);border-radius:7px;cursor:pointer;background:#fff;transition:border-color .1s}
+.dec-opt:hover{border-color:var(--s3b)}
+.dec-opt.sel{border-color:var(--s3)}
+.dec-radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--b2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:border-color .1s}
+.dec-opt.sel .dec-radio{border-color:var(--s3)}
+.dec-rin{width:7px;height:7px;border-radius:50%;background:var(--s3);display:none}
+.dec-opt.sel .dec-rin{display:block}
+.dec-opt-t{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:2px}
+.dec-opt-s{font-size:11px;color:var(--t3);line-height:1.5}
+.dec-con{font-size:11px;padding:7px 10px;border-radius:6px;margin-top:9px;display:none}
+.dec-con.show{display:block}
+.dc-ok{background:var(--okl);color:var(--ok);border:1px solid var(--okb)}
+.dc-warn{background:var(--warnl);color:var(--warn);border:1px solid var(--warnb)}
+/* Deps */
+.depstrip{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:9px 15px;border-top:1px solid var(--b);background:var(--card2)}
+.dep-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t4);margin-right:3px}
+.depnode{font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px;border:1px solid;white-space:nowrap}
+.dn-ok{background:var(--okl);color:var(--ok);border-color:var(--okb)}
+.dn-req{background:var(--errl);color:var(--err);border-color:var(--errb)}
+.dep-arr{font-size:10px;color:var(--t4)}
+/* Complete row */
+.cr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-top:1px solid var(--b);background:var(--card2)}
+.cr-l{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:5px}
+.cr-l svg{width:11px;height:11px;color:var(--ai)}
+.crbtn{background:var(--stcol,var(--s1));color:#fff;border:none;border-radius:7px;padding:8px 16px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .12s}
+.crbtn:hover{opacity:.86}
+.crbtn:disabled{opacity:.3;cursor:default}
+.crbtn svg{width:11px;height:11px}
+/* Stage end */
+.stage-end{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:18px 20px;margin-top:12px;display:none}
+.stage-end.show{display:block}
+.se-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ok);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.se-label svg{width:11px;height:11px}
+.se-h{font-family:var(--serif);font-size:19px;font-weight:400;color:var(--t1);margin-bottom:5px}
+.se-sub{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:13px}
+.se-btn{display:inline-flex;align-items:center;gap:6px;background:var(--t1);color:#fff;border:none;border-radius:7px;padding:9px 18px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;transition:background .12s}
+.se-btn:hover{background:#1F2937}
+.se-btn svg{width:12px;height:12px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:18px 18px 60px}
+  .bgrid{grid-template-columns:1fr}
+  .cb-map{grid-template-columns:1fr 18px 1fr}
+  .ov-prins{grid-template-columns:1fr 1fr}
+  .ov-stats{display:none}
+}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="ld-mark"><svg viewBox="0 0 20 20" fill="none"><path d="M10 1L3 5.5v9L10 19l7-4.5v-9L10 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M10 1v18M3 5.5l7 4.5 7-4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+  <div class="ld-text">Preparing migration journey</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+</div>
+<nav class="nav">
+  <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none"><rect x="4" y="1.5" width="6" height="11" rx="1" fill="white"/><rect x="1.5" y="4" width="2.5" height="6" rx=".5" fill="white" fill-opacity=".6"/><rect x="10" y="4" width="2.5" height="6" rx=".5" fill="white" fill-opacity=".6"/></svg></div>
+  <span class="nav-brand">Intuit Enterprise Suite</span>
+  <div class="nav-sep"></div>
+  <span class="nav-co">Meridian Construction Group</span>
+  <div class="nav-sp"></div>
+  <div class="nav-right">
+    <span class="nav-prog-label">Progress</span>
+    <div class="nav-pips" id="navPips"></div>
+    <span class="nav-pct" id="navPct">0%</span>
+  </div>
+</nav>
+<div class="shell">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main"></main>
+</div>
+<script>
+const STAGES=[
+{id:'s1',col:'var(--s1)',cx:1,ai:true,badge:'Stage 1 · Discovery',name:'AI diagnostic',
+title:'AI reads your business <em>before</em> you configure anything',
+sub:'Your QBDT Enterprise file is analysed automatically. No settings, no forms. The result is an Operational DNA report — a plain-language description of how Meridian operates today and how it maps to IES.',
+steps:[
+{id:'s1_1',n:'01',title:'File health & operational profile scan',tags:['AI automated','Gate'],tc:['tag-ai','tag-gate'],
+sub:'AI reads the QBDT company file and returns a complete operational picture. Zero user input.',
+aiTasks:[
+{s:'done',t:'QBDT Enterprise 23.0 validated — no corruption or schema errors',sub:'File: MeridianCG_2024.QBW · 842 MB · Last backup: 13 Dec 2024 · 9 years of history'},
+{s:'done',t:'Industry classified: General Contracting (NAICS 2361)',sub:'Construction module loaded · Customer:Job depth: 3 levels · 187 active jobs detected'},
+{s:'done',t:'34 employees across CA, NV, AZ — payroll service: QBDT Enhanced',sub:'29 active · 5 terminated (W-2 window) · 1 rehired employee (D. Harrington)'},
+{s:'done',t:'Transaction volume: 312,440 across 9 years — within 750K ceiling',sub:'Full data conversion recommended · Historical depth: complete'},
+{s:'done',t:'3 connected apps identified',sub:'Procore · QuickBooks Time · Custom PO sync (Buildertrend)'},
+],
+aiResult:'Operational DNA complete. Meridian Construction Group: $8.2M revenue, 34 employees, Customer:Job hierarchy 3 levels deep, 6 active classes, $2.1M open A/R across 18 jobs. Industry module: General Contracting.',
+sample:null,concept:null,mapRows:null,decision:null,
+gate:'Runs automatically when the QBDT company file is connected. No input required until the next step.',
+deps:[{l:'QBDT company file (.QBW)',s:'ok'},{l:'IES account activated',s:'ok'}]},
+{id:'s1_2',n:'02',title:'Review Operational DNA & gap assessment',tags:['You review','AI generated'],tc:['tag-learn','tag-ai'],
+sub:'AI describes your business. You confirm it is accurate and decide how to handle 3 identified feature gaps.',
+aiTasks:[
+{s:'done',t:'3 feature gaps detected for Meridian\'s profile',sub:'Assembly BOM tracking · Bin-level inventory · Custom field "Subcontractor License #" has no IES equivalent'},
+{s:'done',t:'Top 8 memorised reports identified from usage frequency',sub:'Job Cost Summary · WIP Schedule · Subcontractor Ageing · Open Commitments · 4 others — IES equivalents drafted'},
+{s:'done',t:'Integration compatibility checked',sub:'Procore: ✓ IES-certified · QuickBooks Time: ✓ IES-native · Buildertrend PO sync: ✗ rebuild required'},
+],
+aiResult:'3 gaps require a decision before migration proceeds. All other Meridian workflows have a direct IES equivalent.',
+sample:{label:'Detected gaps — Meridian Construction Group',cols:['Gap','Severity','AI workaround'],rows:[
+['Assembly BOM — equipment assemblies','Medium','SOS Inventory integration (quoted $149/mo)'],
+['Bin-level inventory tracking — equipment yard','Low','Location dimension tracks yard areas — bin precision not preserved'],
+['Custom field: "Subcontractor License #"','Low','Moves to Vendor notes field — searchable but not reportable'],
+]},
+concept:null,mapRows:null,
+decision:{q:'How would you like to handle the 3 identified gaps before migration continues?',opts:[
+{t:'Schedule a Professional Services gap review call',sub:'An IES specialist reviews each gap with you and Lisa Park (your CPA). Recommended — 60 minutes, prevents post-migration surprises.',c:'ok',ct:'A PS specialist will contact tom.vasquez@meridianconst.com within 1 business day. Migration configuration continues in parallel.'},
+{t:'Proceed with AI-suggested workarounds for all 3 gaps',sub:'AI applies the best available alternative at the relevant step. You will be prompted to confirm each workaround.',c:'warn',ct:'⚠ Equipment assembly tracking and bin-level inventory require manual workarounds or third-party integrations. Confirm scope with your operations team before go-live.'},
+]},
+gate:null,deps:[{l:'File scan complete',s:'ok'}]},
+]},
+{id:'s2',col:'var(--s2)',cx:2,ai:false,badge:'Stage 2 · Concepts',name:'Concept translation',
+title:'Understand what <em>changes</em> — before anything moves',
+sub:'IES uses different terms for familiar business operations. Each translation is explained using Meridian\'s own data — not in platform abstractions. No data has moved. You are still reading your QBDT file.',
+steps:[
+{id:'s2_1',n:'03',title:'Customer:Job hierarchy → Projects',tags:['Concept','Construction','You confirm'],tc:['tag-learn','tag-pay','tag-learn'],
+sub:'Your Customer:Job structure is the operational core of Meridian. This is the highest-impact mapping decision in the entire migration.',
+aiTasks:[
+{s:'done',t:'Customer:Job hierarchy extracted — 187 active jobs, 3 levels deep',sub:'42 clients · 187 jobs · Est. 940 phase records (4–8 phases per job average)'},
+{s:'done',t:'Draft Projects architecture generated for Meridian',sub:'Client → IES Customer · Job → IES Project · Phase → Project cost category'},
+],
+aiResult:'Draft mapping ready for review. 187 QBDT jobs will become 187 IES Projects. Phases will become cost categories inside each Project.',
+sample:{label:'Sample: Customer:Job → Projects mapping (first 6 of 187)',cols:['QBDT Customer:Job','IES Project name','IES Client','Phase handling'],rows:[
+['Vasquez:Copper Ridge Phase 2','Copper Ridge Ph.2','Vasquez Developers','6 cost categories'],
+['Hendricks:Midtown Office Fit-out','Midtown Office Fit-out','Hendricks Commercial','4 cost categories'],
+['Oakmont:Resi Tract 14A','Resi Tract 14A','Oakmont Homes','5 cost categories'],
+['CalTrans:I-15 Bridge Rehab','I-15 Bridge Rehab (Govt)','CalTrans Region 8','8 cost categories'],
+['Vasquez:Copper Ridge Phase 1','Copper Ridge Ph.1 (Archive)','Vasquez Developers','Closed — archived'],
+['Hendricks:Warehouse Expansion','Warehouse Exp. (Hold)','Hendricks Commercial','3 cost categories'],
+]},
+concept:{fl:'In QuickBooks Desktop Enterprise',fv:'Customer → Job → Phase → Cost code',fd:'A 4-level hierarchy. Sub-jobs represent phases (Foundation, Framing, MEP). Cost codes sit beneath phases.',
+tl:'In Intuit Enterprise Suite',tv:'Customer → Project → Cost category',td:'3-level structure. Real-time budget vs actual per Project. Phases become budget line items — not a separate hierarchical level.',
+why:'IES Projects gives Meridian real-time estimated vs actual profitability per job — a view QBDT can only produce at month-end. The trade-off is a flatter hierarchy: your QBDT Phase level maps to Project cost categories in IES rather than a distinct sub-level. For the majority of Meridian\'s jobs this is an improvement in visibility. For the 4 government jobs (CalTrans, municipal contracts) where strict cost-code billing is required, a sub-project structure is also available.',
+parity:[{l:'Client relationship',c:'full'},{l:'Job profitability tracking',c:'full'},{l:'Phase cost visibility',c:'part'},{l:'4-level nesting',c:'gap'},{l:'Budget vs actual live',c:'full'}]},
+mapRows:null,
+decision:{q:'How should construction phases be represented in IES Projects?',opts:[
+{t:'Phases become cost categories inside each Project (recommended)',sub:'Foundation, Framing, MEP, Finishes each appear as a budget line item inside the IES Project. Real-time cost visibility at phase level. This is how 92% of general contractors configure IES.',c:'ok',ct:'All 187 IES Projects will have cost categories matching your QBDT phase structure. The Job Cost Summary and WIP Schedule reports will work as expected.'},
+{t:'Government jobs use sub-projects; commercial/residential use cost categories',sub:'CalTrans and 3 other government jobs get a sub-project per phase for strict cost-code reporting. All other jobs use cost categories. More overhead but full cost-code granularity for billing.',c:'warn',ct:'⚠ This creates ~32 additional Projects in IES for your 4 government jobs. Useful for meeting government billing requirements. Your team will need to navigate a longer Project list.'},
+]},
+gate:null,deps:[{l:'File scan complete',s:'ok'},{l:'Customer:Job data extracted',s:'ok'}]},
+{id:'s2_2',n:'04',title:'Classes & Locations → Dimensions',tags:['Concept','Accounting','AI mapped'],tc:['tag-learn','tag-acct','tag-ai'],
+sub:'Meridian\'s 6 QBDT classes and 3 locations become IES Dimensions — a more flexible, unified segment reporting model. AI has drafted the structure.',
+aiTasks:[
+{s:'done',t:'6 QBDT classes analysed across 9 years of transactions',sub:'Residential · Commercial · Government · Equipment · G&A · Estimating'},
+{s:'done',t:'3 QBDT locations analysed',sub:'California Office · Nevada Office · Arizona Field'},
+{s:'done',t:'Draft Dimensions structure: 2 Dimensions, 9 values total',sub:'Division (6 values from classes) · State Office (3 values from locations)'},
+],
+aiResult:'2 Dimensions proposed. All 6 classes and 3 locations are preserved with no data loss.',
+sample:{label:'Dimensions mapping — all 9 segment values',cols:['QBDT source','IES Dimension','IES value','Transactions tagged'],rows:[
+['Class: Residential','Division','Residential','3,842'],
+['Class: Commercial','Division','Commercial','2,109'],
+['Class: Government','Division','Government','1,847'],
+['Class: Equipment','Division','Equipment','922'],
+['Class: G&A','Division','General & Admin','2,441'],
+['Class: Estimating','Division','Estimating','304'],
+['Location: California Office','State Office','California','6,920'],
+['Location: Nevada Office','State Office','Nevada','2,814'],
+['Location: Arizona Field','State Office','Arizona','1,731'],
+]},
+concept:{fl:'In QuickBooks Desktop Enterprise',fv:'Class list + Location list (separate systems)',fd:'Two independent tracking systems. Applied separately to transactions. Reported separately in financial statements.',
+tl:'In Intuit Enterprise Suite',tv:'Dimensions (unified, combinable)',td:'One model. Multiple Dimensions can be applied to any transaction. Any report can be sliced by any Dimension combination.',
+why:'IES Dimensions is strictly more capable than QBDT Classes + Locations. A Meridian invoice can carry both "Commercial" and "California" simultaneously, and the P&L can be sliced by Division, by State Office, or by any combination — in a single report. The only change is naming: what you called a Class or Location is now called a Dimension. Your segment data is identical.',
+parity:[{l:'Division tracking',c:'full'},{l:'State Office tracking',c:'full'},{l:'Combined segment reporting',c:'full'},{l:'Segment P&L',c:'full'}]},
+mapRows:null,decision:null,gate:null,deps:[{l:'File scan complete',s:'ok'},{l:'Class list extracted',s:'ok'}]},
+{id:'s2_3',n:'05',title:'Price levels → Price rules',tags:['Concept','Accounting','AI mapped'],tc:['tag-learn','tag-acct','tag-ai'],
+sub:'Meridian\'s 4 customer pricing tiers are translated into IES Price Rules. AI has preserved all 42 customer assignments automatically.',
+aiTasks:[
+{s:'done',t:'4 price levels across 42 clients detected',sub:'Standard T&M: 18 clients · Preferred Contractor: 14 · Government Contract: 6 · Cost Plus 18%: 4'},
+{s:'done',t:'IES Price Rules drafted for all 4 levels — customer assignments preserved',sub:'No manual reassignments required · 0 pricing data lost'},
+],
+aiResult:'All 4 price levels mapped to IES Price Rules. 42 client assignments preserved. Review the mapping and confirm.',
+sample:{label:'Price level → Price Rule mapping — Meridian',cols:['QBDT Level','Clients','IES Price Rule','Billing approach'],rows:[
+['Standard T&M','18','Standard Rate Schedule','Time & Materials at posted rates'],
+['Preferred Contractor','14','Preferred Contractor Rate','10% discount on labour, standard materials'],
+['Government Contract','6','Government Schedule of Values','Fixed-fee milestone billing per SOV'],
+['Cost Plus 18%','4','Cost Plus Management Fee','All costs + 18% management fee'],
+]},
+concept:{fl:'In QuickBooks Desktop Enterprise',fv:'Price Levels (flat % discount per customer)',fd:'A percentage discount applied universally to all items for a given customer. One rule per customer.',
+tl:'In Intuit Enterprise Suite',tv:'Price Rules (conditional, item-aware)',td:'Rules can target customers, customer groups, specific items, date ranges, or quantity breaks. Multiple rules can stack.',
+why:'IES Price Rules replicate every Meridian price level exactly — and add capabilities Meridian doesn\'t have in QBDT: date-expiring government contract rates, item-category-specific pricing, and quantity discounts on recurring service lines. Your existing pricing carries over without change.',
+parity:[{l:'Per-customer pricing',c:'full'},{l:'Flat discount levels',c:'full'},{l:'Gov\'t schedule of values',c:'full'},{l:'Quantity-break pricing',c:'full'}]},
+mapRows:null,decision:null,gate:null,deps:[{l:'Customer list extracted',s:'ok'}]},
+]},
+{id:'s3',col:'var(--s3)',cx:3,ai:true,badge:'Stage 3 · Preparation',name:'Data preparation',
+title:'AI prepares the data. <em>You confirm</em> the exceptions.',
+sub:'Accounting, payroll, and HR data is cleaned, mapped, and verified before any migration runs. AI handles the bulk of the work. You review its output and resolve the specific items that need business judgement.',
+steps:[
+{id:'s3_1',n:'06',title:'Chart of Accounts — reconcile & map',tags:['Accounting','AI automated'],tc:['tag-acct','tag-ai'],
+sub:'AI reconciles all Meridian accounts and constructs the IES Chart of Accounts. Lisa Park (CPA) signs off before Stage 4 begins.',
+aiTasks:[
+{s:'done',t:'14 bank and credit card accounts reconciled to Nov 2024 statement',sub:'Last reconciliation gap: 14 days · 0 unreconciled transactions · Petty cash float confirmed $2,500'},
+{s:'done',t:'"A/R Trade" and "Accounts Receivable" merged — 3,842 historical transactions re-pointed',sub:'Duplicate eliminated · No data loss'},
+{s:'done',t:'IES CoA built from construction industry template + Meridian structure — 214 accounts',sub:'CFMA benchmark chart applied · WIP, retainage, and job cost accounts preserved'},
+{s:'done',t:'4 accounts flagged for accountant confirmation',sub:'AI cannot determine the correct IES type from transaction context alone'},
+],
+aiResult:'210 of 214 accounts mapped automatically. 4 need Lisa Park\'s confirmation. Account mapping document sent to lisa.park@mitchellpark-cpa.com.',
+sample:{label:'Accounts requiring accountant confirmation (4 of 214)',cols:['Account name','QBDT type','Transaction pattern','Confirm as'],rows:[
+['Equipment Depreciation Reserve','Other Current Liability','Credit entries, year-end only','Fixed Asset Contra — or Long-term Liability?'],
+['Retainage Held — Federal Jobs','Accounts Receivable','Debit at 10% of govt invoice','A/R sub-account — or separate Current Asset?'],
+['Owner Draw — T. Vasquez','Equity','Monthly fixed withdrawal','Owner Distribution — or Shareholder Loan?'],
+['Misc. Field Expenses','Other Expense','Varied, inconsistent receipts','Job Cost Expense — or Operating Expense?'],
+]},
+concept:null,mapRows:null,decision:null,
+gate:'Lisa Park, CPA (Mitchell & Park LLP) must sign off on Meridian\'s opening balances before Stage 4 can begin. Sign-off request sent.',
+deps:[{l:'Reconciliation complete',s:'ok'},{l:'Dimensions defined (Stage 2)',s:'ok'},{l:'Lisa Park — accountant access',s:'req'}]},
+{id:'s3_2',n:'07',title:'Employee records — complete & tier all 34',tags:['Payroll','HR','AI scored'],tc:['tag-pay','tag-hr','tag-ai'],
+sub:'All 34 Meridian employees scored across 9 required fields. AI pre-fills gaps from paycheck history patterns. You confirm 6 specific items.',
+aiTasks:[
+{s:'done',t:'Tier 1 — 26 employees, all 9 fields complete',sub:'Migrate automatically as native HistoricalPaycheck objects'},
+{s:'done',t:'Tier 2 — 7 employees, gaps pre-filled by AI from paycheck patterns',sub:'W-4 status inferred for 5 employees (avg confidence 91%) · 2 need address confirmation'},
+{s:'done',t:'Tier 3 — 1 terminated employee (R. Delgado, Feb 2023)',sub:'SSN present, address missing · Archive as compliance object in Preserved Paycheck Portal'},
+{s:'done',t:'Rehired employee detected — D. Harrington',sub:'Terminated: 14 Jun 2024 · Rehired: 2 Sep 2024 · YTD split required: Period 1 archived, Period 2 priority migration'},
+],
+aiResult:'26 employees migrate automatically. 6 items need your review — each shown with the underlying paycheck data so you are confirming, not recalling from memory.',
+sample:{label:'Tier 2 employees — AI pre-fill confidence (confirm or correct each)',cols:['Employee','Missing field','AI pre-fill','Confidence','Action'],rows:[
+['Carlos Mendez','W-4 filing status','Single, 0 allowances','94%','Confirm'],
+['Priya Sharma','W-4 filing status','Married, 2 allowances','89%','Confirm'],
+['James Okafor','W-4 filing status','Single, 1 allowance','91%','Confirm'],
+['Maria Santos','Home address','1847 Crestview Dr, Riverside CA 92503','96%','Confirm'],
+['T. Watkins','Home address','Not recoverable — request from employee directly','—','Outreach'],
+['D. Harrington','YTD period split','Period 1: Jan–14 Jun · Period 2: 2 Sep–Dec','Auto','Review split'],
+]},
+concept:null,mapRows:null,decision:null,gate:null,
+deps:[{l:'File scan complete',s:'ok'},{l:'Paycheck history available',s:'ok'}]},
+{id:'s3_3',n:'08',title:'Payroll item mapping — all 41 pay types',tags:['Payroll','AI mapped'],tc:['tag-pay','tag-ai'],
+sub:'AI matched 37 of 41 Meridian pay items automatically. You resolve the 4 custom items that have no direct IES equivalent.',
+aiTasks:[
+{s:'done',t:'35 standard items auto-confirmed at ≥97% confidence',sub:'Federal & state taxes · FICA · Regular pay · OT · PTO · Holiday · 401(k) · Health ins EE/ER · FUTA · CA/NV/AZ SUI · Workers comp'},
+{s:'done',t:'2 negative-value items detected and re-expressed as IES deduction types',sub:'"Tool Advance Recovery" and "Safety Violation Deduction" — IES rejects negative amounts in paycheck payload'},
+{s:'run',t:'Resolving 4 custom items — awaiting your selection',sub:'"Prevailing Wage Suppl." · "Owner Operator Allowance" · "Certification Bonus" · "Union Annuity Fund"'},
+],
+aiResult:'37 of 41 items confirmed. 4 custom items need your selection from the IES pay type library. Each is shown with its transaction history to help you choose.',
+sample:null,
+mapRows:[
+{f:'Regular Pay',t:'Regular Pay',s:'auto'},
+{f:'Overtime Pay',t:'Overtime Pay (1.5×)',s:'auto'},
+{f:'PTO / Vacation',t:'Paid Time Off',s:'auto'},
+{f:'401(k) EE Deduction',t:'401(k) Employee Deduction',s:'auto'},
+{f:'Health Ben ER',t:'Employer Health Ins. Contribution',s:'auto'},
+{f:'CA State Income Tax',t:'CA Withholding (DE 4)',s:'auto'},
+{f:'Tool Advance Recovery',t:'Tool Advance Repayment (Deduction)',s:'auto'},
+{f:'Prevailing Wage Suppl.',t:'Prevailing Wage Supplement — select type',s:'rev'},
+{f:'Owner Operator Allowance',t:'Non-taxable Vehicle Allowance (suggested)',s:'rev'},
+{f:'Certification Bonus',t:'Supplemental Wage — Bonus (suggested)',s:'rev'},
+{f:'Union Annuity Fund',t:'Union Annuity Contribution — select type',s:'rev'},
+],
+concept:null,decision:null,
+gate:'All 41 items must be mapped before paycheck migration runs. A single unmapped item causes the entire paycheck payload to be rejected by the IES API — the paycheck stays as a bank transaction.',
+deps:[{l:'Employee records confirmed',s:'ok'},{l:'PAYCHECK_LINE_ITEM scan complete',s:'ok'}]},
+{id:'s3_4',n:'09',title:'Voided, amended & prior-year paychecks',tags:['Payroll','AI detected'],tc:['tag-pay','tag-ai'],
+sub:'AI identified all voided and amended paychecks and calculated the exact W-2 impact of including or excluding void reversals.',
+aiTasks:[
+{s:'done',t:'5 voided paychecks found in current-year migration window',sub:'C. Mendez: 15 Mar ($3,840) · J. Okafor: 2 Apr ($2,920) · P. Sharma: 8 Jun ($3,110) · M. Santos: 22 Aug ($2,780) · D. Harrington: 14 Jun ($4,200) — termination'},
+{s:'done',t:'2 amended paychecks found',sub:'T. Watkins: 4 May — OT correction (+$480) · S. Kim: 28 Sep — prevailing wage correction (+$620)'},
+{s:'done',t:'YTD impact of excluding void reversals calculated',sub:'W-2 Box 1 overstated by $12,650 across 4 employees if reversals excluded'},
+{s:'done',t:'Prior-year scope assessed — 8 years of history available',sub:'PDF export queued for 2016–2023 · 2024 current-year in IES API migration scope'},
+],
+aiResult:'Recommendation: include all 5 voided reversals. Excluding them overstates W-2 wages by $12,650 for Mendez, Okafor, Sharma, and Santos — requiring W-2c corrections at year-end.',
+sample:{label:'Voided paychecks — W-2 impact if reversals excluded',cols:['Employee','Date','Gross','W-2 Box 1 overstatement','Recommendation'],rows:[
+['Carlos Mendez','15 Mar 2024','$3,840','$3,840 overstated','Include reversal'],
+['James Okafor','02 Apr 2024','$2,920','$2,920 overstated','Include reversal'],
+['Priya Sharma','08 Jun 2024','$3,110','$3,110 overstated','Include reversal'],
+['Maria Santos','22 Aug 2024','$2,780','$2,780 overstated','Include reversal'],
+['D. Harrington','14 Jun 2024','$4,200','Period 1 archive — no W-2 impact','Archive (Tier 3)'],
+]},
+concept:null,mapRows:null,
+decision:{q:'Include voided paycheck reversals in the current-year migration?',opts:[
+{t:'Yes — include all 5 voided reversals (recommended)',sub:'All 5 paychecks migrate with their reversal records. YTD accurate. W-2 Box 1 correct for Mendez, Okafor, Sharma, and Santos at year-end.',c:'ok',ct:'YTD accurate across all 34 employees. No W-2c corrections required at year-end. D. Harrington\'s 14 Jun paycheck is archived separately as part of his Period 1 (pre-termination) record.'},
+{t:'No — exclude voided records, migrate processed paychecks only',sub:'Void reversals excluded. Only successfully processed paychecks migrate.',c:'warn',ct:'⚠ W-2 Box 1 overstated by $12,650 across 4 employees. W-2c corrections will be required for Mendez, Okafor, Sharma, and Santos at year-end. Not recommended.'},
+]},
+gate:null,deps:[{l:'Employee records confirmed',s:'ok'},{l:'Pay item mapping complete',s:'ok'}]},
+{id:'s3_5',n:'10',title:'Integration audit & recurring transaction inventory',tags:['Integrations','AI verified'],tc:['tag-int','tag-ai'],
+sub:'Every connected app and recurring transaction in Meridian\'s QBDT file is assessed against the IES integration directory.',
+aiTasks:[
+{s:'done',t:'3 connected apps checked against IES integration directory',sub:'Procore 2024: ✓ IES-certified · QuickBooks Time: ✓ IES-native · Buildertrend PO sync: ✗ rebuild required'},
+{s:'done',t:'5 bank feeds inventoried — all re-connectable post-migration',sub:'Wells Fargo operating · Chase credit line · BofA payroll · Amex equipment · US Bank surety bond'},
+{s:'done',t:'14 recurring transactions catalogued and pre-filled in IES',sub:'6 recurring bills · 5 recurring invoices · 3 recurring JEs — none migrate automatically'},
+{s:'done',t:'Top 8 memorised reports drafted as IES equivalents',sub:'Job Cost Summary · WIP Schedule · Subcontractor Ageing · Open Commitments · 4 others'},
+],
+aiResult:'1 integration gap: Buildertrend PO sync requires Engineering assessment. All other integrations have a clear IES path. 14 recurring transactions pre-filled — need your approval.',
+aiCol:['Confirmed Procore IES integration active — re-authentication only after go-live','Pre-filled all 14 recurring transactions with IES-equivalent configurations for your approval','Pre-built 8 IES report equivalents from Meridian\'s most-used QBDT memorised reports','Scheduled bank feed reconnection window — allow 3 business days per institution'],
+youCol:['Approve or adjust each of the 14 pre-filled recurring transactions — AI steps you through each one','Confirm the 8 IES report equivalents match your needs, or flag any that need adjustment','Initiate Buildertrend rebuild assessment — Engineering ticket link sent to Daniel Cruz (IT)','Block 3 days for bank feed reconnection in the first week after go-live'],
+sample:null,concept:null,mapRows:null,decision:null,gate:null,
+deps:[{l:'IES environment configured',s:'req'},{l:'App list extracted',s:'ok'}]},
+]},
+{id:'s4',col:'var(--s4)',cx:4,ai:true,badge:'Stage 4 · Migration',name:'Active migration',
+title:'AI executes the migration. <em>You monitor</em> exceptions.',
+sub:'No configuration decisions in this stage. AI processes all three workstreams in parallel — financial history, paycheck records, and HR data. You are alerted only when a situation genuinely requires your judgement.',
+steps:[
+{id:'s4_1',n:'11',title:'Financial data migration — transactions, A/R, A/P, WIP',tags:['Accounting','AI executing'],tc:['tag-acct','tag-ai'],
+sub:'Nine years of Meridian financial history migrates into the IES environment built in Stage 3. AI monitors every batch and flags unexplained variances in real time.',
+aiTasks:[
+{s:'done',t:'214-account Chart of Accounts imported — confirmed by Lisa Park, CPA',sub:'Opening balances: Assets $3,847,200 · Liabilities $1,294,600 · Equity $2,552,600 · Trial balance verified'},
+{s:'done',t:'42 customer accounts + 67 vendor accounts migrated',sub:'Price rules applied · Dimensions tagged · All contact data preserved · 0 duplicates'},
+{s:'run',t:'Open transactions migrating — 34 open invoices, 22 open bills',sub:'A/R open: $2,147,800 (18 active jobs) · A/P open: $894,300 (31 subcontractors)'},
+{s:'wait',t:'Historical transaction migration queued (2016–2024)',sub:'3 years full detail + 6 years summary · Est. 2.5 hours'},
+],
+aiResult:'',
+aiCol:['Applying Division and State Office Dimensions to all historical transactions based on Stage 2 class/location mapping','Preserving retainage: $218,400 held (federal jobs) and $94,200 receivable (commercial) as separate line items','Calculating WIP Schedule positions — 12 jobs under-billed, 6 over-billed as at migration date','Running real-time Balance Sheet diff vs QBDT baseline — 0 unexplained variances at last check'],
+youCol:['Monitor the progress counter — Meridian\'s file size means financial migration takes approximately 3 hours','Do not enter new transactions in QBDT during this window','Review any exceptions in the queue — each has a specific reason and 3 resolution options','Confirm retainage and WIP positions with Lisa Park before the payroll migration begins'],
+sample:null,concept:null,mapRows:null,decision:null,gate:null,
+deps:[{l:'CoA signed off — Lisa Park, CPA',s:'ok'},{l:'Dimensions configured',s:'ok'},{l:'IES environment ready',s:'ok'}]},
+{id:'s4_2',n:'12',title:'Paycheck history — priority & historical lanes',tags:['Payroll','AI executing','Gate'],tc:['tag-pay','tag-ai','tag-gate'],
+sub:'34 employees migrate in two parallel lanes. 29 active employees via HistoricalPaycheck API (Priority). 5 terminated + prior-year via Archive API (Historical).',
+aiTasks:[
+{s:'done',t:'In-progress payroll gate cleared — no pending batches as at 14 Dec 2024',sub:'Last submitted: 6 Dec 2024 · Next scheduled: 20 Dec 2024 · Safe to proceed'},
+{s:'done',t:'Pre-flight dry run: 1,847 paychecks validated — 4 read-only overrides (rounding < $1.50)',sub:'0 blocked paychecks · 0 payload failures · 4 math-error overrides bulk-accepted'},
+{s:'run',t:'Priority lane: 29 employees, 1,340 paychecks — HistoricalPaycheck API',sub:'Processed: 847 · Remaining: 493 · Est. 18 minutes remaining'},
+{s:'run',t:'Historical lane: 5 terminated employees, 507 paychecks — Archive API',sub:'PDF export running in parallel for 2016–2023'},
+],
+aiResult:'',
+aiCol:['Check-to-paycheck intercept running — any paycheck the native tool converts to a bank transaction is caught and re-posted as a HistoricalPaycheck object','YTD accumulator building per employee — verified against QBDT Payroll Summary after every batch of 50 paychecks','D. Harrington Period 1 (Jan–14 Jun 2024) archived · Period 2 (2 Sep–Dec 2024) in priority migration with fresh YTD accumulator','Prior-year PDF export (2016–2023) running for all 34 employees — stored in IES document vault, 7-year retention'],
+youCol:['Watch the "paychecks recovered" counter — this is the check-to-paycheck intercept working as designed','Sign off on per-batch YTD validation as each batch of 50 completes — AI explains every delta in plain English','Review any exceptions in the queue — goal is zero before the 20 Dec payroll','Do not run the 20 Dec payroll in QBDT — it will run in IES'],
+sample:{label:'Per-batch YTD validation — Batch 1 (employees A–H, complete)',cols:['Employee','QBDT YTD Gross','IES YTD Gross','Fed Tax (QBDT)','Fed Tax (IES)','Status'],rows:[
+['J. Allen','$94,200','$94,200','$18,420','$18,420','Matched'],
+['R. Bautista','$82,400','$82,400','$15,890','$15,890','Matched'],
+['M. Chen','$67,800','$67,800','$12,304','$12,302','Amber — $2 rounding'],
+['D. Harrington (P2)','$41,600','$41,600','$7,488','$7,488','Matched — Period 2 only'],
+['L. Hernandez','$88,400','$88,400','$17,620','$17,620','Matched'],
+['K. Iwata','$54,800','$54,800','$9,212','$9,212','Matched'],
+]},
+concept:null,mapRows:null,decision:null,
+gate:'Must complete before the 20 Dec 2024 IES payroll run. The YTD accumulator reads from these migrated paychecks — any error produces incorrect withholding on the first live paycheck.',
+deps:[{l:'Pay item mapping complete',s:'ok'},{l:'Employee records confirmed',s:'ok'},{l:'Pre-flight passed',s:'ok'}]},
+{id:'s4_3',n:'13',title:'CoA deduplication & change notification',tags:['Accounting','AI automated'],tc:['tag-acct','tag-ai'],
+sub:'AI suppresses 1,340 payroll bank transactions that are now native paycheck objects, preventing doubled Chart of Accounts entries. A plain-English notification explains every change.',
+aiTasks:[
+{s:'done',t:'1,340 paycheck-to-bank-transaction matches confirmed',sub:'Match key: paycheck date + net pay + employee SSN + pay period end · 0 false positives'},
+{s:'done',t:'1,340 bank transactions suppressed — conditional on HistoricalPaycheck API confirmation',sub:'No bank transaction removed until its paycheck object was confirmed by the API'},
+{s:'done',t:'7 pre-2022 manual checks had no matching bank transaction',sub:'7 new CoA entries created — expected (paper checks before Meridian moved to direct deposit)'},
+{s:'done',t:'Change notification drafted in plain English — sent to Tom Vasquez and Lisa Park',sub:'No accounting jargon · Explains what changed and why totals are unchanged'},
+],
+aiResult:'1,340 payroll bank transactions replaced by detailed paycheck records. Meridian\'s CoA payroll totals are unchanged — same expenses, now in a more accessible format. 7 pre-2022 manual check entries added (expected).',
+aiCol:['All deduplication ran automatically — no user input at any point','Conditional suppression: no bank transaction removed unless its HistoricalPaycheck was API-confirmed first','Change notification written in plain English and sent to tom.vasquez@meridianconst.com and lisa.park@mitchellpark-cpa.com'],
+youCol:['Read the change notification — confirm the explanation is clear before your next bank reconciliation','Confirm with Lisa Park that the 7 manual check entries are expected (they are — pre-direct deposit era)','Your CoA totals have not changed — only the structure of how payroll is presented'],
+sample:null,concept:null,mapRows:null,decision:null,gate:null,
+deps:[{l:'Paycheck migration complete',s:'ok'},{l:'HistoricalPaycheck API confirmed',s:'ok'}]},
+]},
+{id:'s5',col:'var(--s5)',cx:5,ai:false,badge:'Stage 5 · Go-Live',name:'Validation & first payroll',
+title:'Validate everything. <em>Then run payroll</em> with confidence.',
+sub:'The highest-complexity stage — and the one that determines whether this migration succeeded. Every report is compared against your QBDT baseline. The 20 Dec payroll is Meridian\'s proof point. AI monitors activity for 90 days after go-live.',
+steps:[
+{id:'s5_1',n:'14',title:'Financial validation — reports vs QBDT baseline',tags:['Accounting','AI comparison'],tc:['tag-acct','tag-ai'],
+sub:'AI runs a line-by-line comparison of all IES reports against pre-migration QBDT baseline snapshots. Lisa Park must sign off before Meridian goes live.',
+aiTasks:[
+{s:'done',t:'Balance Sheet — as at 31 Dec 2024',sub:'Assets $3,847,200 ✓ · Liabilities $1,294,600 ✓ · Equity $2,552,600 ✓ · 0 unexplained variances'},
+{s:'done',t:'P&L — Jan–Dec 2024',sub:'Revenue $8,204,400 ✓ · COGS $5,998,200 ✓ · Gross margin 26.9% ✓ · Operating expenses $1,124,800 ✓'},
+{s:'done',t:'A/R Ageing — 34 open invoices',sub:'$2,147,800 total · All 34 match exactly · $218,400 retainage held preserved'},
+{s:'done',t:'Payroll Summary — 34 employees YTD',sub:'33 of 34: exact match · M. Chen: $2 federal rounding difference — within IRS tolerance, explained'},
+],
+aiResult:'All Meridian financials match QBDT baseline. 1 amber item: M. Chen $2 federal tax rounding — within IRS tolerance, pre-explained. Lisa Park\'s sign-off is pending.',
+sample:{label:'Key validation summary',cols:['Report','QBDT baseline','IES result','Variance','Status'],rows:[
+['Total Assets','$3,847,200','$3,847,200','—','Matched'],
+['Total Revenue YTD','$8,204,400','$8,204,400','—','Matched'],
+['Open A/R','$2,147,800','$2,147,800','—','Matched'],
+['Open A/P','$894,300','$894,300','—','Matched'],
+['YTD Payroll Wages (all)','$2,184,600','$2,184,600','—','Matched'],
+['M. Chen — Federal Tax YTD','$12,304','$12,302','$2','Amber — rounding tolerance'],
+['WIP Under-billed','$384,200','$384,200','—','Matched'],
+['WIP Over-billed','$142,600','$142,600','—','Matched'],
+]},
+concept:null,mapRows:null,decision:null,
+gate:'Lisa Park, CPA must formally sign off on Meridian\'s opening balances before the first live IES transaction is entered. Sign-off request sent — awaiting response.',
+deps:[{l:'Financial migration complete',s:'ok'},{l:'Lisa Park — sign-off',s:'req'}]},
+{id:'s5_2',n:'15',title:'Pay History verification & north-star test',tags:['Payroll','You test'],tc:['tag-pay','tag-learn'],
+sub:'Before going live, you personally test the scenario the entire payroll migration was built for: find a specific Meridian employee\'s pay stub from a specific period and download it.',
+aiTasks:[
+{s:'done',t:'Pay History populated for all 34 employees',sub:'Timeline anchor set at 31 Dec 2024 · "Migrated from QuickBooks Desktop" label on all historical records'},
+{s:'done',t:'Three record types configured and visually distinguished',sub:'Live IES paycheck · Historical standard (read-only) · Historical · Override (4 paychecks, rounding < $1.50)'},
+{s:'done',t:'W-2 readiness simulation — all 34 employees',sub:'Box 1, 2, 3/4, 5/6, 12, 15/16/17 verified · 0 discrepancies · D. Harrington W-2 reflects Period 2 wages only ($41,600)'},
+{s:'done',t:'Preserved Paycheck Portal configured for 5 terminated employees + prior-year records',sub:'R. Delgado and 4 others searchable by name, last 4 SSN, period, tax year'},
+],
+aiResult:'Pay History ready for all 34 employees. Run the north-star test before proceeding.',
+aiCol:['1,340 paychecks visible in Pay History with correct timeline anchor and record type badges','W-2 simulation confirmed accurate — no year-end corrections anticipated for any of Meridian\'s 34 employees','"Report an issue" path on every historical paycheck — structured form routes to IES migration team, not general support'],
+youCol:['Run the north-star test: find Carlos Mendez → Pay History tab → click April 2024 paycheck → download the PDF stub → confirm all fields are present (OT, health deduction, prevailing wage supplement)','Confirm the timeline anchor (31 Dec 2024) is visible between historical and live records','Confirm you can distinguish the 4 read-only override records — they carry a small "Override" label and a tooltip explaining the rounding variance'],
+sample:null,concept:null,mapRows:null,decision:null,
+gate:'The north-star test must pass — find and download a specific historical pay stub in under 3 minutes — before the 20 Dec payroll runs.',
+deps:[{l:'Paycheck migration complete',s:'ok'},{l:'YTD validation signed off',s:'ok'}]},
+{id:'s5_3',n:'16',title:'Employee setup — direct deposit & self-service',tags:['Payroll','HR','You act'],tc:['tag-pay','tag-hr'],
+sub:'Banking details cannot migrate from QBDT for security reasons. 29 active Meridian employees re-enter their own banking details via the IES self-service portal.',
+aiTasks:[
+{s:'done',t:'Self-service invitations sent to all 29 active employees',sub:'Email + SMS · Sent: 10 Dec 2024 · Deadline: 18 Dec 2024 · Reminders at 48h and 24h before deadline'},
+{s:'done',t:'Completion: 26 of 29 employees (90%)',sub:'Pending: T. Watkins · A. Rivera · J. Osei'},
+{s:'done',t:'Fallback: 3 pending employees will receive paper checks on 20 Dec',sub:'Amounts pre-calculated · No payroll delay · Payroll admin (Maria Santos) notified'},
+],
+aiResult:'26 of 29 employees complete. T. Watkins, A. Rivera, and J. Osei are pending. All 3 will receive paper checks on 20 Dec if not completed — no payroll is delayed.',
+aiCol:['Invitation flow fully automated — Maria Santos did not need to contact employees individually','Completion dashboard live — shows who is done, pending, and when each employee last opened the portal','Paper check fallback pre-calculated for 3 pending employees — no action required from payroll admin'],
+youCol:['Follow up directly with T. Watkins, A. Rivera, and J. Osei — a personal message is more effective than a system reminder at this point','Confirm with Maria Santos that paper checks for 3 employees are acceptable for this run','After 20 Dec: ensure all 3 complete direct deposit setup before the 3 Jan payroll'],
+sample:null,concept:null,mapRows:null,decision:null,gate:null,
+deps:[{l:'Pay History verified',s:'ok'},{l:'Employee roster confirmed',s:'ok'}]},
+{id:'s5_4',n:'17',title:'Parallel payroll dry run — 20 Dec in both systems',tags:['Payroll','Gate','You approve'],tc:['tag-pay','tag-gate'],
+sub:'The 20 Dec bi-weekly payroll is run in both QBDT and IES. The IES run is not submitted. Line-by-line comparison across all 29 active employees.',
+aiTasks:[
+{s:'done',t:'20 Dec payroll calculated in QBDT (reference) and IES (test — not submitted)',sub:'29 employees · Pay period: 7–20 Dec 2024 · Includes OT from Copper Ridge Phase 2 rush'},
+{s:'done',t:'Comparison complete: 27 of 29 employees exact match',sub:'2 employees have differences requiring review'},
+{s:'done',t:'Discrepancy analysis for 2 employees',sub:'T. Watkins: $269.60 difference — W-4 not entered in IES (expected) · P. Sharma: $18 CA SDI — rate lookup discrepancy'},
+{s:'done',t:'First-run anomaly detection armed',sub:'AI will compare 20 Dec total against Meridian\'s historical bi-weekly average ($164,800) before you submit'},
+],
+aiResult:'2 discrepancies: T. Watkins (expected — W-4 not entered). P. Sharma $18 CA SDI requires a configuration check before submitting.',
+sample:{label:'Parallel run — selected employees (27 exact matches not shown)',cols:['Employee','QBDT net pay','IES net pay','Difference','Status'],rows:[
+['J. Allen','$5,820.40','$5,820.40','—','Matched'],
+['M. Chen','$4,218.60','$4,218.60','—','Matched'],
+['D. Harrington','$2,940.80','$2,940.80','—','Matched'],
+['P. Sharma','$4,640.20','$4,622.20','$18.00','⚠ CA SDI discrepancy'],
+['T. Watkins','$3,892.00','$3,622.40','$269.60','⚠ W-4 not entered in IES'],
+['S. Garcia','$4,408.00','$4,408.00','—','Matched'],
+]},
+concept:null,mapRows:null,
+decision:{q:'Two discrepancies found in the 20 Dec parallel run. How would you like to proceed?',opts:[
+{t:'Fix P. Sharma\'s CA SDI configuration and re-run comparison before submitting (recommended)',sub:'The $18 SDI difference indicates a rate table error. Fix it now — it affects every CA employee on every payroll. T. Watkins will receive a paper check for this run.',c:'ok',ct:'IES SDI configuration corrected. Comparison re-running for P. Sharma. T. Watkins receives a paper check on 20 Dec. Both corrected for the 3 Jan payroll.'},
+{t:'Submit the 20 Dec IES payroll with the known $18 SDI difference',sub:'Accept the $18 difference for P. Sharma this period. Fix the SDI rate before the 3 Jan payroll.',c:'warn',ct:'⚠ P. Sharma will be under-withheld by $18 CA SDI this period. Fix the rate configuration immediately after the 20 Dec run — before the 3 Jan payroll.'},
+]},
+gate:'The parallel run must pass — or all differences must be explained and accepted — before the 20 Dec IES payroll is submitted.',
+deps:[{l:'Pay History verified',s:'ok'},{l:'Employee setup 26/29',s:'ok'},{l:'YTD validation signed off',s:'ok'}]},
+{id:'s5_5',n:'18',title:'5-night parallel monitor → QBDT decommission',tags:['Accounting','Payroll','AI monitoring'],tc:['tag-acct','tag-pay','tag-ai'],
+sub:'From 20 Dec through the first week of January, AI compares IES and QBDT registers every night. After 5 consecutive clean nights, the decommission gate opens for co-sign.',
+aiTasks:[
+{s:'done',t:'Night 1 — 20 Dec: all registers matched',sub:'Payroll register · Bank register · Liability balances · 29 direct deposits confirmed'},
+{s:'done',t:'Night 2 — 23 Dec: all registers matched',sub:'A/R and A/P ageing unchanged · 0 unexplained variances'},
+{s:'run',t:'Night 3 — 27 Dec: running…',sub:'Est. completion: 2:00 AM PST'},
+{s:'wait',t:'Nights 4 and 5 — 28 and 30 Dec: pending',sub:'After 5 consecutive clean nights, decommission gate opens'},
+],
+aiResult:'3 of 5 clean nights complete. On track for QBDT decommission recommendation by 30 Dec 2024.',
+aiCol:['Nightly comparison runs automatically — Tom Vasquez and Lisa Park receive a 7 AM morning digest each day','Anomaly detection active on every IES payroll run — comparison against Meridian\'s historical bi-weekly average ($164,800) before submission','Pay History access monitored — AI flags if payroll admin (Maria Santos) or any employee has not opened Pay History within 14 days','90-day IES Insights seeding: Job Cost Variance, WIP Position, and Division P&L benchmarks available by Day 30 post-go-live'],
+youCol:['Read the morning digest each day — "All registers matched" or specific items to investigate','After 5 clean nights: co-sign the QBDT decommission confirmation with Lisa Park — stored in IES audit trail','Archive the QBDT company file (.QBW) to secure off-site storage — retain for 7 years per IRS requirements','AI generates Meridian\'s migration completion document — you and Lisa Park co-sign, stored permanently in IES'],
+sample:{label:'Parallel monitor — first 3 nights',cols:['Night','Date','Check register','Payroll register','Liability balances','Result'],rows:[
+['1','20 Dec 2024','$164,824 ✓','29 employees ✓','FUTA/SUI/SIT ✓','Clean'],
+['2','23 Dec 2024','No payroll ✓','—','Unchanged ✓','Clean'],
+['3','27 Dec 2024','Running…','Running…','Running…','Pending'],
+]},
+concept:null,mapRows:null,decision:null,
+gate:'Co-signed decommission confirmation from Tom Vasquez (Owner) and Lisa Park, CPA is required before QBDT is archived. This action is irreversible.',
+deps:[{l:'First IES payroll submitted (20 Dec)',s:'req'},{l:'Financial validation signed off',s:'ok'},{l:'Lisa Park — decommission co-sign',s:'req'}]},
+]},
+];
+/* STATE */
+let cur=-1,openSteps={},done={},picks={};
+const total=()=>STAGES.reduce((a,s)=>a+s.steps.length,0);
+const doneN=()=>Object.values(done).filter(Boolean).length;
+/* ICONS */
+const ic={
+chk:`<svg viewBox="0 0 10 10" fill="none" width="10" height="10" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+sp:`<svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="14" stroke-dashoffset="10" stroke-linecap="round"/></svg>`,
+wt:`<svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/></svg>`,
+ch:`<svg viewBox="0 0 13 13" fill="none"><path d="M3 6.5l3 3 4.5-4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+arr:`<svg viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ai:`<svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1v2M6.5 10v2M1 6.5h2M10 6.5h2M2.7 2.7l1.3 1.3M9 9l1.3 1.3M2.7 10.3l1.3-1.3M9 4l1.3-1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+gt:`<svg viewBox="0 0 12 12" fill="none"><path d="M6 1L1.5 4v6.5L6 13l4.5-2.5V4L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`,
+nx:`<svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+/* NAV */
+function rNav(){
+  const pips=STAGES.map((s,i)=>{
+    const d=s.steps.every(st=>done[st.id]),a=cur===i;
+    return `<div class="npip s${i+1}${d?' dn':''}${a?' act':''}" title="${s.name}" onclick="goSt(${i})"></div>`;
+  }).join('');
+  document.getElementById('navPips').innerHTML=pips;
+  document.getElementById('navPct').textContent=Math.round(doneN()/total()*100)+'%';
+}
+/* SIDEBAR */
+function rSb(){
+  const sb=document.getElementById('sidebar');
+  let h=`<div class="sb-top"><button class="sb-ov${cur===-1?' act':''}" onclick="goOv()">${ic.ai} Overview</button></div>`;
+  STAGES.forEach((s,si)=>{
+    const a=cur===si,d=s.steps.every(st=>done[st.id]);
+    h+=`<div class="sb-stage">
+      <div class="sb-sh${a?' act':''}${d?' dn':''}" style="--stcol:${s.col}" onclick="goSt(${si})">
+        <div class="sb-dot"></div>
+        <div><div class="sb-stlbl">${s.badge}</div><div class="sb-stname">${s.name}</div></div>
+      </div>`;
+    if(a){
+      h+=`<div class="sb-steps">`;
+      s.steps.forEach(st=>{h+=`<div class="sb-step${done[st.id]?' dn':openSteps[st.id]?' act':''}" onclick="openSt('${st.id}')"><div class="sb-step-pip"></div>${st.title}</div>`;});
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  });
+  sb.innerHTML=h;
+}
+/* OVERVIEW */
+function rOv(){
+  const m=document.getElementById('main');
+  m.innerHTML=`
+<div class="ov-bar">
+  <div class="ov-logo">MCG</div>
+  <div><div class="ov-coname">Meridian Construction Group</div><div class="ov-cosub">General Contractor · QBDT Enterprise 23.0 · 9 years of history</div></div>
+  <div class="ov-stats">
+    <div><div class="ov-stat-v">$8.2M</div><div class="ov-stat-l">Revenue</div></div>
+    <div><div class="ov-stat-v">34</div><div class="ov-stat-l">Employees</div></div>
+    <div><div class="ov-stat-v">CA/NV/AZ</div><div class="ov-stat-l">States</div></div>
+    <div><div class="ov-stat-v">187</div><div class="ov-stat-l">Active jobs</div></div>
+  </div>
+</div>
+<h1 class="ov-h1">Migration to <em>Intuit Enterprise Suite</em></h1>
+<p class="ov-sub">A structured, AI-assisted journey — 5 stages, 18 steps, increasing complexity. AI performs the analytical and configuration work. You confirm accuracy, resolve exceptions, and sign off at each gate. Nothing moves until Stage 3.</p>
+<div class="ov-prins">
+  <div class="ov-prin"><div class="ov-pi" style="background:var(--ail)">${ic.ai}</div><div class="ov-ptitle">AI does the work</div><div class="ov-ptext">Reads your file, detects gaps, pre-fills all configurations, and monitors the first 90 days post go-live.</div></div>
+  <div class="ov-prin"><div class="ov-pi" style="background:var(--s2l)"><svg viewBox="0 0 13 13" fill="none" style="width:13px;height:13px;color:var(--s2)"><path d="M2 6.5h9M7 2.5l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="ov-ptitle">Concepts in context</div><div class="ov-ptext">Customer:Job → Projects. Classes → Dimensions. Each translation shown using Meridian's actual data at the moment it matters.</div></div>
+  <div class="ov-prin"><div class="ov-pi" style="background:var(--okl)"><svg viewBox="0 0 13 13" fill="none" style="width:13px;height:13px;color:var(--ok)"><path d="M2 6.5l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="ov-ptitle">Gates protect integrity</div><div class="ov-ptext">Accountant sign-off, validation pass, parallel run clearance. Nothing proceeds until each gate is confirmed.</div></div>
+</div>
+<div class="ov-stagelist">
+${STAGES.map((s,i)=>`
+${i?`<div class="ov-stcon"></div>`:''}
+<div class="ov-stage" style="--stcol:${s.col}" onclick="goSt(${i})">
+  <div class="ov-stage-left"><div class="ov-snum" style="border-color:${s.col};color:${s.col}">0${i+1}</div></div>
+  <div class="ov-scard">
+    <div class="ov-sbadge" style="color:${s.col}">${s.badge}</div>
+    <div class="ov-stitle">${s.name.charAt(0).toUpperCase()+s.name.slice(1)}</div>
+    <div class="ov-ssub">${s.sub}</div>
+    <div class="ov-smeta">
+      <span class="ov-spill">${s.steps.length} steps</span>
+      ${s.ai?`<span class="ov-spill" style="color:var(--ai);border-color:var(--aib);background:var(--ail)">AI-driven</span>`:''}
+      <div class="ov-cx"><span class="ov-cx-lbl">Complexity</span><div style="display:flex;gap:3px">${[1,2,3,4,5].map(n=>`<div class="ov-cxp${n<=s.cx?' on':''}" style="${n<=s.cx?`background:${s.col}`:''}"></div>`).join('')}</div></div>
+    </div>
+  </div>
+</div>`).join('')}
+</div>
+<button class="ov-btn" onclick="goSt(0)">${ic.ai} Begin migration journey ${ic.nx}</button>`;
+}
+/* STAGE */
+function rSt(si){
+  const s=STAGES[si];
+  const allDone=s.steps.every(st=>done[st.id]);
+  const nxt=si<STAGES.length-1?STAGES[si+1]:null;
+  const m=document.getElementById('main');
+  m.innerHTML=`
+<div class="st-hdr" style="--stcol:${s.col}">
+  <div class="st-eyebrow">
+    <span class="st-badge" style="color:${s.col};border-color:${s.col};background:${s.col}18">${s.badge}</span>
+    <div class="st-cx"><span class="st-cx-lbl">Complexity</span><div style="display:flex;gap:3px">${[1,2,3,4,5].map(n=>`<div class="st-cxp${n<=s.cx?' on':''}" style="${n<=s.cx?`background:${s.col}`:''}"></div>`).join('')}</div></div>
+    ${s.ai?`<div class="ai-driven-tag">${ic.ai} AI-driven</div>`:''}
+  </div>
+  <h2 class="st-h2" style="--stcol:${s.col}">${s.title}</h2>
+  <p class="st-sub">${s.sub}</p>
+</div>
+${s.ai?`<div class="ai-ctx"><div class="ai-ctx-ic">${ic.ai}</div><div><div class="ai-ctx-lbl">AI-driven stage</div><div class="ai-ctx-t">In this stage, <strong>AI performs the analysis and configuration automatically</strong>. Your role is to review its output, confirm accuracy, and resolve the items that require business judgement.</div></div></div>`:''}
+<div class="step-list">${s.steps.map((st,si2)=>rCard(st,s,si2)).join('')}</div>
+<div class="stage-end${allDone?' show':''}" id="se_${s.id}">
+  <div class="se-label">${ic.chk} Stage complete</div>
+  <div class="se-h">${s.name.charAt(0).toUpperCase()+s.name.slice(1)} — confirmed</div>
+  <div class="se-sub">${nxt?`All ${s.steps.length} steps confirmed. ${nxt.name.charAt(0).toUpperCase()+nxt.name.slice(1)} is next — complexity increases to ${nxt.cx} of 5.`:`Meridian Construction Group's migration journey is complete. Archive your QBDT file and confirm decommission with Lisa Park.`}</div>
+  ${nxt?`<button class="se-btn" onclick="goSt(${si+1})">${ic.nx} Continue to ${nxt.name}</button>`:`<button class="se-btn" onclick="goOv()">Return to overview</button>`}
+</div>`;
+}
+/* CARD */
+function rCard(st,stage,si2){
+  const o=openSteps[st.id],d=done[st.id],lk=si2>0&&!done[stage.steps[si2-1].id];
+  return `<div class="scard${o?' open':''}${d?' dn':''}${lk?' locked':''}" id="card_${st.id}" style="--stcol:${stage.col}">
+<div class="sc-head" onclick="togSt('${st.id}')">
+  <div class="sc-n">${d?ic.chk:`<span>${st.n}</span>`}</div>
+  <div class="sc-meta">
+    <div class="sc-tags">${st.tags.map((t,i)=>`<span class="tag ${st.tc[i]}">${t}</span>`).join('')}</div>
+    <div class="sc-title">${st.title}</div>
+    <div class="sc-sub">${st.sub}</div>
+  </div>
+  <div class="sc-right">
+    ${d?`<span class="confirmed-pill">Confirmed</span>`:st.aiTasks?`<span class="sc-aitag">${ic.ai} AI</span>`:''}
+    <div class="sc-chev">${ic.ch}</div>
+  </div>
+</div>
+${o?rBody(st,stage):''}
+</div>`;
+}
+/* BODY */
+function rBody(st,stage){
+  let h=`<div class="sc-body"><div class="sc-body-in">`;
+  if(st.gate) h+=`<div class="gate-box">${ic.gt}<div class="gate-t"><strong>Gate: </strong>${st.gate}</div></div>`;
+  if(st.aiTasks?.length){
+    const sm={done:'aic-done',run:'aic-run',wait:'aic-wait'};
+    const sv={done:ic.chk,run:ic.sp,wait:ic.wt};
+    h+=`<div class="ai-doing"><div class="aid-h">${ic.ai}<span class="aid-h-lbl">AI is handling for you</span></div>
+<div class="aid-tasks">${st.aiTasks.map(t=>`<div class="aid-t${t.s==='run'?' running':''}"><div class="aic ${sm[t.s]}">${sv[t.s]}</div><div><div class="aid-main">${t.t}</div>${t.sub?`<div class="aid-sub">${t.sub}</div>`:''}</div></div>`).join('')}</div>
+${st.aiResult?`<div class="aid-result show">${ic.chk} ${st.aiResult}</div>`:''}
+</div>`;
+  }
+  if(st.concept){
+    const c=st.concept;
+    h+=`<div class="cb"><div class="cb-hdr"><svg viewBox="0 0 12 12" fill="none" style="width:12px;height:12px;color:#6D28D9"><path d="M2 6h8M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="cb-hdr-t">Concept translation</span><span class="cb-hdr-sub">What changes and why</span></div>
+<div class="cb-body">
+<div class="cb-map">
+  <div class="cb-side cb-from"><div class="cb-sl">${c.fl}</div><div class="cb-sv">${c.fv}</div><div class="cb-sd">${c.fd}</div></div>
+  <div class="cb-arr"><svg viewBox="0 0 18 18" fill="none" style="width:18px;height:18px;color:#8B5CF6"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div class="cb-arr-lbl">becomes</div></div>
+  <div class="cb-side cb-to"><div class="cb-sl">${c.tl}</div><div class="cb-sv">${c.tv}</div><div class="cb-sd">${c.td}</div></div>
+</div>
+<div class="cb-why"><strong>For Meridian: </strong>${c.why}</div>
+${c.parity?`<div class="cb-par">${c.parity.map(p=>`<span class="pc pc-${p.c}">${p.c==='full'?'✓':p.c==='part'?'≈':'✗'} ${p.l}</span>`).join('')}</div>`:''}
+</div></div>`;
+  }
+  if(st.sample){
+    const s=st.sample;
+    h+=`<div class="ds"><div class="ds-hdr"><span class="ds-lbl">${s.label}</span><span class="ds-count">${s.rows.length} records</span></div>
+<table class="dst"><thead><tr>${s.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+<tbody>${s.rows.map(r=>`<tr>${r.map((cell,ci)=>{
+  const pills={'Matched':'dpill dpill-ok','Clean':'dpill dpill-ok','Pending':'dpill dpill-neu'};
+  const isPill=Object.keys(pills).some(k=>cell===k)||cell.startsWith('⚠');
+  if(cell==='Matched'||cell==='Clean') return `<td><span class="dpill dpill-ok">${cell}</span></td>`;
+  if(cell.startsWith('⚠')) return `<td><span class="dpill dpill-warn">${cell}</span></td>`;
+  if(cell==='Pending…'||cell==='Running…') return `<td><span class="dpill dpill-neu">${cell}</span></td>`;
+  if(cell.startsWith('Amber')) return `<td><span class="dpill dpill-warn">${cell}</span></td>`;
+  const mono=ci===0||cell.startsWith('$')||/^\d{1,3},/.test(cell);
+  return `<td${mono?' class="ds-mono"':''}>${cell}</td>`;
+}).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+  if(st.mapRows?.length){
+    const auto=st.mapRows.filter(r=>r.s==='auto').length,rev=st.mapRows.filter(r=>r.s==='rev').length;
+    h+=`<div class="mapwrap"><div class="mapwrap-lbl">AI pay item mapping — ${auto} auto-confirmed, ${rev} require review</div>
+<div class="maprows">${st.mapRows.map(r=>`<div class="maprow${r.s==='auto'?' ok':''}">
+<div class="mf">${r.f}</div><div class="ma"><svg viewBox="0 0 11 11" fill="none" style="width:11px;height:11px;color:var(--t4)"><path d="M2 5.5h7M7 3l2.5 2.5L7 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+<div class="mt">${r.t}</div><span class="ms2 ms-${r.s==='auto'?'auto':r.s==='rev'?'rev':'man'}">${r.s==='auto'?'Auto-matched':'Review'}</span>
+</div>`).join('')}</div>
+<div class="mapsummary"><div class="msi"><div class="msdot" style="background:var(--ok)"></div>${auto} auto-matched</div>${rev?`<div class="msi"><div class="msdot" style="background:var(--warn)"></div>${rev} review needed</div>`:''}</div>
+</div>`;
+  }
+  if(st.aiCol&&st.youCol){
+    h+=`<div class="bgrid">
+<div><div class="bglbl bglbl-ai">AI handles automatically</div><div class="bgpts">${st.aiCol.map(t=>`<div class="bgpt"><div class="bgdot bgd-ai"></div><div class="bgt">${t}</div></div>`).join('')}</div></div>
+<div><div class="bglbl bglbl-you">Your role</div><div class="bgpts">${st.youCol.map(t=>`<div class="bgpt"><div class="bgdot bgd-you"></div><div class="bgt">${t}</div></div>`).join('')}</div></div>
+</div>`;
+  }
+  if(st.decision){
+    const d2=st.decision,sel=picks[st.id];
+    h+=`<div class="dec"><div class="dec-lbl">Decision required</div><div class="dec-q">${d2.q}</div>
+<div class="dec-opts">${d2.opts.map((o,oi)=>`<div class="dec-opt${sel===oi?' sel':''}" onclick="pick2('${st.id}',${oi})">
+<div class="dec-radio"><div class="dec-rin"></div></div>
+<div><div class="dec-opt-t">${o.t}</div><div class="dec-opt-s">${o.sub}</div></div>
+</div>`).join('')}</div>
+${d2.opts.map((o,oi)=>sel===oi?`<div class="dec-con dc-${o.c} show">${o.ct}</div>`:``).join('')}
+</div>`;
+  }
+  if(st.deps?.length){
+    h+=`<div class="depstrip"><span class="dep-lbl">Requires</span>
+${st.deps.map((d,i)=>`${i?`<span class="dep-arr">→</span>`:''}<span class="depnode dn-${d.s==='ok'?'ok':'req'}">${d.l}</span>`).join('')}
+</div>`;
+  }
+  const d=done[st.id],nd=st.decision&&picks[st.id]===undefined;
+  h+=`<div class="cr">
+<div class="cr-l">${ic.ai} AI monitoring</div>
+<button class="crbtn" ${d||nd?'disabled':''} onclick="markDone('${st.id}')" style="background:${stage.col}">
+${d?ic.chk:ic.nx} ${d?'Confirmed':'Confirm & continue'}
+</button>
+</div>`;
+  h+=`</div></div>`;
+  return h;
+}
+/* INTERACTIONS */
+function goOv(){cur=-1;rOv();rSb();rNav();}
+function goSt(si){
+  cur=si;
+  const f=STAGES[si].steps.find(st=>!done[st.id]);
+  if(f){Object.keys(openSteps).forEach(k=>delete openSteps[k]);openSteps[f.id]=true;}
+  rSt(si);rSb();rNav();window.scrollTo({top:0,behavior:'smooth'});
+}
+function togSt(id){
+  if(openSteps[id]){delete openSteps[id];}
+  else{Object.keys(openSteps).forEach(k=>delete openSteps[k]);openSteps[id]=true;}
+  if(cur>=0) rSt(cur);rSb();
+}
+function openSt(id){
+  const si=STAGES.findIndex(s=>s.steps.some(st=>st.id===id));
+  if(si>=0&&si!==cur){cur=si;}
+  Object.keys(openSteps).forEach(k=>delete openSteps[k]);
+  openSteps[id]=true;
+  rSt(cur);rSb();rNav();
+  setTimeout(()=>{const el=document.getElementById('card_'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
+}
+function pick2(sid,oi){picks[sid]=oi;if(cur>=0)rSt(cur);rSb();}
+function markDone(id){
+  done[id]=true;delete openSteps[id];
+  if(cur>=0){
+    const s=STAGES[cur];
+    const idx=s.steps.findIndex(st=>st.id===id);
+    if(idx<s.steps.length-1)openSteps[s.steps[idx+1].id]=true;
+  }
+  rSt(cur);rSb();rNav();
+  setTimeout(()=>{const el=document.getElementById(`se_s${cur+1}`);if(el&&el.classList.contains('show'))el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('gone');
+    goOv();openSteps[STAGES[0].steps[0].id]=true;
+  },1500);
+});
+</script>
+</body>
+</html>

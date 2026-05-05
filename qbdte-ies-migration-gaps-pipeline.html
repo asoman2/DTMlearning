@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Migration Gap — QBDT Enterprise → IES · A Collaborative Pipeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+/* ─── TOKENS ─── */
+:root {
+  --ink:     #0B0F14;
+  --ink-2:   #1A2232;
+  --ink-3:   #243044;
+  --muted:   #8A96A8;
+  --muted-2: #B4BCCA;
+  --border:  rgba(255,255,255,.08);
+  --border-2:rgba(255,255,255,.14);
+  --surface: rgba(255,255,255,.04);
+  --surface-2:rgba(255,255,255,.07);
+  --white:   #FFFFFF;
+
+  /* accent — amber-gold for "warning / gap" energy */
+  --gold:    #E8A82A;
+  --gold-lt: rgba(232,168,42,.15);
+  --gold-dk: #C48B18;
+
+  /* signal colours */
+  --red:     #E05252;   --red-lt:  rgba(224,82,82,.12);
+  --grn:     #3EC87A;   --grn-lt:  rgba(62,200,122,.10);
+  --blue:    #4BA3E3;   --blue-lt: rgba(75,163,227,.10);
+  --purple:  #9B7FE8;   --purple-lt:rgba(155,127,232,.10);
+  --teal:    #2DBFB8;   --teal-lt: rgba(45,191,184,.10);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  --max: 1120px;
+  --r: 8px;
+  --r-lg: 14px;
+  --sh: 0 2px 20px rgba(0,0,0,.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: var(--ink);
+  color: var(--white);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .4;
+}
+
+/* ─── NAV ─── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(11,15,20,.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 52px;
+  display: flex; align-items: center; gap: 20px;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logomark {
+  width: 26px; height: 26px;
+  background: var(--gold);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-logomark svg { width: 14px; height: 14px; }
+.nav-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); letter-spacing: .02em; }
+.nav-div { width: 1px; height: 18px; background: var(--border-2); }
+.nav-sub { font-size: 11px; color: var(--muted); }
+.nav-spacer { flex: 1; }
+.nav-tag {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+  padding: 3px 10px; border-radius: 99px;
+  background: var(--gold-lt); border: 1px solid rgba(232,168,42,.3); color: var(--gold);
+}
+
+/* ─── MASTHEAD ─── */
+.masthead {
+  position: relative;
+  padding: 96px 32px 72px;
+  max-width: var(--max);
+  margin: 0 auto;
+  z-index: 1;
+}
+.masthead-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.masthead-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--gold);
+}
+.masthead-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  margin-bottom: 28px;
+  max-width: 760px;
+}
+.masthead-h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold);
+}
+.masthead-lede {
+  font-size: 18px;
+  line-height: 1.72;
+  color: var(--muted-2);
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+.masthead-meta {
+  display: flex; gap: 32px; flex-wrap: wrap;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.mm-item { }
+.mm-val { font-size: 28px; font-weight: 700; font-family: var(--font-display); color: var(--white); line-height: 1; margin-bottom: 4px; }
+.mm-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+
+/* ─── PAGE BODY ─── */
+.body { max-width: var(--max); margin: 0 auto; padding: 0 32px 96px; position: relative; z-index: 1; }
+
+/* ─── SECTION DIVIDERS ─── */
+.sec-divider {
+  display: flex; align-items: center; gap: 16px;
+  margin: 64px 0 32px;
+}
+.sec-divider-num {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--muted);
+  letter-spacing: .1em;
+  flex-shrink: 0;
+}
+.sec-divider-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 600;
+  color: var(--white);
+}
+.sec-divider-line { flex: 1; height: 1px; background: var(--border-2); }
+
+/* ─── INTRO PROSE ─── */
+.prose {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--muted-2);
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+.prose strong { color: var(--white); font-weight: 600; }
+.prose em { font-style: italic; color: var(--muted-2); }
+
+/* ─── GAP CARDS (the critical gaps section) ─── */
+.gap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.gap-card {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  padding: 24px 26px;
+  position: relative;
+  overflow: hidden;
+  transition: background .2s, border-color .2s;
+}
+.gap-card:hover { background: var(--surface-2); border-color: rgba(255,255,255,.22); }
+.gap-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.gc--red::before   { background: var(--red); }
+.gc--gold::before  { background: var(--gold); }
+.gc--blue::before  { background: var(--blue); }
+.gc--purple::before{ background: var(--purple); }
+.gc--teal::before  { background: var(--teal); }
+.gap-card-tag {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .09em;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.gc--red   .gap-card-tag { color: var(--red); }
+.gc--gold  .gap-card-tag { color: var(--gold); }
+.gc--blue  .gap-card-tag { color: var(--blue); }
+.gc--purple.gap-card-tag { color: var(--purple); }
+.gc--purple .gap-card-tag { color: var(--purple); }
+.gc--teal  .gap-card-tag { color: var(--teal); }
+.gap-card-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600;
+  margin-bottom: 10px; line-height: 1.3;
+}
+.gap-card-body {
+  font-size: 13px; color: var(--muted-2);
+  line-height: 1.7; margin-bottom: 14px;
+}
+.gap-card-impact {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: var(--r);
+  font-weight: 500;
+}
+.gc--red   .gap-card-impact { background: var(--red-lt);   color: #F5A0A0; }
+.gc--gold  .gap-card-impact { background: var(--gold-lt);  color: var(--gold); }
+.gc--blue  .gap-card-impact { background: var(--blue-lt);  color: #93C8F2; }
+.gc--purple.gap-card-impact { background: var(--purple-lt);color: #C4B0F5; }
+.gc--teal  .gap-card-impact { background: var(--teal-lt);  color: #85DDD9; }
+.gap-card-impact-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 3px;
+  opacity: .7;
+}
+
+/* ─── THE PIPELINE CONCEPT ─── */
+.pipeline-intro {
+  background: linear-gradient(135deg, rgba(232,168,42,.08) 0%, rgba(75,163,227,.05) 100%);
+  border: 1px solid rgba(232,168,42,.2);
+  border-radius: var(--r-lg);
+  padding: 36px 40px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.pipeline-intro::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(232,168,42,.1);
+  pointer-events: none;
+}
+.pipeline-intro-label {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--gold);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 14px;
+}
+.pipeline-intro-title {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 600;
+  margin-bottom: 16px; line-height: 1.2;
+}
+.pipeline-intro-body {
+  font-size: 15px; color: var(--muted-2);
+  line-height: 1.8; max-width: 680px;
+}
+
+/* ─── PIPELINE STAGES ─── */
+.pipeline-stages { display: flex; flex-direction: column; gap: 0; margin-bottom: 48px; }
+.ps-connector {
+  width: 2px; height: 28px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.1), rgba(255,255,255,.04));
+  margin-left: 27px;
+}
+.pipeline-stage {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0;
+}
+.ps-left { display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+.ps-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.ps--intake .ps-num  { border-color: var(--blue);   color: var(--blue);   background: var(--blue-lt); }
+.ps--intel  .ps-num  { border-color: var(--gold);   color: var(--gold);   background: var(--gold-lt); }
+.ps--design .ps-num  { border-color: var(--purple); color: var(--purple); background: var(--purple-lt); }
+.ps--build  .ps-num  { border-color: var(--teal);   color: var(--teal);   background: var(--teal-lt); }
+.ps--validate.ps-num { border-color: var(--grn);    color: var(--grn);    background: var(--grn-lt); }
+.ps--live   .ps-num  { border-color: var(--white);  color: var(--white);  background: var(--surface); }
+
+.ps-card {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  margin: 10px 0 10px 16px;
+  transition: background .2s;
+}
+.ps-card:hover { background: var(--surface-2); }
+.ps-stage-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase; letter-spacing: .09em;
+  margin-bottom: 6px;
+}
+.ps--intake  .ps-stage-label { color: var(--blue); }
+.ps--intel   .ps-stage-label { color: var(--gold); }
+.ps--design  .ps-stage-label { color: var(--purple); }
+.ps--build   .ps-stage-label { color: var(--teal); }
+.ps--validate .ps-stage-label { color: var(--grn); }
+.ps--live    .ps-stage-label { color: var(--muted-2); }
+
+.ps-title {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 600;
+  margin-bottom: 10px; line-height: 1.25;
+}
+.ps-body { font-size: 13px; color: var(--muted-2); line-height: 1.7; margin-bottom: 16px; }
+
+.ps-actors {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.ps-actor {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 99px;
+  border: 1px solid;
+}
+.actor-ai      { background: rgba(232,168,42,.1); border-color: rgba(232,168,42,.25); color: var(--gold); }
+.actor-ps      { background: rgba(75,163,227,.1); border-color: rgba(75,163,227,.25); color: var(--blue); }
+.actor-cust    { background: rgba(155,127,232,.1); border-color: rgba(155,127,232,.25); color: var(--purple); }
+.actor-acct    { background: rgba(45,191,184,.1); border-color: rgba(45,191,184,.25); color: var(--teal); }
+.actor-ind     { background: rgba(232,82,82,.1); border-color: rgba(232,82,82,.25); color: var(--red); }
+
+.ps-items { display: flex; flex-direction: column; gap: 6px; }
+.ps-item { display: flex; gap: 10px; align-items: flex-start; }
+.ps-item-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 8px;
+}
+.ps-item-text { font-size: 13px; color: var(--muted-2); line-height: 1.6; }
+.ps-item-text strong { color: var(--white); font-weight: 500; }
+
+/* ─── INDUSTRY MODULES ─── */
+.industry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.ind-card {
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+.ind-card:hover { border-color: rgba(255,255,255,.25); transform: translateY(-2px); }
+.ind-card-head {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ind-card-icon { font-size: 20px; margin-bottom: 10px; display: block; }
+.ind-card-industry {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .09em;
+  margin-bottom: 6px;
+}
+.ind-card-title {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 600;
+  line-height: 1.3;
+}
+.ind-card-body { padding: 16px 22px; background: var(--surface); }
+.ind-gap-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--red); margin-bottom: 6px;
+}
+.ind-gap-text { font-size: 12px; color: var(--muted-2); line-height: 1.6; margin-bottom: 12px; }
+.ind-ies-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--grn); margin-bottom: 6px;
+}
+.ind-ies-text { font-size: 12px; color: var(--muted-2); line-height: 1.6; margin-bottom: 12px; }
+.ind-translation-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--gold); margin-bottom: 6px;
+}
+.ind-translation-text { font-size: 12px; color: var(--muted-2); line-height: 1.6; }
+
+/* ─── TRANSLATION TABLE ─── */
+.translation-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-bottom: 48px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.translation-table th {
+  background: var(--surface-2);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-2);
+}
+.translation-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top; line-height: 1.55; color: var(--muted-2);
+}
+.translation-table tr:last-child td { border-bottom: none; }
+.translation-table tr:hover td { background: var(--surface); }
+.qbdt-concept { color: var(--white); font-weight: 500; }
+.ies-concept { color: var(--blue); font-weight: 500; }
+.translation-note { color: var(--gold); font-size: 12px; }
+.gap-flag { color: var(--red); font-size: 11px; font-weight: 600; }
+.parity-flag { color: var(--grn); font-size: 11px; font-weight: 600; }
+.partial-flag { color: var(--gold); font-size: 11px; font-weight: 600; }
+
+/* ─── DESIGN PRINCIPLES ─── */
+.principles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 48px; }
+.principle {
+  border-left: 2px solid var(--border-2);
+  padding: 0 0 0 20px;
+  transition: border-color .2s;
+}
+.principle:hover { border-left-color: var(--gold); }
+.principle-num {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--muted);
+  margin-bottom: 8px;
+}
+.principle-title {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 600;
+  margin-bottom: 8px; line-height: 1.3;
+}
+.principle-body { font-size: 13px; color: var(--muted-2); line-height: 1.7; }
+
+/* ─── CLOSING MANIFESTO ─── */
+.manifesto {
+  background: linear-gradient(135deg, rgba(155,127,232,.08) 0%, rgba(45,191,184,.06) 100%);
+  border: 1px solid rgba(155,127,232,.2);
+  border-radius: var(--r-lg);
+  padding: 48px 52px;
+  margin-bottom: 48px;
+}
+.manifesto-label {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--purple);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 16px;
+}
+.manifesto-title {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 600;
+  margin-bottom: 24px; line-height: 1.15; max-width: 640px;
+}
+.manifesto-title em { font-style: italic; font-weight: 300; color: var(--purple); }
+.manifesto-body { font-size: 15px; color: var(--muted-2); line-height: 1.85; max-width: 680px; }
+.manifesto-body + .manifesto-body { margin-top: 16px; }
+.manifesto-body strong { color: var(--white); }
+
+/* ─── FOOTER ─── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 32px;
+  max-width: var(--max); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-txt { font-size: 11px; color: var(--muted); }
+.footer-txt strong { color: var(--muted-2); }
+.footer-links { display: flex; gap: 20px; }
+.footer-link { font-size: 11px; color: var(--muted); font-weight: 500; transition: color .15s; text-decoration: none; }
+.footer-link:hover { color: var(--white); }
+
+/* ─── CALLOUT BLOCK ─── */
+.callout {
+  border-left: 3px solid var(--gold);
+  padding: 16px 20px;
+  background: var(--gold-lt);
+  border-radius: 0 var(--r) var(--r) 0;
+  margin: 24px 0;
+}
+.callout p { font-size: 14px; color: rgba(255,255,255,.8); line-height: 1.7; }
+.callout strong { color: var(--gold); }
+
+/* ─── ENTRY ANIMATIONS ─── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.masthead-eyebrow { animation: fadeUp .5s .1s both; }
+.masthead-h1      { animation: fadeUp .5s .2s both; }
+.masthead-lede    { animation: fadeUp .5s .3s both; }
+.masthead-meta    { animation: fadeUp .5s .4s both; }
+
+@media(max-width:800px) {
+  .nav,.masthead,.body,.footer{ padding-left:20px; padding-right:20px; }
+  .gap-grid, .industry-grid { grid-template-columns: 1fr; }
+  .principles { grid-template-columns: 1fr; }
+  .manifesto { padding: 32px 28px; }
+  .pipeline-intro { padding: 28px 24px; }
+  .pipeline-stage { grid-template-columns: 44px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logomark">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L2 4v6l5 3 5-3V4L7 1z" stroke="white" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M7 1v12M2 4l5 3 5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="nav-title">Intuit Enterprise Suite</span>
+  </div>
+  <div class="nav-div"></div>
+  <span class="nav-sub">Migration Strategy</span>
+  <div class="nav-spacer"></div>
+  <span class="nav-tag">Strategic Brief</span>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-eyebrow">Critical workflow analysis — QBDT Enterprise → IES</div>
+  <h1 class="masthead-h1">
+    We are<br>
+    <em>overpromising</em><br>
+    the migration.
+  </h1>
+  <p class="masthead-lede">
+    QuickBooks Desktop Enterprise is not a data store — it is a deeply configured operational system. 
+    Inventory assemblies, class tracking, job costing, custom fields, industry workflows built over 
+    years. Moving that to IES and calling it "migration" is technically accurate and experientially wrong. 
+    This document names the real gaps, then proposes a collaborative pipeline that can actually close them.
+  </p>
+  <div class="masthead-meta">
+    <div class="mm-item"><div class="mm-val">6</div><div class="mm-lbl">Critical feature parity gaps</div></div>
+    <div class="mm-item"><div class="mm-val">5</div><div class="mm-lbl">Conceptual translation failures</div></div>
+    <div class="mm-item"><div class="mm-val">6</div><div class="mm-lbl">Pipeline stages proposed</div></div>
+    <div class="mm-item"><div class="mm-val">5</div><div class="mm-lbl">Industry-specific modules</div></div>
+  </div>
+</header>
+
+<!-- BODY -->
+<main class="body">
+
+  <!-- ═══════════════════════════════════════
+       SECTION 1 — THE REAL GAPS
+  ═══════════════════════════════════════ -->
+  <div class="sec-divider">
+    <span class="sec-divider-num">01 —</span>
+    <span class="sec-divider-title">The critical workflow gaps</span>
+    <div class="sec-divider-line"></div>
+  </div>
+
+  <p class="prose">
+    These are not missing features that will ship in Q3. They are <strong>structural differences</strong> in how 
+    QBDT Enterprise and IES model business operations. Telling a customer their workflows will 
+    "migrate" when these gaps exist is the source of post-migration churn, escalations, and lost trust.
+  </p>
+
+  <div class="gap-grid">
+
+    <div class="gap-card gc--red">
+      <div class="gap-card-tag">Gap 01 · Inventory</div>
+      <div class="gap-card-title">Advanced inventory depth and assembly manufacturing</div>
+      <div class="gap-card-body">
+        QBDT Enterprise has serial/lot number tracking, bin location management, FIFO costing, 
+        barcode scanning, multiple warehouse locations, and build assembly workflows — including 
+        work-in-progress tracking, component shortfall alerts, and unit cost rollups. IES has 
+        strong inventory fundamentals but the manufacturing and warehouse management depth 
+        simply does not have a 1:1 equivalent for a distributor or light manufacturer running on 
+        QBDT Enterprise today.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Companies using QBDT Enterprise for inventory management will need a separate WMS or 
+        manufacturing app post-migration — an unplanned integration that was never part of the 
+        migration conversation.
+      </div>
+    </div>
+
+    <div class="gap-card gc--gold">
+      <div class="gap-card-tag">Gap 02 · Conceptual translation</div>
+      <div class="gap-card-title">Projects and dimensions are not natural language for a QBDT user</div>
+      <div class="gap-card-body">
+        IES uses <strong>Projects</strong> and <strong>Dimensions</strong> (Classes + Locations unified) as 
+        its primary segment reporting model. QBDT Enterprise users think in terms of 
+        <strong>Jobs, Classes, Customer:Job hierarchies, and Service Items</strong>. These are not 
+        the same concepts. A contractor who has built eight years of job cost reporting on the 
+        QBDT class structure will not recognise their data in IES unless someone explicitly 
+        maps each concept and demonstrates that the reporting they depend on still works.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Finance and operations teams arrive in IES not understanding why their segment reports 
+        look different. They distrust the data, revert to QBDT for reconciliation, and delay 
+        the transition indefinitely.
+      </div>
+    </div>
+
+    <div class="gap-card gc--blue">
+      <div class="gap-card-tag">Gap 03 · Job costing</div>
+      <div class="gap-card-title">Job cost reporting doesn't have a direct migration path</div>
+      <div class="gap-card-body">
+        QBDT Enterprise job costing — estimated vs actual costs, job cost detail by phase, 
+        profitability by job, WIP reporting — is one of the primary reasons construction and 
+        professional services companies choose QBDT Enterprise over standard QBO. IES's 
+        Projects feature can replicate many of these capabilities, but the migration engine 
+        does not automatically translate QBDT Job cost structures into IES Projects with 
+        the correct budget and actuals mapping.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Construction and professional services companies — the largest QBDT Enterprise 
+        segment — lose their primary reason for upgrading. They land in IES and immediately 
+        ask "where are my job cost reports?"
+      </div>
+    </div>
+
+    <div class="gap-card gc--purple">
+      <div class="gap-card-tag">Gap 04 · Custom fields and forms</div>
+      <div class="gap-card-title">Custom fields, memorised reports, and form templates are orphaned</div>
+      <div class="gap-card-body">
+        QBDT Enterprise supports extensive custom field configurations at the customer, vendor, 
+        item, and transaction level — often built by the company's accountant or IT team over 
+        years. Memorised report groups are another operational dependency. Neither custom fields 
+        nor memorised reports have an automated migration path to IES. They are silently abandoned.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Operational teams who depended on custom field data (customer category codes, vendor 
+        compliance flags, item tracking attributes) discover their data is missing weeks after 
+        go-live — after the QBDT file has been archived.
+      </div>
+    </div>
+
+    <div class="gap-card gc--teal">
+      <div class="gap-card-tag">Gap 05 · Pricing and price levels</div>
+      <div class="gap-card-title">Price levels and per-customer pricing rules don't transfer</div>
+      <div class="gap-card-body">
+        QBDT Enterprise supports multiple price levels per item, per-customer price level 
+        assignments, and quantity-break pricing. A distributor with 200 customers on 
+        differentiated pricing structures has those rules embedded in QBDT. IES has 
+        price rules capabilities but they are structured differently — and the 
+        migration engine moves the items, not the pricing matrix.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Sales team issues the first invoice post-migration and quotes the wrong price 
+        to a preferred customer. That error reaches the customer before anyone 
+        realises the pricing rules didn't migrate.
+      </div>
+    </div>
+
+    <div class="gap-card gc--red">
+      <div class="gap-card-tag">Gap 06 · Audit and control</div>
+      <div class="gap-card-title">Closing date enforcement and audit trail parity gaps</div>
+      <div class="gap-card-body">
+        QBDT Enterprise's closing date password, audit trail, and transaction lock mechanisms 
+        behave differently from IES's period close and permission model. Companies in regulated 
+        industries, or those undergoing audits, expect the same hard-close guarantees. 
+        The role-based permission model in IES is actually stronger — but the transition 
+        between paradigms is not explained or managed during migration.
+      </div>
+      <div class="gap-card-impact">
+        <div class="gap-card-impact-label">Business impact if not addressed</div>
+        Accountants and controllers discover post-migration that their close-date controls 
+        work differently than expected. In an audit context, this gap is a compliance risk, 
+        not just a UX inconvenience.
+      </div>
+    </div>
+
+  </div><!-- /gap-grid -->
+
+  <div class="callout">
+    <p>
+      <strong>The honest statement:</strong> IES is a more capable platform than QBDT Enterprise in most 
+      dimensions. The problem is not what IES can do — it is the absence of a <em>translation 
+      layer</em> that connects what the customer knows how to do in QBDT to how it is done in IES. 
+      Right now that translation lives in the customer's head, or in their accountant's experience, 
+      or it doesn't happen at all.
+    </p>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 2 — CONCEPTUAL TRANSLATION MAP
+  ═══════════════════════════════════════ -->
+  <div class="sec-divider">
+    <span class="sec-divider-num">02 —</span>
+    <span class="sec-divider-title">Conceptual translation map — QBDT → IES</span>
+    <div class="sec-divider-line"></div>
+  </div>
+
+  <p class="prose">
+    Before any configuration begins, every business must understand what their QBDT concepts become 
+    in IES. This is not a feature comparison. It is a <strong>language translation</strong>. 
+    The concepts below are the ones that consistently disorient migrating customers.
+  </p>
+
+  <table class="translation-table">
+    <thead>
+      <tr>
+        <th style="width:20%">QBDT Enterprise concept</th>
+        <th style="width:22%">IES equivalent</th>
+        <th style="width:14%">Parity</th>
+        <th style="width:44%">What the customer must understand — and what is genuinely different</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="qbdt-concept">Classes</span><br><span style="font-size:11px;color:var(--muted)">Segment tagging on transactions</span></td>
+        <td><span class="ies-concept">Dimensions (Classes + Locations)</span></td>
+        <td><span class="parity-flag">✓ Parity</span></td>
+        <td>IES unifies Classes and Locations into a single Dimensions model. More powerful — but a customer who had separate Class and Location tracking will need a mapping decision: do Classes become one Dimension and Locations another, or are they merged? This decision must be made before migration, not discovered after.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Customer:Job hierarchy</span><br><span style="font-size:11px;color:var(--muted)">Parent customer with sub-jobs</span></td>
+        <td><span class="ies-concept">Projects (under a Customer)</span></td>
+        <td><span class="partial-flag">~ Partial</span></td>
+        <td>IES Projects are more capable than QBDT Jobs — they support budget vs actual tracking, profitability reporting, and time integration. But QBDT's multi-level Customer:Job hierarchy (customer → job → phase → cost code) does not map cleanly to IES Projects' flat structure. Deep hierarchies require a deliberate re-architecting, not a direct migration.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Items (Inventory, Non-inventory, Service, Assembly)</span></td>
+        <td><span class="ies-concept">Products &amp; Services (with inventory tracking)</span></td>
+        <td><span class="partial-flag">~ Partial</span></td>
+        <td>Standard items migrate well. Assembly items (Bill of Materials) have no direct IES equivalent without a manufacturing integration. Inventory Assembly items that track builds and component consumption will either need a third-party manufacturing app or a significant workflow redesign in IES.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Price Levels</span><br><span style="font-size:11px;color:var(--muted)">Per-customer or per-item pricing rules</span></td>
+        <td><span class="ies-concept">Price Rules / Custom Pricing</span></td>
+        <td><span class="partial-flag">~ Partial</span></td>
+        <td>IES supports custom pricing rules but structures them differently from QBDT's price levels. A flat percentage discount level in QBDT must be re-created as an explicit price rule in IES. Quantity-break pricing requires a manual rule creation for each break point. The migration engine does not carry pricing rules — only item list prices.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Custom Fields (on customers, vendors, items, transactions)</span></td>
+        <td><span class="ies-concept">Custom Fields (limited to specific record types)</span></td>
+        <td><span class="gap-flag">✗ Gap</span></td>
+        <td>IES has custom fields but at a different level of granularity than QBDT Enterprise. Some QBDT custom field placements have no IES equivalent location. The data in those fields does not migrate — it must be manually mapped to an available field, or that data category is permanently lost. This gap is invisible until someone looks for the data post-migration.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Memorised Reports and Report Groups</span></td>
+        <td><span class="ies-concept">Custom Reports (must be rebuilt)</span></td>
+        <td><span class="gap-flag">✗ Gap</span></td>
+        <td>No migration path exists for QBDT memorised reports. A finance team that opens IES on Day 1 and tries to run their standard morning reports will find none of them. This is predictable, preventable, and consistently surprises customers because it is never surfaced during the migration conversation.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Serial / Lot Number Tracking</span></td>
+        <td><span class="ies-concept">Not available natively in IES</span></td>
+        <td><span class="gap-flag">✗ Gap</span></td>
+        <td>Serial and lot tracking requires a third-party app integration (e.g. Katana, SOS Inventory, Fishbowl). If this is a core operational dependency, it must be scoped as an integration requirement and tested before go-live — not discovered post-migration when the first serialised inventory receipt fails.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Multiple Warehouse / Bin Locations</span></td>
+        <td><span class="ies-concept">Partial — Locations dimension, no bin-level</span></td>
+        <td><span class="gap-flag">✗ Gap</span></td>
+        <td>IES supports multiple inventory locations at the warehouse level but does not support bin-level tracking natively. Businesses with bin-level inventory control — distribution centres, manufacturing operations — need a WMS integration. This is not communicated during the migration sales process.</td>
+      </tr>
+      <tr>
+        <td><span class="qbdt-concept">Closing Date Password</span><br><span style="font-size:11px;color:var(--muted)">Hard-close enforcement mechanism</span></td>
+        <td><span class="ies-concept">Period Close + Role-based permissions</span></td>
+        <td><span class="partial-flag">~ Different</span></td>
+        <td>IES's period close model is more sophisticated but works differently. The QBDT "closing date password" is a single hard lock. IES uses role-based permissions per period. The outcome is similar — prior-period protection — but the mechanism is different enough that accountants who depend on closing date enforcement need explicit orientation before go-live.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 3 — THE COLLABORATIVE PIPELINE
+  ═══════════════════════════════════════ -->
+  <div class="sec-divider">
+    <span class="sec-divider-num">03 —</span>
+    <span class="sec-divider-title">The collaborative migration pipeline</span>
+    <div class="sec-divider-line"></div>
+  </div>
+
+  <div class="pipeline-intro">
+    <div class="pipeline-intro-label">Proposed approach</div>
+    <div class="pipeline-intro-title">From data transport to operational transformation</div>
+    <div class="pipeline-intro-body">
+      The migration experience needs to be rebuilt around a single honest premise: 
+      <strong style="color:var(--white)">the customer is not migrating a file — they are re-platforming an operating system.</strong>
+      That requires a structured engagement model where AI does the diagnostic and translation work, 
+      Professional Services provides industry expertise and configuration guidance, and the customer's 
+      own stakeholders — finance, operations, warehouse, HR — are brought in at the moments their 
+      domain knowledge is actually needed. Not as spectators to a technical process, but as 
+      co-designers of their own IES environment.
+    </div>
+  </div>
+
+  <div class="pipeline-stages">
+
+    <!-- STAGE 1: INTAKE & DISCOVERY -->
+    <div class="pipeline-stage ps--intake">
+      <div class="ps-left">
+        <div class="ps-num">01</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 1 · Intake &amp; AI Discovery</div>
+        <div class="ps-title">Deep diagnostic — AI reads the operational DNA of the QBDT file</div>
+        <div class="ps-body">
+          Before any human reviews anything, AI performs a comprehensive analysis of the QBDT Enterprise 
+          file — not just the data, but the operational patterns. Which custom fields are populated by 
+          more than 80% of records (operationally critical)? Which classes map to departments vs job types 
+          vs segments? What is the Customer:Job hierarchy depth? Which items have assemblies? What 
+          percentage of inventory uses serial or lot numbers? This diagnostic produces an 
+          <strong>Operational DNA report</strong> — a plain-English description of how this business 
+          actually runs — before a single migration configuration question is asked.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-ai">AI automated</span>
+          <span class="ps-actor actor-ps">PS team receives</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--blue)"></div><div class="ps-item-text"><strong>Industry detection:</strong> AI classifies the business by operational pattern — not just by NAICS code. A "construction" company running primarily service workflows is treated differently from one running WIP-heavy project management.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--blue)"></div><div class="ps-item-text"><strong>Complexity scoring:</strong> Inventory complexity, reporting complexity, user configuration depth, and integration dependency each scored independently. The score drives which pipeline tier this customer lands in — standard guided, custom configured, or full Professional Services engagement.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--blue)"></div><div class="ps-item-text"><strong>Gap pre-detection:</strong> AI flags known-gap categories before the customer is onboarded — serial/lot tracking, assembly manufacturing, deep job cost hierarchy, custom field proliferation. Customer hears about these gaps from Intuit first, not discovers them post-migration.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--blue)"></div><div class="ps-item-text"><strong>Stakeholder map:</strong> Based on the operational DNA, AI recommends which internal roles must be engaged at each pipeline stage: "Your file shows deep job cost tracking — your Project Manager or Site Supervisor needs to be part of the Projects configuration session."</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-connector"></div>
+
+    <!-- STAGE 2: TRANSLATION INTELLIGENCE -->
+    <div class="pipeline-stage ps--intel">
+      <div class="ps-left">
+        <div class="ps-num">02</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 2 · AI Translation Intelligence</div>
+        <div class="ps-title">Conceptual translation — map every QBDT construct to its IES equivalent, explicitly</div>
+        <div class="ps-body">
+          AI generates a draft <strong>Concept Translation Map</strong> for this specific customer — not a 
+          generic table, but a document that shows exactly how this customer's classes, jobs, price levels, 
+          custom fields, and item types map to their IES equivalents. Where the mapping is clean, it is 
+          confirmed. Where there is a gap or a structural difference, AI surfaces three design options and 
+          explains the trade-offs in business language — not technical language. The PS team reviews and 
+          annotates before the customer ever sees it.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-ai">AI generates</span>
+          <span class="ps-actor actor-ps">PS team annotates</span>
+          <span class="ps-actor actor-acct">Accountant reviews</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--gold)"></div><div class="ps-item-text"><strong>Dimension design session:</strong> AI produces a proposed Dimensions structure for IES based on the customer's class/location usage patterns. Customer's accountant confirms or adjusts. No dimension decision is made without a human with business context in the room.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--gold)"></div><div class="ps-item-text"><strong>Projects architecture:</strong> For job-costing-heavy customers, AI proposes a Project hierarchy design — which QBDT Customer:Jobs become IES Projects, which become sub-projects, and how phases and cost codes are modelled. Presented to the Project Manager, not the accountant.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--gold)"></div><div class="ps-item-text"><strong>Gap decision log:</strong> For each identified gap (serial tracking, assembly builds, custom field locations), AI generates a decision prompt: "Your business uses lot tracking for [X items]. Here are three ways to handle this in IES: [A] third-party WMS, [B] manual lot notes field, [C] defer to post-migration. Which fits your operation?" Each decision is logged, attributed, and used to configure the migration scope.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--gold)"></div><div class="ps-item-text"><strong>Report re-creation plan:</strong> AI analyses the customer's top 10 most-run QBDT reports (from usage data) and drafts the IES equivalent configuration for each. Finance team confirms. No customer arrives on Day 1 without their key reports already built.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-connector"></div>
+
+    <!-- STAGE 3: CO-DESIGN -->
+    <div class="pipeline-stage ps--design">
+      <div class="ps-left">
+        <div class="ps-num">03</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 3 · Collaborative Co-Design</div>
+        <div class="ps-title">Stakeholder workshops — configure IES to match the business, not the default template</div>
+        <div class="ps-body">
+          This is where the collaborative model differs most sharply from the current experience. Instead of 
+          the PS team configuring IES and presenting it to the customer, the configuration happens 
+          <strong>in sessions where the right domain expert is in the room.</strong> Inventory sessions 
+          include the warehouse manager. Project configuration sessions include the job site supervisor. 
+          Approval workflow sessions include the controller. Each session is pre-loaded by AI with the 
+          draft configuration from Stage 2 — the human session is for validation, exception handling, 
+          and decisions that require judgment.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-ps">PS team facilitates</span>
+          <span class="ps-actor actor-cust">Business stakeholders</span>
+          <span class="ps-actor actor-acct">Accountant</span>
+          <span class="ps-actor actor-ai">AI captures decisions</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--purple)"></div><div class="ps-item-text"><strong>Finance configuration session:</strong> Chart of Accounts sign-off, Dimensions design confirmation, approval workflow thresholds, period close permissions. Attendees: Controller, external accountant. Duration: 90 minutes with pre-work delivered by AI the day before.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--purple)"></div><div class="ps-item-text"><strong>Inventory and operations session:</strong> Item migration review, pricing rule recreation, inventory location mapping, gap decisions (serial/lot, assemblies). Attendees: Warehouse manager, purchasing manager, operations lead.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--purple)"></div><div class="ps-item-text"><strong>Project and job cost session:</strong> Customer:Job → Projects architecture, budget template creation, cost code mapping, profitability report rebuilding. Attendees: Project manager, job site supervisors, estimator.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--purple)"></div><div class="ps-item-text"><strong>Payroll and HR session:</strong> (Where applicable) Employee record review, YTD confirmation, deduction mapping, pay stub format orientation, Pay History walkthrough. Attendees: HR manager, payroll processor.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--purple)"></div><div class="ps-item-text"><strong>Decision capture:</strong> AI records every configuration decision made in each session — who decided what, when, and why. This becomes the <em>Configuration Rationale Document</em> — the single source of truth if a decision needs to be revisited post-go-live.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-connector"></div>
+
+    <!-- STAGE 4: AI-ASSISTED BUILD -->
+    <div class="pipeline-stage ps--build">
+      <div class="ps-left">
+        <div class="ps-num">04</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 4 · AI-Assisted Configuration Build</div>
+        <div class="ps-title">Automated IES configuration — from decisions to a working environment</div>
+        <div class="ps-body">
+          With the co-design decisions captured, AI builds the IES environment to match the agreed 
+          configuration. Chart of Accounts structure, Dimensions hierarchy, Project templates, pricing 
+          rules, approval workflows, custom fields, user roles, and report configurations are all 
+          applied programmatically from the decision log. The PS team reviews the output. The customer 
+          gets a configured IES environment — not a blank platform with default settings — before 
+          data migration begins.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-ai">AI builds</span>
+          <span class="ps-actor actor-ps">PS team reviews</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--teal)"></div><div class="ps-item-text"><strong>Industry template as baseline:</strong> IES environment is initialised with an industry-specific template (construction, distribution, professional services, manufacturing, non-profit) rather than a blank default. Industry-appropriate Chart of Accounts, report library, approval workflow patterns, and dimension structures are pre-loaded.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--teal)"></div><div class="ps-item-text"><strong>AI Insights seeding:</strong> IES's AI Insights is pre-configured with the KPIs most relevant to this industry — job cost variance for contractors, inventory turnover for distributors, utilisation rate for professional services. The customer opens IES on Day 1 and their dashboard already speaks their language.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--teal)"></div><div class="ps-item-text"><strong>Integration pipeline assembly:</strong> For gap items (serial tracking, WMS, manufacturing app), integration connections are established, configured, and tested during Stage 4 — not discovered as missing after go-live.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--teal)"></div><div class="ps-item-text"><strong>Data migration runs:</strong> With IES fully configured, the data migration engine runs against a prepared target environment — not a blank one. The paycheck migration, CoA migration, and list migrations run into an environment that already knows what to do with the data.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-connector"></div>
+
+    <!-- STAGE 5: VALIDATION -->
+    <div class="pipeline-stage ps--validate">
+      <div class="ps-left">
+        <div class="ps-num">05</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 5 · Stakeholder Validation</div>
+        <div class="ps-title">Role-by-role sign-off — every team confirms their workflows work</div>
+        <div class="ps-body">
+          Validation is not a single UAT session — it is a structured role-by-role confirmation where 
+          each stakeholder who participated in Stage 3 tests the specific workflows they depend on. 
+          The warehouse manager tests an inventory receipt and a build. The project manager runs a 
+          job cost report. The controller runs a trial balance and confirms the period close works. 
+          AI monitors the validation sessions and flags any discrepancy between what was decided in 
+          Stage 3 and what the environment produces.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-cust">All business stakeholders</span>
+          <span class="ps-actor actor-ps">PS team observes</span>
+          <span class="ps-actor actor-ai">AI monitors</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--grn)"></div><div class="ps-item-text"><strong>North-star scenario testing per role:</strong> Each stakeholder has a pre-defined primary scenario — the one task that, if it works correctly, proves their domain is migrated successfully. For the warehouse manager: receive a serialised item. For the project manager: run an estimated vs actual cost report for an in-progress job.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--grn)"></div><div class="ps-item-text"><strong>AI discrepancy detection:</strong> AI compares validation outputs against the Configuration Rationale Document decisions. "The job cost report you are running shows only labour costs — but in your Stage 3 session, you specified it should also include materials allocated to the job. This appears to be a configuration gap."</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--grn)"></div><div class="ps-item-text"><strong>Formal go/no-go per domain:</strong> Each domain (finance, operations, payroll, projects) has a named sign-off. The go-live decision is not made at the project level — it is made when every domain lead has signed off on their workflows. One domain not ready blocks go-live for that domain only — not for the whole business.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-connector"></div>
+
+    <!-- STAGE 6: LIVE + CONTINUOUS INTELLIGENCE -->
+    <div class="pipeline-stage ps--live">
+      <div class="ps-left">
+        <div class="ps-num">06</div>
+      </div>
+      <div class="ps-card">
+        <div class="ps-stage-label">Stage 6 · Go-Live + Continuous AI Intelligence</div>
+        <div class="ps-title">Go-live is the beginning of the relationship — not the end of the engagement</div>
+        <div class="ps-body">
+          The current migration experience ends at go-live. The proposed pipeline continues. AI monitors 
+          IES usage patterns for 90 days post-go-live and surfaces signals: which features are being 
+          underused relative to the customer's industry peers, which workflows are producing exceptions 
+          at a higher rate than expected, which IES capabilities — Projects, Dimensions, AI Insights — 
+          the team has not yet adopted. The goal is to ensure that the customer actually realises the 
+          IES capabilities they paid for, not just that their QBDT data is in a new location.
+        </div>
+        <div class="ps-actors">
+          <span class="ps-actor actor-ai">AI continuous monitor</span>
+          <span class="ps-actor actor-ps">PS team on standby</span>
+          <span class="ps-actor actor-cust">Customer team</span>
+        </div>
+        <div class="ps-items">
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--muted-2)"></div><div class="ps-item-text"><strong>Adoption signals:</strong> "Your team has been running payroll correctly for 30 days — well done. But your Projects feature has not been used yet. Based on your job cost history in QBDT, this feature would give you real-time profitability visibility per project. Here is a 10-minute setup guide for your Project Manager."</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--muted-2)"></div><div class="ps-item-text"><strong>AI Insights benchmarking:</strong> 90 days post-migration, IES has enough data to run industry benchmarks. "Your gross margin on construction projects is 18% — the median for your industry segment in your region is 24%. Here are the three job cost line items where your projects consistently run over budget."</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--muted-2)"></div><div class="ps-item-text"><strong>Capability expansion prompts:</strong> As the customer stabilises, AI surfaces the next level of IES capability relevant to their industry — Workforce management for a contractor, AP automation for a distributor, revenue recognition for a professional services firm. Migration becomes the entry point for ongoing value realisation.</div></div>
+          <div class="ps-item"><div class="ps-item-dot" style="background:var(--muted-2)"></div><div class="ps-item-text"><strong>Churn early-warning:</strong> Specific usage drops — Pay History not accessed, Projects not updated, Dimensions not being applied to transactions — trigger a PS team alert before the customer contacts support or considers reverting.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pipeline-stages -->
+
+  <!-- ═══════════════════════════════════════
+       SECTION 4 — INDUSTRY MODULES
+  ═══════════════════════════════════════ -->
+  <div class="sec-divider">
+    <span class="sec-divider-num">04 —</span>
+    <span class="sec-divider-title">Industry-specific migration modules</span>
+    <div class="sec-divider-line"></div>
+  </div>
+
+  <p class="prose">
+    The pipeline is not a single template applied to every customer. It is a <strong>configurable framework</strong> 
+    with industry modules that pre-load the right conceptual translation, gap handling, and IES 
+    configuration for each business type. The AI diagnostic in Stage 1 routes the customer to the 
+    correct module automatically.
+  </p>
+
+  <div class="industry-grid">
+
+    <div class="ind-card">
+      <div class="ind-card-head" style="background:linear-gradient(135deg,rgba(75,163,227,.08),transparent)">
+        <span class="ind-card-icon">🏗</span>
+        <div class="ind-card-industry" style="color:var(--blue)">Construction &amp; Contracting</div>
+        <div class="ind-card-title">Job cost hierarchy, WIP, subcontractor management</div>
+      </div>
+      <div class="ind-card-body">
+        <div class="ind-gap-label">Critical QBDT dependency</div>
+        <div class="ind-gap-text">Customer:Job hierarchy with phases and cost codes; estimated vs actual job cost reports; subcontractor certificate of insurance tracking; AIA billing formats; WIP schedules.</div>
+        <div class="ind-ies-label">IES capability</div>
+        <div class="ind-ies-text">Projects with budget templates, custom cost categories, Progress Invoicing, time &amp; expense tracking per project. Stronger than QBDT for active project visibility.</div>
+        <div class="ind-translation-label">Pipeline translation required</div>
+        <div class="ind-translation-text">Every QBDT job becomes an IES Project. Cost code structure maps to custom Project cost categories. Phase billing maps to Progress Invoicing milestones. This cannot be automated — it requires a 90-minute session with the estimator and project manager.</div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-card-head" style="background:linear-gradient(135deg,rgba(62,200,122,.06),transparent)">
+        <span class="ind-card-icon">📦</span>
+        <div class="ind-card-industry" style="color:var(--grn)">Wholesale Distribution</div>
+        <div class="ind-card-title">Multi-location inventory, price levels, purchase orders</div>
+      </div>
+      <div class="ind-card-body">
+        <div class="ind-gap-label">Critical QBDT dependency</div>
+        <div class="ind-gap-text">Multiple warehouse locations; per-customer price levels; quantity break pricing; bin management; serial/lot tracking; drop shipment workflows; vendor lead times.</div>
+        <div class="ind-ies-label">IES capability</div>
+        <div class="ind-ies-text">Multi-location inventory at warehouse level, custom pricing rules, advanced PO management, 850+ app integrations for WMS. Better reporting than QBDT on inventory performance.</div>
+        <div class="ind-translation-label">Pipeline translation required</div>
+        <div class="ind-translation-text">Warehouse locations map to IES Locations dimension. Price levels must be manually rebuilt as Price Rules. Serial/lot tracking requires a WMS integration decision made in Stage 2 — before migration scope is set. Bin management is a confirmed gap requiring a third-party app.</div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-card-head" style="background:linear-gradient(135deg,rgba(155,127,232,.07),transparent)">
+        <span class="ind-card-icon">⚙</span>
+        <div class="ind-card-industry" style="color:var(--purple)">Light Manufacturing</div>
+        <div class="ind-card-title">Assembly builds, BOM, production orders, WIP</div>
+      </div>
+      <div class="ind-card-body">
+        <div class="ind-gap-label">Critical QBDT dependency</div>
+        <div class="ind-gap-text">Assembly items with Bills of Materials; build/pending build orders; component shortfall alerts; WIP inventory valuation; FIFO costing; production cost tracking.</div>
+        <div class="ind-ies-label">IES capability</div>
+        <div class="ind-ies-text">IES does not have native BOM or production order management. This is the largest structural gap in the QBDT Enterprise → IES migration for manufacturers.</div>
+        <div class="ind-translation-label">Pipeline translation required</div>
+        <div class="ind-translation-text">Stage 1 AI diagnostic must detect assembly item usage and immediately surface the manufacturing gap. Stage 2 must present a manufacturing integration decision (Katana, SOS, Fishbowl) with clear scope and cost implications. Manufacturing customers without this conversation should not be migrated without an agreed integration plan.</div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-card-head" style="background:linear-gradient(135deg,rgba(45,191,184,.07),transparent)">
+        <span class="ind-card-icon">💼</span>
+        <div class="ind-card-industry" style="color:var(--teal)">Professional Services</div>
+        <div class="ind-card-title">Time tracking, project billing, utilisation, revenue recognition</div>
+      </div>
+      <div class="ind-card-body">
+        <div class="ind-gap-label">Critical QBDT dependency</div>
+        <div class="ind-gap-text">Time and expense tracking by client and project; billable vs non-billable hours; client profitability reporting; invoice creation from approved time; retainer management.</div>
+        <div class="ind-ies-label">IES capability</div>
+        <div class="ind-ies-text">Projects with time tracking, billable expense management, client profitability dashboards, revenue recognition workflows. This is arguably IES's strongest segment vs QBDT — significantly more capable.</div>
+        <div class="ind-translation-label">Pipeline translation required</div>
+        <div class="ind-translation-text">The opportunity gap: professional services firms that fully adopt IES Projects get better client visibility than QBDT ever offered. The pipeline session must reframe this as a capability upgrade — not a translation — and bring the engagement manager into the configuration session.</div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-card-head" style="background:linear-gradient(135deg,rgba(232,168,42,.07),transparent)">
+        <span class="ind-card-icon">🏥</span>
+        <div class="ind-card-industry" style="color:var(--gold)">Non-profit &amp; Healthcare-adjacent</div>
+        <div class="ind-card-title">Fund accounting, grant tracking, donor restrictions, compliance</div>
+      </div>
+      <div class="ind-card-body">
+        <div class="ind-gap-label">Critical QBDT dependency</div>
+        <div class="ind-gap-text">Class-based fund tracking; restricted vs unrestricted net assets; grant expense tracking; programme allocation; donor reporting; Form 990 preparation support.</div>
+        <div class="ind-ies-label">IES capability</div>
+        <div class="ind-ies-text">Dimensions for fund and programme tracking, project-based grant management, custom financial statement templates. Not a native fund accounting system — but capable with correct configuration.</div>
+        <div class="ind-translation-label">Pipeline translation required</div>
+        <div class="ind-translation-text">Each restricted fund maps to a Dimension value. Grant tracking moves to Projects. The Stage 3 session must include the development director, not just the accountant — they own the donor reporting requirements. Form 990 preparation still requires external support or a specialised integration.</div>
+      </div>
+    </div>
+
+  </div><!-- /industry-grid -->
+
+  <!-- ═══════════════════════════════════════
+       SECTION 5 — DESIGN PRINCIPLES
+  ═══════════════════════════════════════ -->
+  <div class="sec-divider">
+    <span class="sec-divider-num">05 —</span>
+    <span class="sec-divider-title">Design principles for the pipeline</span>
+    <div class="sec-divider-line"></div>
+  </div>
+
+  <div class="principles">
+    <div class="principle">
+      <div class="principle-num">P.01</div>
+      <div class="principle-title">Name the gaps before the customer discovers them</div>
+      <div class="principle-body">Every known feature parity gap — serial tracking, assembly manufacturing, bin management, memorised reports — must be surfaced by the AI diagnostic in Stage 1, before any commitment is made. A customer who hears about a gap from Intuit before migration has a choice. A customer who discovers it post-migration has a grievance.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">P.02</div>
+      <div class="principle-title">Route each decision to the person with the relevant knowledge</div>
+      <div class="principle-body">The warehouse manager knows how their inventory is organised. The project manager knows how jobs are structured. The controller knows how periods are closed. Configuration decisions made without the right domain expert produce configurations that are technically valid but operationally wrong. The pipeline routes each decision to the person who should make it.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">P.03</div>
+      <div class="principle-title">AI does the knowing. Humans make the judgment calls.</div>
+      <div class="principle-body">AI is faster and more thorough than any PS team at reading a QBDT file, classifying its operational patterns, and generating configuration drafts. But AI cannot replace the judgment of a warehouse manager who knows that "Warehouse A" is actually a truck, not a building. The pipeline is designed so AI exhausts what it can automate, and humans only see decisions that require judgment.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">P.04</div>
+      <div class="principle-title">Industry-specific language, not platform-generic language</div>
+      <div class="principle-body">A contractor should never hear the word "Dimensions" in their migration. They should hear "how do you want to track costs per job phase?" A distributor should never hear "Projects" — they should hear "do you want to track profitability per customer account?" The translation layer is not just technical — it is linguistic. IES features must be explained in the vocabulary of the customer's industry.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">P.05</div>
+      <div class="principle-title">Go-live is an entry point, not a finish line</div>
+      <div class="principle-body">The current migration experience treats go-live as delivery. The proposed pipeline treats go-live as the beginning of a 90-day IES adoption period. The most valuable IES capabilities — Projects, AI Insights, Dimensions-based reporting, approval workflows — are not used on Day 1. They are adopted gradually as the team builds confidence. The pipeline is designed to accelerate that adoption through continuous AI-guided nudges.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">P.06</div>
+      <div class="principle-title">The migration scope adapts to the business — not vice versa</div>
+      <div class="principle-body">A light manufacturer with complex assembly workflows and a professional services firm with simple time billing are not the same migration. The pipeline's industry module system means the scope, session structure, integration requirements, and success criteria are customised per customer type in Stage 1. No customer is forced through a workflow designed for a different business model.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       MANIFESTO
+  ═══════════════════════════════════════ -->
+  <div class="manifesto">
+    <div class="manifesto-label">The reframe</div>
+    <div class="manifesto-title">
+      Stop selling a migration.<br>
+      Start selling an <em>operational upgrade.</em>
+    </div>
+    <div class="manifesto-body">
+      The customers who get the most from IES are not the ones who migrated their QBDT data. 
+      They are the ones who understood that IES is a fundamentally different kind of business 
+      operating system — one that offers real-time project profitability, AI-generated cash 
+      flow insights, collaborative approval workflows, and industry benchmarking — and who 
+      then rebuilt their operational model to take advantage of it.
+    </div>
+    <div class="manifesto-body">
+      The gap is not that IES lacks features. The gap is that <strong>the migration experience does 
+      not create the understanding required to use those features.</strong> A contractor who migrates 
+      and never learns about Projects will run IES like a worse version of QBDT. A contractor 
+      who understands that Projects is a real-time job cost monitor — not a data container — 
+      will make decisions faster, catch cost overruns earlier, and bill more accurately.
+    </div>
+    <div class="manifesto-body">
+      The collaborative pipeline proposed here is the mechanism for creating that understanding 
+      at scale — using AI to do the diagnostic and translation work that no PS team can afford 
+      to do manually for every customer, and using structured stakeholder sessions to ensure 
+      that the people who will actually use IES are the ones who configure it.
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-txt"><strong>Intuit Enterprise Suite</strong> · QBDT Enterprise → IES Migration · Critical Workflow Gaps &amp; Collaborative Pipeline · Strategic Brief</div>
+  <nav class="footer-links">
+    <a class="footer-link" href="index.html">← Strategy index</a>
+    <a class="footer-link" href="ies-migration-checklist.html">Migration checklist</a>
+    <a class="footer-link" href="prd-requirements-gap-analysis.html">PRD gap analysis</a>
+    <a class="footer-link" href="https://github.com/asoman2/uxStrategies" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</footer>
+
+</body>
+</html>
